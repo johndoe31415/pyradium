@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>${presentation.title}</title>
+	</head>
+
+	<body>
+		%for slide in presentation.slides:
+		${slide.render()}
+		%endfor
+	</body>
+</html>

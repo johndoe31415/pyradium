@@ -1,0 +1,49 @@
+%if slide.slide_type == "intro":
+<div class="slide title ${slide.style}">
+	${meta.title}
+</div>
+
+%elif slide.slide_type == "toc":
+<div class="slide ${slide.style}">
+	%if slide.subsection != "Undefined subsection":
+	<div class="section">${slide.section} – ${slide.subsection}</div>
+	%else:
+	<div class="section">${slide.section}</div>
+	%endif
+	<div class="title">${slide.title}</div>
+	<div class="content">${slide.content}</div>
+	<div class="pageno">${slide.slideno}</div>
+	<div class="footer">
+		%if meta.classification == "confidential":
+		<span class="confidential">Vertraulich</span> |
+		%elif meta.classification == "internal":
+		<span class="confidential">Intern</span> |
+		%endif
+	</div>
+</div>
+
+%elif slide.slide_type == "default":
+<div class="slide ${slide.style}">
+	%if slide.subsection != "Undefined subsection":
+	<div class="section">${slide.section} – ${slide.subsection}</div>
+	%else:
+	<div class="section">${slide.section}</div>
+	%endif
+	<div class="title">${slide.title}</div>
+	<div class="content">${slide.content}</div>
+	<div class="pageno">${slide.slideno}</div>
+	<div class="footer">
+		%if meta.classification == "confidential":
+		<span class="confidential">Vertraulich</span> |
+		%elif meta.classification == "internal":
+		<span class="confidential">Intern</span> |
+		%endif
+	</div>
+</div>
+
+%elif slide.slide_type == "end":
+<div class="slide title ${slide.style}">
+	${slide.content}
+</div>
+
+%endif

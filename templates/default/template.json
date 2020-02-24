@@ -1,0 +1,5 @@
+{
+	"template_name": "pybeamer default template",
+	"template_author": "Johannes Bauer",
+	"css": [ "default.css" ]
+}

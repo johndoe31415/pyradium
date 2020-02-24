@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<presentation xmlns:s="http://github.com/johndoe31415/pybeamer">
+	<section>Second Topic</section>
+	<subsection>Introduction to second topic</subsection>
+	<slide title="Subtopic">
+		<ul>
+			<li>This is a test!</li>
+			<s:pause />
+			<li>Second slide here!</li>
+		</ul>
+	</slide>
+</presentation>
