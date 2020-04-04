@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+#
+
+which inotifywait >/dev/null 2>&1
+if [ "$?" != "0" ]; then
+	echo "inotify-tools not installed."
+	exit 1
+fi
+
+if [ "$1" == "" ]; then
+	echo "$0 [pybeamer options]"
+	exit 1
+fi
+
+while true; do
+	./pybeamer "$@"
+	inotifywait -e close_nowrite examples/*.xml templates/base/* templates/default/* *.py pybeamer
+done

@@ -2,12 +2,28 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>${presentation.title}</title>
+		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
+		<link rel="stylesheet" href="pybeamer.css">
+		%for css_filename in renderer.css_filenames:
+		<link rel="stylesheet" href="${css_filename}">
+		%endfor
 	</head>
 
 	<body>
+		<div class="menu">
+			<button id="btn_start">Start</button>
+			<button id="btn_stop">Stop</button>
+		</div>
+
 		%for slide in presentation.slides:
-		${slide.render()}
+		${renderer.render_slide(slide = slide, presentation = presentation)}
 		%endfor
+
+		<script type="module">
+			import {Presentation} from "./pybeamer.js";
+			const presentation = new Presentation();
+			document.querySelector("#btn_start").addEventListener("click", (event) => presentation.start());
+			document.querySelector("#btn_stop").addEventListener("click", (event) => presentation.stop());
+		</script>
 	</body>
 </html>

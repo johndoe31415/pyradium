@@ -8,7 +8,10 @@
 		<schedule>14:00-14:45</schedule>
 	</meta>
 
+	<section>Introduction</section>
+	<subsection>Nomenclature</subsection>
 	<slide type="toc" begin="1" end="2.3" />
+
 	<slide title="Intro Slide">
 		<ul>
 			<li>This is a test!</li>
@@ -16,7 +19,7 @@
 			<li>Second slide here!</li>
 		</ul>
 	</slide>
-	
+
 	<slide title="Intro Slide">
 		<ul>
 			<li>This is a test!</li>
@@ -26,10 +29,19 @@
 	</slide>
 
 	<include src="example_sub.xml" />
-	
+
 	<slide title="Second Slide">
 		<ul>
 			<li>Second slide</li>
 		</ul>
+	</slide>
+
+	<slide title="leftright">
+		<s:content name="left">
+			This is on the left side.
+		</s:content>
+		<s:content name="right">
+			This is on the right side.
+		</s:content>
 	</slide>
 </presentation>

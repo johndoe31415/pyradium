@@ -23,18 +23,19 @@ import os
 import xml.etree.ElementTree
 from Slide import Slide
 from Tools import XMLTools
+from Metadata import Metadata
 
 class Presentation():
 	def __init__(self, filename):
 		self._filename = filename
 		self._tree = xml.etree.ElementTree.parse(self._filename)
 		self._xml = self._tree.getroot()
-		self._meta = self._xml.findall("meta")
+		self._meta = Metadata.from_xmlnode(self._xml.find("meta"))
 		self._slides = self._parse_slides()
 
 	@property
-	def title(self):
-		return self._xml.meta
+	def meta(self):
+		return self._meta
 
 	@property
 	def filename(self):

@@ -20,24 +20,50 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
 import sys
+import contextlib
+import fractions
+import argparse
 from FriendlyArgumentParser import FriendlyArgumentParser
 from Presentation import Presentation
 from Renderer import Renderer
 
+def parse_aspect(text):
+	aspect = text.split(":", maxsplit = 1)
+	if len(aspect) != 2:
+		raise argparse.ArgumentTypeError("aspect ratio must be given in form \"width:height\"")
+	try:
+		width = int(aspect[0])
+		height = int(aspect[1])
+		return fractions.Fraction(width, height)
+	except ValueError:
+		raise argparse.ArgumentTypeError("aspect ratio width and height values must be integers")
+
 parser = FriendlyArgumentParser(description = "Render a pybeamer template.")
-parser.add_argument("-a", "--aspect", metavar = "x:y", default = "16:9", help = "Aspect ratio to use. Defaults to %(default)s.")
+parser.add_argument("-a", "--aspect", metavar = "x:y", type = parse_aspect, default = "16:9", help = "Aspect ratio to use. Defaults to %(default)s.")
 parser.add_argument("-m", "--mode", choices = [ "default", "handout" ], default = "default", help = "Mode in which the slides should be rendered. Can be either %(choices)s, defaults to %(default)s.")
-parser.add_argument("--template-dir", metavar = "path", default = "default", help = "Source directory in which all templates are located. Defaults to the pybeamer/templates directory.")
-parser.add_argument("-t", "--template", metavar = "name", default = "default", help = "Name of the template that should be rendered.")
+parser.add_argument("--template-dir", metavar = "path", default = None, help = "Source directory in which all templates are located. Defaults to the pybeamer/templates directory.")
+parser.add_argument("-t", "--template", metavar = "name", default = "default", help = "Name of the template that should be rendered. Defaults to \"%(default)s\".")
 parser.add_argument("-o", "--output", metavar = "path", default = "rendered", help = "Output directory in which the rendered template should be placed.")
 parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite the output directory even if it already exists.")
 parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 parser.add_argument("presentation_xml", metavar = "presentation_xml", help = "Source file that should be rendered.")
 args = parser.parse_args(sys.argv[1:])
 
+if args.template_dir is None:
+	template_dir = os.path.dirname(os.path.realpath(__file__)) + "/templates"
+else:
+	template_dir = os.path.realpath(args.template_dir)
+
+if os.path.exists(args.output) and not args.force:
+	print("Refusing to overwrite output directory: %s" % (args.output), file = sys.stderr)
+	sys.exit(1)
+
+with contextlib.suppress(FileExistsError):
+	os.makedirs(args.output)
+
 presentation = Presentation(args.presentation_xml)
-#presentation.dump()
-renderer = Renderer()
-rendered_master = renderer.render(presentation)
-print(rendered_master)
+renderer = Renderer(template_dir = template_dir, template_name = args.template, aspect_ratio = args.aspect)
+renderer.render(presentation, args.output)
+renderer.copy_style_files(args.output)

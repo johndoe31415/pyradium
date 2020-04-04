@@ -1,49 +1,39 @@
 %if slide.slide_type == "intro":
-<div class="slide title ${slide.style}">
+<div class="slide slidetype-${slide.slide_type}">
 	${meta.title}
 </div>
 
 %elif slide.slide_type == "toc":
-<div class="slide ${slide.style}">
-	%if slide.subsection != "Undefined subsection":
-	<div class="section">${slide.section} – ${slide.subsection}</div>
-	%else:
-	<div class="section">${slide.section}</div>
-	%endif
-	<div class="title">${slide.title}</div>
-	<div class="content">${slide.content}</div>
-	<div class="pageno">${slide.slideno}</div>
-	<div class="footer">
-		%if meta.classification == "confidential":
-		<span class="confidential">Vertraulich</span> |
-		%elif meta.classification == "internal":
-		<span class="confidential">Intern</span> |
-		%endif
-	</div>
+<div class="slide slidetype-${slide.slide_type}">
+TODO replace me
 </div>
 
 %elif slide.slide_type == "default":
-<div class="slide ${slide.style}">
+<div class="slide slidetype-${slide.slide_type}">
 	%if slide.subsection != "Undefined subsection":
 	<div class="section">${slide.section} – ${slide.subsection}</div>
 	%else:
 	<div class="section">${slide.section}</div>
 	%endif
 	<div class="title">${slide.title}</div>
-	<div class="content">${slide.content}</div>
-	<div class="pageno">${slide.slideno}</div>
+	<div class="content">${slide.content()}</div>
+	<div class="pageno">${slide.slide_number}</div>
 	<div class="footer">
-		%if meta.classification == "confidential":
-		<span class="confidential">Vertraulich</span> |
-		%elif meta.classification == "internal":
-		<span class="confidential">Intern</span> |
+		%if meta.get("classification") == "strictly_confidential":
+		<span class="classification">Strictly Confidential</span> |
+		%elif meta.get("classification") == "confidential":
+		<span class="classification">Confidential</span> |
+		%elif meta.get("classification") == "internal":
+		<span class="classification">Internal</span> |
+		%elif meta.get("classification") is not None:
+		<span class="classification">Undefined classification "${meta.get("classification")}"</span> |
 		%endif
 	</div>
 </div>
 
 %elif slide.slide_type == "end":
-<div class="slide title ${slide.style}">
-	${slide.content}
+<div class="slide slidetype-${slide.slide_type}">
+	${slide.content()}
 </div>
 
 %endif

@@ -19,43 +19,17 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-class Slide():
-	def __init__(self, xmlnode, presentation):
-		assert(xmlnode.tag == "slide")
-		self._xml = xmlnode
-		self._presentation = presentation
-		self._slide_type = self._xml.attrib.get("type", "default")
-		self._slide_number = None
+class Metadata():
+	def __init__(self, metadata):
+		self._data = metadata
 
-	@property
-	def presentation(self):
-		return self._presentation
+	def get(self, key, default_value = None):
+		return self._data.get(key, default_value)
 
-	@property
-	def section(self):
-		pass
-
-	@property
-	def subsection(self):
-		pass
-
-	@property
-	def title(self):
-		pass
-
-	@property
-	def slide_type(self):
-		return self._slide_type
-
-	@property
-	def slide_number(self):
-		return self._slide_number
-
-	def content(self, content_name = None):
-		pass
-
-	def dump(self):
-		print("Slide<%s>" % (self.slide_type))
-
-	def __repr__(self):
-		return "Slide<%s>" % (self.slide_type)
+	@classmethod
+	def from_xmlnode(cls, node):
+		metadata = { }
+		if node is not None:
+			for child in node.getchildren():
+				metadata[child.tag] = child.text
+		return cls(metadata)
