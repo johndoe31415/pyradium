@@ -30,7 +30,7 @@ class XMLTools():
 		spc = ("  " * indent)
 		attr_str = "" if (len(node.attrib) == 0) else str(node.attrib)
 		print("%s%s %s" %  (spc, node.tag, attr_str))
-		for child in node.getchildren():
+		for child in node:
 			cls.dump(child, indent + 1)
 
 	@classmethod
@@ -40,4 +40,19 @@ class XMLTools():
 		tree = xml.etree.ElementTree.ElementTree(node)
 		f = io.BytesIO()
 		tree.write(f)
-		print(f.getvalue().decode())
+		return f.getvalue().decode()
+
+	@classmethod
+	def dump_innerxml(cls, node):
+		doc = [ ]
+		if node.text is not None:
+			doc.append(node.text)
+		for child in node:
+			doc.append(cls.dumpxml(child))
+			if child.tail is not None:
+				doc.append(child.tail)
+		return "".join(doc)
+
+	@classmethod
+	def remove_namespace(cls, node, ns):
+		return node

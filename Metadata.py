@@ -38,6 +38,6 @@ class Metadata():
 	def from_xmlnode(cls, node):
 		metadata = { }
 		if node is not None:
-			for child in node.getchildren():
+			for child in node:
 				metadata[child.tag] = child.text
 		return cls(metadata)

@@ -47,7 +47,7 @@ class Presentation():
 
 	def _parse_slides(self):
 		slides = [ ]
-		for child in self._xml.getchildren():
+		for child in self._xml:
 			if child.tag == "slide":
 				slides.append(Slide(child, self))
 			elif child.tag == "include":

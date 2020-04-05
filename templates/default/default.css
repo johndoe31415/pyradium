@@ -78,3 +78,15 @@ div.slidetype-base > div.footer > div.slide-number {
 
 div.slidetype-base > div.footer > div.slide-timing {
 }
+
+div.slidetype-leftright div.content-left {
+	position: relative;
+	float: left;
+	width: 50%;
+}
+
+div.slidetype-leftright div.content-right {
+	position: relative;
+	float: right;
+	width: 50%;
+}

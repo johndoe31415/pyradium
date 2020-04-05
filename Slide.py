@@ -19,45 +19,43 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from Tools import XMLTools
+
+class UndefinedContentException(Exception): pass
+
 class Slide():
 	def __init__(self, xmlnode, presentation):
 		assert(xmlnode.tag == "slide")
 		self._xml = xmlnode
 		self._presentation = presentation
-		self._slide_type = self._xml.attrib.get("type", "default")
-		self._number = None
+		if self.slide_type is None:
+			self._xml.attrib["type"] = "default"
+
+	def clone(self):
+		xmlnode = XMLTools.clone_element(self._xml)
+		return Slide(xmlnode = xmlnode, presentation = self.presentation)
 
 	@property
 	def presentation(self):
 		return self._presentation
 
 	@property
-	def section(self):
-		pass
-
-	@property
-	def subsection(self):
-		pass
-
-	@property
-	def title(self):
-		pass
-
-
-	@property
-	def timing(self):
-		pass
-
-	@property
 	def slide_type(self):
-		return self._slide_type
+		return self._xml.attrib.get("type")
 
-	@property
-	def number(self):
-		return self._number
+	def __getattr__(self, key):
+		return self._xml.attrib.get(key)
 
 	def content(self, content_name = None):
-		pass
+		if content_name is None:
+			# All inner
+			return XMLTools.dump_innerxml(self._xml)
+		else:
+			for child in self._xml.findall("{http://github.com/johndoe31415/pybeamer}content"):
+				if child.attrib.get("name") == content_name:
+					return XMLTools.dump_innerxml(child)
+			else:
+				raise UndefinedContentException("Template tried to access content named '%s', but no such content defined in slide." % (content_name))
 
 	def dump(self):
 		print("Slide<%s>" % (self.slide_type))

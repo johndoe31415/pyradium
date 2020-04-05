@@ -16,7 +16,7 @@
 	<subsection>Nomenclature</subsection>
 	<slide type="toc" begin="1" end="2.3" />
 
-	<slide title="Intro Slide">
+	<slide title="Basic Slide Title">
 		<ul>
 			<li>This is a test!</li>
 			<s:pause />
@@ -24,7 +24,7 @@
 		</ul>
 	</slide>
 
-	<slide title="Intro Slide">
+	<slide title="That's the second slide">
 		<ul>
 			<li>This is a test!</li>
 			<s:clear />
@@ -34,13 +34,14 @@
 
 	<include src="example_sub.xml" />
 
-	<slide title="Second Slide">
+	<subsection>After Include Subsection</subsection>
+	<slide title="After include">
 		<ul>
 			<li>Second slide</li>
 		</ul>
 	</slide>
 
-	<slide title="Left/Right Slide" type="leftright">
+	<slide title="Left/Right slide" type="leftright">
 		<s:content name="left">
 			This is on the left side.
 		</s:content>
