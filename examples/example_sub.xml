@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <presentation xmlns:s="http://github.com/johndoe31415/pybeamer">
-	<section>Second Topic</section>
-	<subsection>Introduction to second topic</subsection>
-	<slide title="Subtopic">
+	<section>Included Topic</section>
+	<subsection>Introduction to included topic</subsection>
+	<slide title="Subtopic Title">
 		<ul>
 			<li>This is a test!</li>
 			<s:pause />

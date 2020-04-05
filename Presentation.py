@@ -24,13 +24,15 @@ import xml.dom.minidom
 from Slide import Slide
 from Tools import XMLTools
 from Metadata import Metadata
+from TOC import TOC
 
 class Presentation():
 	def __init__(self, filename):
 		self._filename = filename
-		self._dom = xml.dom.minidom.parse(self._filename)
-		self._meta = Metadata.from_xmlnode(XMLTools.child_tagname(self._dom, ("presentation", "meta")))
-		self._slides = self._parse_slides()
+		self._meta = None
+		self._toc = TOC()
+		self._slides = [ ]
+		self._parse(self._filename)
 
 	@property
 	def meta(self):
@@ -44,18 +46,32 @@ class Presentation():
 	def slides(self):
 		return self._slides
 
-	def _parse_slides(self):
-		slides = [ ]
-		for child in XMLTools.child_tagname(self._dom, "presentation").childNodes:
+	def _parse(self, filename):
+		dom = xml.dom.minidom.parse(filename)
+		if self._meta is None:
+			self._meta = Metadata.from_xmlnode(XMLTools.child_tagname(dom, ("presentation", "meta")))
+
+		for child in XMLTools.child_tagname(dom, "presentation").childNodes:
 			if child.nodeType != child.ELEMENT_NODE:
 				continue
 			if child.tagName == "slide":
-				slides.append(Slide(child))
+				slide = Slide(child)
+				slide.set_meta("section", self._toc.section)
+				slide.set_meta("subsection", self._toc.subsection)
+				slide.set_meta("slideno", len(self._slides) + 1)
+				self._slides.append(slide)
 			elif child.tagName == "include":
 				dirname = os.path.dirname(self._filename)
-				sub_presentation = Presentation(dirname + "/" + child.getAttribute("src"))
-				slides += sub_presentation.slides
-		return slides
+				sub_presentation = dirname + "/" + child.getAttribute("src")
+				self._parse(sub_presentation)
+			elif child.tagName == "section":
+				self._toc.section = XMLTools.inner_text(child)
+			elif child.tagName == "subsection":
+				self._toc.subsection = XMLTools.inner_text(child)
+
+		for slide in self._slides:
+			slide.set_meta("slidecnt", len(self._slides))
+			slide.set_meta("toc", self._toc)
 
 	def dump(self):
 		for (slideno, slide) in enumerate(self._slides, 1):

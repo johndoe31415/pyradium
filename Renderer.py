@@ -23,22 +23,31 @@ import os
 import json
 import shutil
 import math
+import contextlib
 import mako.lookup
+import pygments
+import textwrap
+import xml.dom.minidom
 from Tools import XMLTools
+from LatexFormula import LatexFormula
 
 class PresentationRenderingError(Exception): pass
 
 class Renderer():
-	def __init__(self, template_dir, template_name, aspect_ratio, rendering_mode = "presentation"):
+	def __init__(self, template_dir, template_name, aspect_ratio, output_dir, rendering_mode = "presentation"):
 		self._template_dir = template_dir
 		self._template_name = template_name
 		self._aspect_ratio = aspect_ratio
+		self._output_dir = output_dir
 		self._rendering_mode = rendering_mode
 		self._lookup = mako.lookup.TemplateLookup(self._template_dir, input_encoding = "utf-8", strict_undefined = True)
 		self._slide_template = self._lookup.get_template(self._template_name + "/template.html")
 		with open(self._template_dir + "/" + self._template_name + "/template.json") as f:
 			self._slide_template_definitions = json.load(f)
 		self._geometry = self._calculate_geometry(self._aspect_ratio)
+		self._cache_dir = os.path.expanduser("~/.cache/pybeamer")
+		with contextlib.suppress(FileExistsError):
+			os.makedirs(self._cache_dir)
 
 	@property
 	def geometry(self):
@@ -67,20 +76,49 @@ class Renderer():
 			raise PresentationRenderingError(msg)
 		return self._slide_template.render(renderer = self, slide = slide, meta = meta, error = error_fnc)
 
-	def _render_tag_content(self, node):
-		pass
-
-	def _render_tag_pause(self, node):
-		pass
-
-	def _render_tag_clear(self, node):
-		pass
+	def _render_tag_content(self, node): pass
+	def _render_tag_pause(self, node): pass
 
 	def _render_tag_debug(self, node):
 		print("Debugging tag encountered: %s" % (node))
-#		xml.tag = "foo"
-#		root.remove(xml)
-#		print(dir(xml))
+		XMLTools.remove_node(node)
+
+	def _render_tag_tex(self, node):
+		formula = LatexFormula(XMLTools.inner_text(node))
+		rendered = formula.render(cache_dir = self._cache_dir)
+		local_filename = "latex_%s.png" % (rendered.cachekey)
+		rendered.write_png(self._output_dir + "/" + local_filename)
+		img = node.ownerDocument.createElement("img")
+		img.setAttribute("src", local_filename)
+		XMLTools.replace_node(node, img)
+		print("LaTeX formula: %s" % (formula))
+
+	def _render_tag_code(self, node):
+		lexer = pygments.lexers.get_lexer_by_name(node.getAttribute("lang"))
+		code = XMLTools.inner_text(node).rstrip()
+		if code.startswith("\n"):
+			code = code[1:]
+		code = textwrap.dedent(code)
+		highlighted_code = pygments.highlight(code, lexer, pygments.formatters.HtmlFormatter())
+		div_node = xml.dom.minidom.parseString(highlighted_code).firstChild
+		XMLTools.replace_node(node, div_node)
+
+	def _render_tag_term(self, node):
+		# TODO implement me
+		pass
+
+	def _render_tag_emo(self, node):
+		# TODO implement me
+		pass
+
+	def _render_tag_enq(self, node):
+		return self._render_tag_enquote(node)
+
+	def _render_tag_enquote(self, node):
+		# TODO typographic
+		text = "\"" + XMLTools.inner_text(node) + "\""
+		text_node = node.ownerDocument.createText(text)
+		XMLTools.replace_node(node, text_node)
 
 	def _transform_slide_substitutions(self, dom):
 		def visit(node):
@@ -93,11 +131,25 @@ class Renderer():
 				handler(node)
 		XMLTools.walk_elements(dom, visit)
 
-	def _transform_slide(self, slide):
-		print(slide)
-		self._transform_slide_substitutions(slide.dom)
+	def _apply_slide_pauses(self, slide):
+		resulting_slides = [ ]
+		pause_tags = slide.dom.getElementsByTagNameNS("http://github.com/johndoe31415/pybeamer", "pause")
+		for (pause_index, pause_tag) in enumerate(pause_tags):
+			partial_slide = slide.clone()
+			resulting_slides.append(partial_slide)
 
-		return [ slide ]
+			pause_tags = partial_slide.dom.getElementsByTagNameNS("http://github.com/johndoe31415/pybeamer", "pause")
+			last_pause = pause_tags[pause_index]
+			XMLTools.remove_siblings_after(last_pause)
+			for tag in pause_tags:
+				XMLTools.remove_node(tag)
+		resulting_slides.append(slide)
+		return resulting_slides
+
+	def _transform_slide(self, slide):
+		self._transform_slide_substitutions(slide.dom)
+		slides = self._apply_slide_pauses(slide)
+		return slides
 
 	def _transform_presentation(self, presentation):
 		transformed_slides = [ ]
@@ -105,10 +157,10 @@ class Renderer():
 			transformed_slides += self._transform_slide(slide)
 		return transformed_slides
 
-	def render(self, presentation, output_dir):
+	def render(self, presentation):
 		slides = self._transform_presentation(presentation)
-		self._render_static_file(slides, presentation.meta, "base/master_presentation.html", output_dir + "/index.html")
-		self._render_static_file(slides, presentation.meta, "base/pybeamer.css", output_dir + "/pybeamer.css")
+		self._render_static_file(slides, presentation.meta, "base/master_presentation.html", self._output_dir + "/index.html")
+		self._render_static_file(slides, presentation.meta, "base/pybeamer.css", self._output_dir + "/pybeamer.css")
 
 	def _render_static_file(self, slides, meta, input_filename, output_filename):
 		master = self._lookup.get_template(input_filename)
@@ -116,14 +168,14 @@ class Renderer():
 		with open(output_filename, "w") as f:
 			f.write(rendered)
 
-	def _copy_static_style_file(self, subdir, filename, output_dir):
+	def _copy_static_style_file(self, subdir, filename):
 		src_filename = self._template_dir + "/" + subdir + "/" + filename
-		dst_filename = output_dir + "/" + os.path.basename(filename)
+		dst_filename = self._output_dir + "/" + os.path.basename(filename)
 		shutil.copy(src_filename, dst_filename)
 
-	def copy_style_files(self, output_dir):
-		self._copy_static_style_file("base", "pybeamer.js", output_dir)
+	def copy_style_files(self):
+		self._copy_static_style_file("base", "pybeamer.js")
 		for css_filename in self._slide_template_definitions.get("css", [ ]):
-			self._copy_static_style_file(self._template_name, css_filename, output_dir)
+			self._copy_static_style_file(self._template_name, css_filename)
 		for static_filename in self._slide_template_definitions.get("static", [ ]):
-			self._copy_static_style_file(self._template_name, static_filename, output_dir)
+			self._copy_static_style_file(self._template_name, static_filename)

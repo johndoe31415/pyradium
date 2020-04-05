@@ -37,11 +37,19 @@ class XMLTools():
 
 	@classmethod
 	def remove_node(cls, node):
-		node.parentNode.removeChild(node)
+		if node.parentNode is not None:
+			node.parentNode.removeChild(node)
 
 	@classmethod
 	def replace_node(cls, node, replacement):
 		node.parentNode.replaceChild(replacement, node)
+
+	@classmethod
+	def remove_siblings_after(cls, node):
+		while node is not None:
+			next_node = node.nextSibling
+			cls.remove_node(node)
+			node = next_node
 
 	@classmethod
 	def inner_text(cls, node):
@@ -122,3 +130,7 @@ class XMLTools():
 				new_tagname = assigned_namespaces[node.namespaceURI] + ":" + tag
 			node.tagName = new_tagname
 		cls.walk_elements(node, visit)
+
+	@classmethod
+	def inner_toxml(cls, node):
+		return "".join(child.toxml() for child in node.childNodes)

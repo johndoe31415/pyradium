@@ -25,7 +25,7 @@ import tempfile
 import hashlib
 import subprocess
 
-_TEX_TEMPLATE = r"""\
+_TEX_TEMPLATE = r"""
 \documentclass[preview,border=1mm,varwidth=true]{standalone}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -43,6 +43,15 @@ class RenderedLatexFormula():
 		self._png_data = png_data
 		self._baseline = baseline
 		self._rendering_parameters = rendering_parameters
+
+	@classmethod
+	def calculate_cachekey(cls, formula, rendering_parameters):
+		input_data = formula + " || " + str(sorted(rendering_parameters.items()))
+		return hashlib.md5(input_data.encode("utf-8")).hexdigest()
+
+	@property
+	def cachekey(self):
+		return self.calculate_cachekey(self._formula, self._rendering_parameters)
 
 	@property
 	def baseline(self):
@@ -78,10 +87,6 @@ class LatexFormula():
 	def formula(self):
 		return self._formula
 
-	def _get_cachekey(self, rendering_parameters):
-		input_data = self._formula + " || " + str(sorted(rendering_parameters.items()))
-		return hashlib.md5(input_data.encode("utf-8")).hexdigest()
-
 	def _find_baseline(self, png_filename, xoffset):
 		crop_output = subprocess.check_output([ "convert", "%s[1x+%d+0]" % (png_filename, xoffset), "-trim", "info:-" ])
 		crop_output = crop_output.decode().split()
@@ -97,7 +102,7 @@ class LatexFormula():
 		return baseline_y_from_bottom
 
 	def _do_render(self, rendering_parameters):
-		with tempfile.TemporaryDirectory(prefix = "pybeamer_eqn_") as tex_dir:
+		with tempfile.TemporaryDirectory(prefix = "pybeamer_formula_") as tex_dir:
 			# Formula to PDF first using pdflatex
 			tex_filename = tex_dir + "/formula.tex"
 			pdf_filename = tex_dir + "/formula.pdf"
@@ -137,7 +142,7 @@ class LatexFormula():
 			"short":			short,
 		}
 		if cache_dir is not None:
-			cachekey = self._get_cachekey(rendering_parameters)
+			cachekey = RenderedLatexFormula.calculate_cachekey(self.formula, rendering_parameters)
 			cachefile = cache_dir + "/latex_" + cachekey + ".json"
 			try:
 				rendered = RenderedLatexFormula.read_jsonfile(cachefile)
@@ -151,7 +156,10 @@ class LatexFormula():
 
 		return rendered
 
+	def __str__(self):
+		return "LaTeX(%s)" % (self.formula)
+
 if __name__ == "__main__":
-	eqn = LatexFormula("y^2 = x^3 + ax + b")
-	eqn.render(cache_dir = "foo/").write_png("formula_long.png")
-	eqn.render(cache_dir = "foo/", short = True).write_png("formula_short.png")
+	tex = LatexFormula("y^2 = x^3 + ax + b")
+	tex.render(cache_dir = "foo/").write_png("formula_long.png")
+	tex.render(cache_dir = "foo/", short = True).write_png("formula_short.png")

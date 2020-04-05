@@ -16,11 +16,13 @@
 	<subsection>Nomenclature</subsection>
 	<slide type="toc" begin="1" end="2.3" />
 
-	<slide title="Basic Slide Title">
+	<slide title="Pausing Slides">
 		<ul>
-			<li>This is a test!</li>
+			<li>This is a test! Pause1</li>
 			<s:pause />
-			<li>Second slide here!</li>
+			<li>After the first pause! Pause2</li>
+			<s:pause />
+			<li>After the second pause! Pause3</li>
 		</ul>
 	</slide>
 
@@ -28,8 +30,7 @@
 		<ul>
 			<li>This is a test!</li>
 			<s:debug>This is debugging text.</s:debug>
-			<s:clear />
-			<li>And this is a cleared slide!</li>
+			<li>Should be slide number two!</li>
 		</ul>
 	</slide>
 
@@ -49,5 +50,36 @@
 		<s:content name="right">
 			This is on the right side.
 		</s:content>
+	</slide>
+
+	<slide title="Formula in Text">
+		<ul>
+			<li>Short Weierstrass: <s:tex>y^2 = x^3 + ax + b</s:tex></li>
+		</ul>
+	</slide>
+
+	<slide title="Some Source Code">
+		<s:code lang="python3"><![CDATA[
+			if foo == "bar":
+				print("foo was 'bar'")
+			else:
+				print("foo was not 'bar'")
+		]]></s:code>
+	</slide>
+
+	<slide title="Some Source Code">
+		<s:code lang="python3" src="my_data.py" />
+	</slide>
+
+	<slide title="Some Terminal">
+		<s:term><![CDATA[
+			$ ls /
+			bin
+			sbin
+		]]></s:term>
+	</slide>
+
+	<slide title="Some Terminal">
+		<s:term src="terminal_output.txt" />
 	</slide>
 </presentation>

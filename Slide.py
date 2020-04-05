@@ -27,12 +27,15 @@ class Slide():
 	def __init__(self, xmlnode):
 		assert(xmlnode.tagName == "slide")
 		self._dom = xmlnode
+		self._meta = { }
 		if not self._dom.hasAttribute("type"):
 			self._dom.setAttribute("type", "default")
 
 	def clone(self):
-		xmlnode = XMLTools.clone_element(self._xml)
-		return Slide(xmlnode = xmlnode)
+		dom = self._dom.cloneNode(deep = True)
+		clone = Slide(xmlnode = dom)
+		clone._meta = dict(self._meta)
+		return clone
 
 	@property
 	def slide_type(self):
@@ -41,6 +44,12 @@ class Slide():
 	@property
 	def dom(self):
 		return self._dom
+
+	def set_meta(self, key, value):
+		self._meta[key] = value
+
+	def get_meta(self, key):
+		return self._meta.get(key)
 
 	def __getattr__(self, key):
 		if self._dom.hasAttribute(key):
@@ -51,11 +60,11 @@ class Slide():
 	def content(self, content_name = None):
 		if content_name is None:
 			# All inner
-			return self._dom.toxml()
+			return XMLTools.inner_toxml(self._dom)
 		else:
 			for child in self._dom.getElementsByTagNameNS("http://github.com/johndoe31415/pybeamer", "content"):
 				if child.getAttribute("name") == content_name:
-					return child.toxml()
+					return XMLTools.inner_toxml(child)
 			else:
 				raise UndefinedContentException("Template tried to access content named '%s', but no such content defined in slide." % (content_name))
 

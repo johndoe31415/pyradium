@@ -14,7 +14,9 @@
 		%endif
 	</div>
 	<div class="content">
-		${caller.body()}
+		<div class="innercontent">
+			${caller.body()}
+		</div>
 	</div>
 	<div class="footer">
 		%if meta.has("title"):
@@ -23,12 +25,8 @@
 		%if meta.has("classification"):
 			<div class="classification">${meta.classification}</div>
 		%endif
-		%if slide.number is not None:
-		<div class="slide-number">${slide.number}</div>
-		%endif
-		%if slide.timing is not None:
-		<div class="slide-timing">${slide.timing}</div>
-		%endif
+		<div class="slide-number">${slide.get_meta("slideno")} / ${slide.get_meta("slidecnt")}</div>
+		<div class="slide-timing">${slide.get_meta("timing")}</div>
 	</div>
 </div>
 </%def>
