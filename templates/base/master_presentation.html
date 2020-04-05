@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
+		<title>${meta.get("title", "Untitled Presentation")}</title>
 		<link rel="stylesheet" href="pybeamer.css">
 		%for css_filename in renderer.css_filenames:
 		<link rel="stylesheet" href="${css_filename}">
@@ -15,8 +15,8 @@
 			<button id="btn_stop">Stop</button>
 		</div>
 
-		%for slide in presentation.slides:
-		${renderer.render_slide(slide = slide, presentation = presentation)}
+		%for slide in slides:
+		${renderer.render_slide(slide = slide, meta = meta)}
 		%endfor
 
 		<script type="module">

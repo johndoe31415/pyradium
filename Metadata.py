@@ -19,6 +19,8 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from Tools import XMLTools
+
 class Metadata():
 	def __init__(self, metadata):
 		self._data = metadata
@@ -38,6 +40,7 @@ class Metadata():
 	def from_xmlnode(cls, node):
 		metadata = { }
 		if node is not None:
-			for child in node:
-				metadata[child.tag] = child.text
+			for child in node.childNodes:
+				if child.nodeType == child.ELEMENT_NODE:
+					metadata[child.tagName] = XMLTools.inner_text(child)
 		return cls(metadata)

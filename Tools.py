@@ -19,40 +19,106 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import io
-import xml.etree.ElementTree
-
 class XMLTools():
 	@classmethod
-	def dump(cls, node, indent = 0):
-		if isinstance(node, xml.etree.ElementTree.ElementTree):
-			node = node.getroot()
-		spc = ("  " * indent)
-		attr_str = "" if (len(node.attrib) == 0) else str(node.attrib)
-		print("%s%s %s" %  (spc, node.tag, attr_str))
-		for child in node:
-			cls.dump(child, indent + 1)
+	def child_tagname(cls, node, tag_name):
+		if node is None:
+			return None
+		if isinstance(tag_name, str):
+			for child in node.childNodes:
+				if (child.nodeType == node.ELEMENT_NODE) and (child.tagName == tag_name):
+					return child
+			return None
+		else:
+			current = node
+			for path_element in tag_name:
+				current = cls.child_tagname(current, path_element)
+			return current
 
 	@classmethod
-	def dumpxml(cls, node):
-		if isinstance(node, xml.etree.ElementTree.ElementTree):
-			node = node.getroot()
-		tree = xml.etree.ElementTree.ElementTree(node)
-		f = io.BytesIO()
-		tree.write(f)
-		return f.getvalue().decode()
+	def remove_node(cls, node):
+		node.parentNode.removeChild(node)
 
 	@classmethod
-	def dump_innerxml(cls, node):
-		doc = [ ]
-		if node.text is not None:
-			doc.append(node.text)
-		for child in node:
-			doc.append(cls.dumpxml(child))
-			if child.tail is not None:
-				doc.append(child.tail)
-		return "".join(doc)
+	def replace_node(cls, node, replacement):
+		node.parentNode.replaceChild(replacement, node)
 
 	@classmethod
-	def remove_namespace(cls, node, ns):
-		return node
+	def inner_text(cls, node):
+		result = [ ]
+		def callback(node):
+			result.append(node.wholeText)
+		cls.walk(node, callback, predicate = lambda node: node.nodeType == node.TEXT_NODE)
+		return "".join(result)
+
+	@classmethod
+	def get_ns_tag(cls, node):
+		if ":" in node.tagName:
+			return node.tagName.split(":")
+		else:
+			return (None, node.tagName)
+
+	@classmethod
+	def walk(cls, node, callback, predicate = None):
+		if (predicate is None) or predicate(node):
+			callback(node)
+		for child in node.childNodes:
+			cls.walk(child, callback)
+
+	@classmethod
+	def walk_elements(cls, node, callback):
+		cls.walk(node, callback, predicate = lambda node: node.nodeType == node.ELEMENT_NODE)
+
+	@classmethod
+	def findall_recurse_predicate(cls, root_node, predicate):
+		result = [ ]
+		def callback(node, parent):
+			if predicate(node):
+				result.append((node, parent))
+		cls.walk_elements(root_node, callback)
+		return result
+
+	@classmethod
+	def findall_recurse(cls, root_node, name):
+		return cls.findall_recurse_predicate(root_node, predicate = lambda node: node.tag == name)
+
+	@classmethod
+	def normalize_ns(cls, node, known_namespaces = None):
+		if known_namespaces is None:
+			known_namespaces = { }
+
+		# First collect all known namespace URIs
+		present_namespaces = set()
+		def visit(node):
+			if node.namespaceURI is not None:
+				present_namespaces.add(node.namespaceURI)
+		cls.walk_elements(node, visit)
+
+		# Then assign them
+		assigned_namespaces = { }
+		namespace_id = 0
+		for uri in sorted(present_namespaces):
+			if uri in known_namespaces:
+				assigned_namespaces[uri] = known_namespaces[uri]
+			else:
+				assigned_namespaces[uri] = "ns%d" % (namespace_id)
+				namespace_id += 1
+
+		# Remove old namespace assignments
+		remove_attributes = set(key for key in node.attributes.keys() if key.startswith("xmlns:"))
+		for key in remove_attributes:
+			node.attributes.removeNamedItem(key)
+
+		# Append new namespace assignments to root element
+		for (uri, key) in assigned_namespaces.items():
+			node.setAttribute("xmlns:%s" % (key), uri)
+
+		# Finally, traverse the tree again and change tag Names
+		def visit(node):
+			(ns, tag) = cls.get_ns_tag(node)
+			if node.namespaceURI is None:
+				new_tagname = tag
+			else:
+				new_tagname = assigned_namespaces[node.namespaceURI] + ":" + tag
+			node.tagName = new_tagname
+		cls.walk_elements(node, visit)

@@ -27,6 +27,7 @@
 	<slide title="That's the second slide">
 		<ul>
 			<li>This is a test!</li>
+			<s:debug>This is debugging text.</s:debug>
 			<s:clear />
 			<li>And this is a cleared slide!</li>
 		</ul>

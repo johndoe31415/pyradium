@@ -24,14 +24,16 @@ import json
 import shutil
 import math
 import mako.lookup
+from Tools import XMLTools
 
 class PresentationRenderingError(Exception): pass
 
 class Renderer():
-	def __init__(self, template_dir, template_name, aspect_ratio):
-		self._aspect_ratio = aspect_ratio
+	def __init__(self, template_dir, template_name, aspect_ratio, rendering_mode = "presentation"):
 		self._template_dir = template_dir
 		self._template_name = template_name
+		self._aspect_ratio = aspect_ratio
+		self._rendering_mode = rendering_mode
 		self._lookup = mako.lookup.TemplateLookup(self._template_dir, input_encoding = "utf-8", strict_undefined = True)
 		self._slide_template = self._lookup.get_template(self._template_name + "/template.html")
 		with open(self._template_dir + "/" + self._template_name + "/template.json") as f:
@@ -60,19 +62,57 @@ class Renderer():
 	def slide_template(self):
 		return self._slide_template
 
-	def render_slide(self, slide, presentation):
+	def render_slide(self, slide, meta):
 		def error_fnc(msg):
 			raise PresentationRenderingError(msg)
-		return self._slide_template.render(renderer = self, slide = slide, presentation = presentation, meta = presentation.meta, error = error_fnc)
+		return self._slide_template.render(renderer = self, slide = slide, meta = meta, error = error_fnc)
+
+	def _render_tag_content(self, node):
+		pass
+
+	def _render_tag_pause(self, node):
+		pass
+
+	def _render_tag_clear(self, node):
+		pass
+
+	def _render_tag_debug(self, node):
+		print("Debugging tag encountered: %s" % (node))
+#		xml.tag = "foo"
+#		root.remove(xml)
+#		print(dir(xml))
+
+	def _transform_slide_substitutions(self, dom):
+		def visit(node):
+			if node.namespaceURI == "http://github.com/johndoe31415/pybeamer":
+				(ns, tag_name) = XMLTools.get_ns_tag(node)
+				handler_name = "_render_tag_" + tag_name
+				handler = getattr(self, handler_name, None)
+				if handler is None:
+					raise PresentationRenderingError("Unrecognized tag '%s' found in XML source." % (tag_name))
+				handler(node)
+		XMLTools.walk_elements(dom, visit)
+
+	def _transform_slide(self, slide):
+		print(slide)
+		self._transform_slide_substitutions(slide.dom)
+
+		return [ slide ]
+
+	def _transform_presentation(self, presentation):
+		transformed_slides = [ ]
+		for slide in presentation:
+			transformed_slides += self._transform_slide(slide)
+		return transformed_slides
 
 	def render(self, presentation, output_dir):
-		presentation.process_slides()
-		self._render_static_file(presentation, "base/master_presentation.html", output_dir + "/index.html")
-		self._render_static_file(presentation, "base/pybeamer.css", output_dir + "/pybeamer.css")
+		slides = self._transform_presentation(presentation)
+		self._render_static_file(slides, presentation.meta, "base/master_presentation.html", output_dir + "/index.html")
+		self._render_static_file(slides, presentation.meta, "base/pybeamer.css", output_dir + "/pybeamer.css")
 
-	def _render_static_file(self, presentation, input_filename, output_filename):
+	def _render_static_file(self, slides, meta, input_filename, output_filename):
 		master = self._lookup.get_template(input_filename)
-		rendered = master.render(renderer = self, presentation = presentation)
+		rendered = master.render(renderer = self, slides = slides, meta = meta)
 		with open(output_filename, "w") as f:
 			f.write(rendered)
 

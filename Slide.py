@@ -24,36 +24,38 @@ from Tools import XMLTools
 class UndefinedContentException(Exception): pass
 
 class Slide():
-	def __init__(self, xmlnode, presentation):
-		assert(xmlnode.tag == "slide")
-		self._xml = xmlnode
-		self._presentation = presentation
-		if self.slide_type is None:
-			self._xml.attrib["type"] = "default"
+	def __init__(self, xmlnode):
+		assert(xmlnode.tagName == "slide")
+		self._dom = xmlnode
+		if not self._dom.hasAttribute("type"):
+			self._dom.setAttribute("type", "default")
 
 	def clone(self):
 		xmlnode = XMLTools.clone_element(self._xml)
-		return Slide(xmlnode = xmlnode, presentation = self.presentation)
-
-	@property
-	def presentation(self):
-		return self._presentation
+		return Slide(xmlnode = xmlnode)
 
 	@property
 	def slide_type(self):
-		return self._xml.attrib.get("type")
+		return self._dom.getAttribute("type")
+
+	@property
+	def dom(self):
+		return self._dom
 
 	def __getattr__(self, key):
-		return self._xml.attrib.get(key)
+		if self._dom.hasAttribute(key):
+			return self._dom.getAttribute(key)
+		else:
+			return None
 
 	def content(self, content_name = None):
 		if content_name is None:
 			# All inner
-			return XMLTools.dump_innerxml(self._xml)
+			return self._dom.toxml()
 		else:
-			for child in self._xml.findall("{http://github.com/johndoe31415/pybeamer}content"):
-				if child.attrib.get("name") == content_name:
-					return XMLTools.dump_innerxml(child)
+			for child in self._dom.getElementsByTagNameNS("http://github.com/johndoe31415/pybeamer", "content"):
+				if child.getAttribute("name") == content_name:
+					return child.toxml()
 			else:
 				raise UndefinedContentException("Template tried to access content named '%s', but no such content defined in slide." % (content_name))
 

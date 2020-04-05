@@ -25,7 +25,7 @@ import tempfile
 import hashlib
 import subprocess
 
-_TEX_TEMPLATE = r"""
+_TEX_TEMPLATE = r"""\
 \documentclass[preview,border=1mm,varwidth=true]{standalone}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}

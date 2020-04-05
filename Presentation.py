@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
-import xml.etree.ElementTree
+import xml.dom.minidom
 from Slide import Slide
 from Tools import XMLTools
 from Metadata import Metadata
@@ -28,9 +28,8 @@ from Metadata import Metadata
 class Presentation():
 	def __init__(self, filename):
 		self._filename = filename
-		self._tree = xml.etree.ElementTree.parse(self._filename)
-		self._xml = self._tree.getroot()
-		self._meta = Metadata.from_xmlnode(self._xml.find("meta"))
+		self._dom = xml.dom.minidom.parse(self._filename)
+		self._meta = Metadata.from_xmlnode(XMLTools.child_tagname(self._dom, ("presentation", "meta")))
 		self._slides = self._parse_slides()
 
 	@property
@@ -47,21 +46,22 @@ class Presentation():
 
 	def _parse_slides(self):
 		slides = [ ]
-		for child in self._xml:
-			if child.tag == "slide":
-				slides.append(Slide(child, self))
-			elif child.tag == "include":
+		for child in XMLTools.child_tagname(self._dom, "presentation").childNodes:
+			if child.nodeType != child.ELEMENT_NODE:
+				continue
+			if child.tagName == "slide":
+				slides.append(Slide(child))
+			elif child.tagName == "include":
 				dirname = os.path.dirname(self._filename)
-				sub_presentation = Presentation(dirname + "/" + child.attrib["src"])
+				sub_presentation = Presentation(dirname + "/" + child.getAttribute("src"))
 				slides += sub_presentation.slides
 		return slides
 
 	def dump(self):
 		for (slideno, slide) in enumerate(self._slides, 1):
-			print("Slide %d from %s:" % (slideno, slide.presentation.filename))
+			print("Slide %d:" % (slideno))
 			slide.dump()
 			print()
 
-	def process_slides(self):
-		"""Go through slides and interpret special commands (e.g., pause/clear/etc.)"""
-		pass
+	def __iter__(self):
+		return iter(self._slides)
