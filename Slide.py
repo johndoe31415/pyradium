@@ -25,7 +25,7 @@ class Slide():
 		self._xml = xmlnode
 		self._presentation = presentation
 		self._slide_type = self._xml.attrib.get("type", "default")
-		self._slide_number = None
+		self._number = None
 
 	@property
 	def presentation(self):
@@ -43,13 +43,18 @@ class Slide():
 	def title(self):
 		pass
 
+
+	@property
+	def timing(self):
+		pass
+
 	@property
 	def slide_type(self):
 		return self._slide_type
 
 	@property
-	def slide_number(self):
-		return self._slide_number
+	def number(self):
+		return self._number
 
 	def content(self, content_name = None):
 		pass

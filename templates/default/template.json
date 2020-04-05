@@ -1,5 +1,10 @@
 {
 	"template_name": "pybeamer default template",
 	"template_author": "Johannes Bauer",
-	"css": [ "default.css" ]
+	"css": [ "font_fira.css", "default.css" ],
+	"static": [
+		"FiraSans-Regular-latin.woff2",
+		"FiraSans-Light-latin.woff2",
+		"FiraSans-Bold-latin.woff2"
+	]
 }

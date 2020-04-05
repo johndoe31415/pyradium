@@ -1,39 +1,88 @@
-%if slide.slide_type == "intro":
+<%def name="basic_slide_layout()">
+<div class="slide slidetype-base slidetype-${slide.slide_type}">
+	<div class="header">
+		%if (slide.section is not None) and (slide.subsection is not None):
+		<div class="section">${slide.section} – ${slide.subsection}</div>
+		%elif (slide.section is not None):
+		<div class="section">${slide.section}</div>
+		%elif meta.has("title"):
+		<div class="section">${meta.title}</div>
+		%endif
+
+		%if slide.title is not None:
+		<div class="title">${slide.title}</div>
+		%endif
+	</div>
+	<div class="content">
+		${caller.body()}
+	</div>
+	<div class="footer">
+		%if meta.has("title"):
+			<div class="presentation-title">${meta.title}</div>
+		%endif
+		%if meta.has("classification"):
+			<div class="classification">${meta.classification}</div>
+		%endif
+		%if slide.number is not None:
+		<div class="slide-number">${slide.number}</div>
+		%endif
+		%if slide.timing is not None:
+		<div class="slide-timing">${slide.timing}</div>
+		%endif
+	</div>
+</div>
+</%def>
+
+%if slide.slide_type == "title":
 <div class="slide slidetype-${slide.slide_type}">
-	${meta.title}
+	<div class="presentation-title">
+		%if meta.has("title"):
+		${meta.title}
+		%else:
+		Untitled Presentation
+		%endif
+	</div>
+	%if meta.has("subtitle"):
+	<div class="presentation-subtitle">${meta.subtitle}</div>
+	%endif
+	<hr class="divider" />
+	%if meta.has("author"):
+	<div class="presentation-author">
+		%if meta.has("affiliation"):
+		${meta.author}, ${meta.affiliation}
+		%else:
+		${meta.author}
+		%endif
+	</div>
+	%endif
+	%if meta.has("date"):
+	<div class="presentation-date">${meta.date}</div>
+	%endif
 </div>
 
 %elif slide.slide_type == "toc":
 <div class="slide slidetype-${slide.slide_type}">
-TODO replace me
+Table of Contents
 </div>
 
 %elif slide.slide_type == "default":
-<div class="slide slidetype-${slide.slide_type}">
-	%if slide.subsection != "Undefined subsection":
-	<div class="section">${slide.section} – ${slide.subsection}</div>
-	%else:
-	<div class="section">${slide.section}</div>
-	%endif
-	<div class="title">${slide.title}</div>
-	<div class="content">${slide.content()}</div>
-	<div class="pageno">${slide.slide_number}</div>
-	<div class="footer">
-		%if meta.get("classification") == "strictly_confidential":
-		<span class="classification">Strictly Confidential</span> |
-		%elif meta.get("classification") == "confidential":
-		<span class="classification">Confidential</span> |
-		%elif meta.get("classification") == "internal":
-		<span class="classification">Internal</span> |
-		%elif meta.get("classification") is not None:
-		<span class="classification">Undefined classification "${meta.get("classification")}"</span> |
-		%endif
-	</div>
-</div>
+<%self:basic_slide_layout>
+	${slide.content()}
+</%self:basic_slide_layout>
+
+%elif slide.slide_type == "leftright":
+<%self:basic_slide_layout>
+	<div class="content-left">${slide.content("left")}</div>
+	<div class="content-right">${slide.content("right")}</div>
+</%self:basic_slide_layout>
 
 %elif slide.slide_type == "end":
 <div class="slide slidetype-${slide.slide_type}">
 	${slide.content()}
 </div>
+
+%else:
+
+${error("Slide type undefined in this template: %s" % (slide.slide_type))}
 
 %endif

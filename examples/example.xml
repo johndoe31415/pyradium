@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <presentation xmlns:s="http://github.com/johndoe31415/pybeamer">
 	<meta>
+		<title>Battle of Wolf 359</title>
+		<subtitle>A Recap of Events</subtitle>
 		<author>Jean-Luc Picard</author>
 		<fullauthor>Jean-Luc Picard, Retired Starfleet Admiral</fullauthor>
-		<title>Battle of Wolf 359</title>
+		<affiliation>Starfleet</affiliation>
 		<date>2020-01-01</date>
 		<schedule>14:00-14:45</schedule>
 	</meta>
+
+	<slide type="title" />
 
 	<section>Introduction</section>
 	<subsection>Nomenclature</subsection>
@@ -36,7 +40,7 @@
 		</ul>
 	</slide>
 
-	<slide title="leftright">
+	<slide title="Left/Right Slide" type="leftright">
 		<s:content name="left">
 			This is on the left side.
 		</s:content>

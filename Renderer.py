@@ -25,6 +25,8 @@ import shutil
 import math
 import mako.lookup
 
+class PresentationRenderingError(Exception): pass
+
 class Renderer():
 	def __init__(self, template_dir, template_name, aspect_ratio):
 		self._aspect_ratio = aspect_ratio
@@ -59,7 +61,9 @@ class Renderer():
 		return self._slide_template
 
 	def render_slide(self, slide, presentation):
-		return self._slide_template.render(renderer = self, slide = slide, presentation = presentation, meta = presentation.meta)
+		def error_fnc(msg):
+			raise PresentationRenderingError(msg)
+		return self._slide_template.render(renderer = self, slide = slide, presentation = presentation, meta = presentation.meta, error = error_fnc)
 
 	def render(self, presentation, output_dir):
 		presentation.process_slides()

@@ -23,8 +23,16 @@ class Metadata():
 	def __init__(self, metadata):
 		self._data = metadata
 
+	def has(self, key):
+		return key in self._data
+
 	def get(self, key, default_value = None):
 		return self._data.get(key, default_value)
+
+	def __getattr__(self, key):
+		if not self.has(key):
+			raise AttributeError("No such attribute: %s" % (key))
+		return self.get(key)
 
 	@classmethod
 	def from_xmlnode(cls, node):
