@@ -15,5 +15,5 @@ fi
 
 while true; do
 	./pybeamer "$@"
-	inotifywait -e close_nowrite examples/*.xml templates/base/* templates/default/* *.py pybeamer
+	inotifywait -e close_write examples/*.xml templates/base/* templates/default/* *.py pybeamer
 done

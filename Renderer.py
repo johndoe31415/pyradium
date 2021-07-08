@@ -106,9 +106,13 @@ class RenderedPresentation():
 		return self._render_tag_enquote(node)
 
 	def _render_tag_enquote(self, node):
-		# TODO typographic
-		text = "\"" + XMLTools.inner_text(node) + "\""
-		text_node = node.ownerDocument.createText(text)
+		style = {
+			"fr":	"«»",
+			"de":	"„“",
+			"sgl":	"‘’",
+		}.get(node.getAttribute("type"), "“”")
+		text = style[0] + XMLTools.inner_text(node) + style[1]
+		text_node = node.ownerDocument.createTextNode(text)
 		XMLTools.replace_node(node, text_node)
 
 	def _transform_slide_substitutions(self, dom):

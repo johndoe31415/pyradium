@@ -91,6 +91,15 @@
 		]]></s:term>
 	</slide>
 
+	<slide title="Quotation Marks">
+		<ul>
+			<li><s:enq>US style</s:enq></li>
+			<li><s:enq type="fr">French style</s:enq></li>
+			<li><s:enq type="de">German style</s:enq></li>
+			<li><s:enq type="sgl">Single quotation marks</s:enq></li>
+		</ul>
+	</slide>
+
 	<slide title="Some Terminal">
 		<s:term src="terminal_output.txt" />
 	</slide>
