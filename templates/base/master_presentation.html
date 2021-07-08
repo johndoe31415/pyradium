@@ -7,6 +7,9 @@
 		%for css_filename in renderer.css_filenames:
 		<link rel="stylesheet" href="${css_filename}">
 		%endfor
+		%for css_filename in rendered_presentation.additional_css:
+		<link rel="stylesheet" href="${css_filename}">
+		%endfor
 	</head>
 
 	<body>

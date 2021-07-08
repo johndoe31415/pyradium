@@ -65,5 +65,5 @@ with contextlib.suppress(FileExistsError):
 
 presentation = Presentation(args.presentation_xml)
 renderer = Renderer(template_dir = template_dir, template_name = args.template, aspect_ratio = args.aspect, output_dir = args.output)
-renderer.render(presentation)
-renderer.copy_style_files()
+rendered_presentation = renderer.render(presentation)
+rendered_presentation.copy_style_files()

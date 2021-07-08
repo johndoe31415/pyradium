@@ -55,19 +55,31 @@
 	<slide title="Formula in Text">
 		<ul>
 			<li>Short Weierstrass: <s:tex>y^2 = x^3 + ax + b</s:tex></li>
+			<li>Some Sum: <s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></li>
 		</ul>
 	</slide>
 
-	<slide title="Some Source Code">
+	<slide title="Some Python Code">
 		<s:code lang="python3"><![CDATA[
 			if foo == "bar":
 				print("foo was 'bar'")
+				return getattr(self, "bar")
 			else:
 				print("foo was not 'bar'")
+				return lambda x: tuple(x, "foo", 123)
 		]]></s:code>
 	</slide>
 
-	<slide title="Some Source Code">
+	<slide title="Some C Code">
+		<s:code lang="c"><![CDATA[
+			int main(int argc, char **argv) {
+				printf("Foo: %d -> %p\n", argc, argv);
+				return 0;
+			}
+		]]></s:code>
+	</slide>
+
+	<slide title="Some Python Code from File">
 		<s:code lang="python3" src="my_data.py" />
 	</slide>
 
