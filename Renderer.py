@@ -99,8 +99,70 @@ class RenderedPresentation():
 		pass
 
 	def _render_tag_emo(self, node):
-		# TODO implement me
-		pass
+		return self._render_sequence(node, "emoji", {
+			";)":	"😉",
+			":)":	"🙂",
+			":))":	"😀",
+			":(":	"🙁",
+			":((":	"☹",
+			";(":	"😢",
+			";((":	"😭",
+			":D":	"😁",
+			":?":	"🤔",
+			":|":	"😐",
+			":o":	"😮",
+			":O":	"😲",
+		})
+
+	def _render_sequence(self, node, replacement_name, replacements):
+		text = XMLTools.inner_text(node)
+		symbol = replacements.get(text.lower())
+		if symbol is not None:
+			symbol_node = node.ownerDocument.createTextNode(symbol)
+			XMLTools.replace_node(node, symbol_node)
+		else:
+			print("Warning: Unrecognized %s sequence: %s" % (replacement_name, text), file = sys.stderr)
+
+
+	def _render_tag_ar(self, node):
+		return self._render_tag_arrow(node)
+
+	def _render_tag_arrow(self, node):
+		return self._render_sequence(node, "arrow", {
+			"-)":		"→",
+			"--)":		"⟶",
+			"(-":		"←",
+			"(--":		"⟵",
+			"(--)":		"⟷",
+			"(-)":		"↔",
+			"=)":		"⇒",
+			"(=":		"⇐",
+			"(=)":		"⇔",
+			"==)":		"⟹  ",
+			"(==)":		"⟺",
+			"enter":	"↵",
+			"light":	"⭍",
+		})
+
+	def _render_tag_sym(self, node):
+		return self._render_tag_symbol(node)
+
+	def _render_tag_symbol(self, node):
+		return self._render_sequence(node, "symbol", {
+			"xor":		"⊕",
+			"xmul":		"⊗",
+			"cdot":		"⊙",
+			"*":		"∙",
+			"approx":	"≈",
+			"ge":		"≥",
+			"le":		"≤",
+			"lt":		"<",
+			"gt":		">",
+			"eq":		"=",
+			"neq":		"≠",
+			"mod":		"≡",
+			"inf":		"∞",
+		})
 
 	def _render_tag_enq(self, node):
 		return self._render_tag_enquote(node)

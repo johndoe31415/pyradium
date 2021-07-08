@@ -100,6 +100,34 @@
 		</ul>
 	</slide>
 
+	<slide title="Arrows">
+		<ul>
+			<li><s:ar>-)</s:ar> Right and long right <s:ar>--)</s:ar></li>
+			<li><s:ar>(-</s:ar> Left and long left <s:ar>(--</s:ar></li>
+			<li><s:ar>(-)</s:ar> both and <s:ar>(--)</s:ar> both long and both double <s:ar>(=)</s:ar> and both double long <s:ar>(==)</s:ar></li>
+			<li><s:ar>=)</s:ar> Double Right</li>
+			<li><s:ar>(=</s:ar> Double Left</li>
+			<li><s:ar>enter</s:ar> Enter Key</li>
+			<li><s:ar>light</s:ar> Lightning</li>
+		</ul>
+	</slide>
+
+	<slide title="Symbols">
+		<ul>
+			<li><s:sym>xor</s:sym> XOR and <s:sym>xmul</s:sym> XMUL</li>
+			<li>Operators <s:sym>le</s:sym> <s:sym>lt</s:sym> <s:sym>eq</s:sym> <s:sym>neq</s:sym> <s:sym>gt</s:sym><s:sym>ge</s:sym></li>
+			<li>Infinity <s:sym>inf</s:sym></li>
+		</ul>
+	</slide>
+
+	<slide title="Emojis">
+		<ul>
+			<li><s:emo>:)</s:emo> <s:emo>:))</s:emo> <s:emo>;)</s:emo></li>
+			<li><s:emo>:(</s:emo> <s:emo>:((</s:emo> <s:emo>;(</s:emo></li>
+			<li><s:emo>:|</s:emo> <s:emo>:o</s:emo> <s:emo>:O</s:emo></li>
+		</ul>
+	</slide>
+
 	<slide title="Some Terminal">
 		<s:term src="terminal_output.txt" />
 	</slide>
