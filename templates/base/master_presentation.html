@@ -14,8 +14,8 @@
 
 	<body>
 		<div class="menu">
-			<button id="btn_start">Start</button>
-			<button id="btn_stop">Stop</button>
+			<input type="text" value="1" id="current_slideno" class="control" />
+			<button id="btn_present" class="control">Present</button>
 		</div>
 
 		%for slide in slides:
@@ -25,8 +25,7 @@
 		<script type="module">
 			import {Presentation} from "./pybeamer.js";
 			const presentation = new Presentation();
-			document.querySelector("#btn_start").addEventListener("click", (event) => presentation.start());
-			document.querySelector("#btn_stop").addEventListener("click", (event) => presentation.stop());
+			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start());
 		</script>
 	</body>
 </html>
