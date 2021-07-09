@@ -66,12 +66,15 @@ class RenderedPresentation():
 	def _render_tag_tex(self, node):
 		formula = LatexFormula(XMLTools.inner_text(node))
 		rendered = formula.render(cache_dir = self._renderer.cache_dir)
+		scale_factor = 0.5
+		width_px = round(rendered.width * scale_factor)
+		baseline_px = round(rendered.baseline * scale_factor)
 		local_filename = "latex_%s.png" % (rendered.cachekey)
 		rendered.write_png(self._renderer.output_dir + "/" + local_filename)
 		img = node.ownerDocument.createElement("img")
 		img.setAttribute("src", local_filename)
+		img.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
 		XMLTools.replace_node(node, img)
-		print("LaTeX formula: %s" % (formula))
 
 	def _render_tag_code(self, node):
 		lexer = pygments.lexers.get_lexer_by_name(node.getAttribute("lang"))

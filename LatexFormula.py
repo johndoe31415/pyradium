@@ -38,10 +38,10 @@ _TEX_TEMPLATE = r"""
 """
 
 class RenderedLatexFormula():
-	def __init__(self, formula, png_data, baseline, rendering_parameters):
+	def __init__(self, formula, png_data, image_info, rendering_parameters):
 		self._formula = formula
 		self._png_data = png_data
-		self._baseline = baseline
+		self._image_info = image_info
 		self._rendering_parameters = rendering_parameters
 
 	@classmethod
@@ -54,22 +54,30 @@ class RenderedLatexFormula():
 		return self.calculate_cachekey(self._formula, self._rendering_parameters)
 
 	@property
+	def width(self):
+		return self._image_info["width"]
+
+	@property
+	def height(self):
+		return self._image_info["height"]
+
+	@property
 	def baseline(self):
-		return self._baseline
+		return self._image_info["baseline"]
 
 	@classmethod
 	def read_jsonfile(cls, filename):
 		with open(filename) as f:
 			json_data = json.load(f)
 		assert(json_data["object"] == "formula")
-		return cls(formula = json_data["formula"], png_data = base64.b64decode(json_data["image"]), baseline = json_data["baseline"], rendering_parameters = json_data["rendering_parameters"])
+		return cls(formula = json_data["formula"], png_data = base64.b64decode(json_data["image"]), image_info = json_data["image_info"], rendering_parameters = json_data["rendering_parameters"])
 
 	def write_jsonfile(self, filename):
 		json_data = {
 			"object":					"formula",
 			"formula":					self._formula,
 			"rendering_parameters":		self._rendering_parameters,
-			"baseline":					self._baseline,
+			"image_info":				self._image_info,
 			"image":					base64.b64encode(self._png_data).decode("ascii"),
 		}
 		with open(filename, "w") as f:
@@ -87,7 +95,7 @@ class LatexFormula():
 	def formula(self):
 		return self._formula
 
-	def _find_baseline(self, png_filename, xoffset):
+	def _get_image_info(self, png_filename, xoffset):
 		crop_output = subprocess.check_output([ "convert", "%s[1x+%d+0]" % (png_filename, xoffset), "-trim", "info:-" ])
 		crop_output = crop_output.decode().split()
 		cropped_size = crop_output[2].split("x")
@@ -96,10 +104,16 @@ class LatexFormula():
 		image_offset = image_offset.split("+")
 		cropped_height = int(cropped_size[1])
 		cropped_yoffset = int(image_offset[1])
+		image_width = int(image_geometry[0])
 		image_height = int(image_geometry[1])
 		baseline_y = cropped_height + cropped_yoffset
 		baseline_y_from_bottom = image_height - baseline_y
-		return baseline_y_from_bottom
+		image_info = {
+			"width":		image_width,
+			"height":		image_height,
+			"baseline":		baseline_y_from_bottom,
+		}
+		return image_info
 
 	def _do_render(self, rendering_parameters):
 		with tempfile.TemporaryDirectory(prefix = "pybeamer_formula_") as tex_dir:
@@ -126,15 +140,15 @@ class LatexFormula():
 			subprocess.check_call([ "convert", "-define", "profile:skip=ICC", "-density", str(rendering_parameters["rendering_dpi"]), "-trim", "+repage", pdf_filename, png_filename ])
 
 #			print("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s" % (left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename))
-			baseline_y = self._find_baseline(png_filename, eval_baseline_at_x)
+			image_info = self._get_image_info(png_filename, eval_baseline_at_x)
 
-#			print("Determined baseline y-offset at %d pixels (measured from bottom)" % (baseline_y))
+#			print("Determined baseline y-offset at %d pixels (measured from bottom)" % (image_info["baseline_y"]))
 
 			# Then crop the image finally
 			png_data = subprocess.check_output([ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", png_filename, "png:-" ])
 
 			# Return an image object
-			return RenderedLatexFormula(formula = self.formula, png_data = png_data, baseline = baseline_y, rendering_parameters = rendering_parameters)
+			return RenderedLatexFormula(formula = self.formula, png_data = png_data, image_info = image_info, rendering_parameters = rendering_parameters)
 
 	def render(self, rendering_dpi = 600, short = False, cache_dir = None):
 		rendering_parameters = {
@@ -160,6 +174,11 @@ class LatexFormula():
 		return "LaTeX(%s)" % (self.formula)
 
 if __name__ == "__main__":
+	import os
+	import contextlib
+	cachedir = "/tmp/test_cachedir/"
+	with contextlib.suppress(FileExistsError):
+		os.makedirs(cachedir)
 	tex = LatexFormula("y^2 = x^3 + ax + b")
-	tex.render(cache_dir = "foo/").write_png("formula_long.png")
-	tex.render(cache_dir = "foo/", short = True).write_png("formula_short.png")
+	tex.render(cache_dir = cachedir).write_png("formula_long.png")
+	tex.render(cache_dir = cachedir, short = True).write_png("formula_short.png")
