@@ -83,7 +83,7 @@ class RenderSlideDirective(BaseDirective):
 		return total_pause_node_count
 
 	def render(self, renderer):
-		paused_containers = PauseRenderer(self).render()
+		paused_containers = PauseRenderer(self, honor_pauses = renderer.rendering_params.honor_pauses).render()
 
 		for paused_container in paused_containers:
 			for container_node in paused_container.values():

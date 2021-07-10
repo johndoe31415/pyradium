@@ -23,8 +23,9 @@ from .Tools import XMLTools
 from .Exceptions import DuplicateOrderException
 
 class PauseRenderer():
-	def __init__(self, slide_directive):
+	def __init__(self, slide_directive, honor_pauses = True):
 		self._slide = slide_directive
+		self._honor_pauses = honor_pauses
 		self._used_order_ids = set()
 
 	def _enumerate_pause_nodes_of(self, root_node):
@@ -54,18 +55,21 @@ class PauseRenderer():
 		print("=" * 120)
 
 	def render(self):
-		self._enumerate_pause_nodes()
-		rendered_containers = [ self._slide.clone_containers() for _ in range(len(self._used_order_ids) + 1) ]
-		sorted_order_ids = list(sorted(self._used_order_ids))
+		if self._honor_pauses:
+			self._enumerate_pause_nodes()
+			rendered_containers = [ self._slide.clone_containers() for _ in range(len(self._used_order_ids) + 1) ]
+			sorted_order_ids = list(sorted(self._used_order_ids))
 
-		for (max_order_id, rendered_container) in zip(sorted_order_ids, rendered_containers):
-			for container_node in rendered_container.values():
-				for pause_node in XMLTools.findall_recurse(container_node, "s:pause"):
-					order = int(pause_node.getAttribute("order"))
-					if order >= max_order_id:
-						XMLTools.remove_siblings_after(pause_node)
-					else:
-						XMLTools.remove_node(pause_node)
+			for (max_order_id, rendered_container) in zip(sorted_order_ids, rendered_containers):
+				for container_node in rendered_container.values():
+					for pause_node in XMLTools.findall_recurse(container_node, "s:pause"):
+						order = int(pause_node.getAttribute("order"))
+						if order >= max_order_id:
+							XMLTools.remove_siblings_after(pause_node)
+						else:
+							XMLTools.remove_node(pause_node)
+		else:
+			rendered_containers = [ self._slide.clone_containers() ]
 
 		# Remove all pause nodes from last container (the one which renders the
 		# whole slide)
