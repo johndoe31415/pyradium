@@ -58,7 +58,7 @@ class XMLTools():
 		result = [ ]
 		def callback(node):
 			result.append(node.wholeText)
-		cls.walk(node, callback, predicate = lambda node: node.nodeType == node.TEXT_NODE)
+		cls.walk(node, callback, predicate = lambda node: node.nodeType in [ node.TEXT_NODE, node.CDATA_SECTION_NODE ])
 		return "".join(result)
 
 	@classmethod

@@ -19,20 +19,29 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import os
-import sys
-from .BaseAction import BaseAction
-from .Presentation import Presentation
-from .RenderingParameters import RenderingParameters
-from .PresentationRenderer import PresentationRenderer
+import textwrap
+from pybeamer.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pybeamer.Tools import XMLTools
 
-class ActionRender(BaseAction):
-	def run(self):
-		if (not self._args.force) and os.path.exists(self._args.outdir):
-			print("Refusing to overwrite: %s" % (self._args.outdir))
-			sys.exit(1)
+@XMLHookRegistry.register_hook
+class TerminalHook(BaseHook):
+	_TAG_NAME = "term"
 
-		presentation = Presentation.load_from_file(self._args.infile)
-		rendering_parameters = RenderingParameters()
-		renderer = PresentationRenderer(presentation, rendering_parameters)
-		rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		if node.hasAttribute("src"):
+			with open(rendered_presentation.renderer.get_include(node.getAttribute("src"))) as f:
+				term_text = f.read()
+		else:
+			term_text = XMLTools.inner_text(node)
+
+
+		term_text = term_text.strip("\n")
+		term_text = textwrap.dedent(term_text)
+		term_text = term_text.strip("\n")
+
+		replacement_node = node.ownerDocument.createElement("pre")
+		replacement_node.setAttribute("class", "terminal")
+		replacement_node.appendChild(node.ownerDocument.createTextNode(term_text))
+
+		return replacement_node

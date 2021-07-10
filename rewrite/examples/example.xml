@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<presentation xmlns:s="https://github.com/johndoe31415/pybeamer">
+	<meta>
+		<title>Battle of Wolf 359</title>
+		<subtitle>A Recap of Events</subtitle>
+		<author>Jean-Luc Picard</author>
+		<fullauthor>Jean-Luc Picard, Retired Starfleet Admiral</fullauthor>
+		<affiliation>Starfleet</affiliation>
+		<date>2020-01-01</date>
+		<schedule>14:00-14:45</schedule>
+		<format>
+			<x>Foo</x>
+		</format>
+	</meta>
+
+	<slide type="title" />
+
+	<section>Introduction</section>
+	<subsection>Nomenclature</subsection>
+	<slide type="toc">
+		<s:var name="begin" value="1" />
+		<s:var name="end" value="2.3" />
+	</slide>
+
+	<slide title="Pausing Slides">
+		<ul>
+			<li>This is a test! Pause1</li>
+			<s:pause />
+			<li>After the first pause! Pause2</li>
+			<s:pause />
+			<li>After the second pause! Pause3</li>
+		</ul>
+	</slide>
+
+	<slide title="That's the second slide">
+		<ul>
+			<li>This is a test!</li>
+			<s:debug>This is debugging text.</s:debug>
+			<li>Should be slide number two!</li>
+		</ul>
+	</slide>
+
+	<include src="example_sub.xml" />
+
+	<subsection>After Include Subsection</subsection>
+	<slide title="After include">
+		<ul>
+			<li>Second slide</li>
+		</ul>
+	</slide>
+
+	<slide title="Left/Right slide" type="leftright">
+		<s:content name="left">
+			This is on the left side.
+		</s:content>
+		<s:content name="right">
+			This is on the right side.
+		</s:content>
+	</slide>
+
+	<slide title="Formula in Text">
+		<ul>
+			<li>Short Weierstrass: <s:tex>y^2 = x^3 + ax + b</s:tex></li>
+			<li>Some Sum: <s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></li>
+		</ul>
+	</slide>
+
+	<slide title="Long Formula">
+		<ul>
+			<li><s:tex long="1">y^2 = x^3 + ax + b</s:tex></li>
+		</ul>
+	</slide>
+
+	<slide title="Some Python Code">
+		<s:code lang="python3"><![CDATA[
+			if foo == "bar":
+				print("foo was 'bar'")
+				return getattr(self, "bar")
+			else:
+				print("foo was not 'bar'")
+				return lambda x: tuple(x, "foo", 123)
+		]]></s:code>
+	</slide>
+
+	<slide title="Some C Code">
+		<s:code lang="c"><![CDATA[
+			int main(int argc, char **argv) {
+				printf("Foo: %d -> %p\n", argc, argv);
+				return 0;
+			}
+		]]></s:code>
+	</slide>
+
+	<slide title="Some Python Code from File">
+		<s:code lang="python3" src="my_data.py" />
+	</slide>
+
+	<slide title="Some Terminal">
+		<s:term><![CDATA[
+			$ ls /
+			bin
+			sbin
+		]]></s:term>
+	</slide>
+
+	<slide title="Quotation Marks">
+		<ul>
+			<li><s:enq>US style</s:enq></li>
+			<li><s:enq type="fr">French style</s:enq></li>
+			<li><s:enq type="de">German style</s:enq></li>
+			<li><s:enq type="sgl">Single quotation marks</s:enq></li>
+		</ul>
+	</slide>
+
+	<slide title="Arrows">
+		<ul>
+			<li><s:ar>-)</s:ar> Right and long right <s:ar>--)</s:ar></li>
+			<li><s:ar>(-</s:ar> Left and long left <s:ar>(--</s:ar></li>
+			<li><s:ar>(-)</s:ar> both and <s:ar>(--)</s:ar> both long and both double <s:ar>(=)</s:ar> and both double long <s:ar>(==)</s:ar></li>
+			<li><s:ar>=)</s:ar> Double Right</li>
+			<li><s:ar>(=</s:ar> Double Left</li>
+			<li><s:ar>enter</s:ar> Enter Key</li>
+			<li><s:ar>light</s:ar> Lightning</li>
+		</ul>
+	</slide>
+
+	<slide title="Symbols">
+		<ul>
+			<li><s:sym>xor</s:sym> XOR and <s:sym>xmul</s:sym> XMUL</li>
+			<li>Operators <s:sym>le</s:sym> <s:sym>lt</s:sym> <s:sym>eq</s:sym> <s:sym>neq</s:sym> <s:sym>gt</s:sym><s:sym>ge</s:sym></li>
+			<li>Infinity <s:sym>inf</s:sym></li>
+		</ul>
+	</slide>
+
+	<slide title="Emojis">
+		<ul>
+			<li><s:emo>:)</s:emo> <s:emo>:))</s:emo> <s:emo>;)</s:emo></li>
+			<li><s:emo>:(</s:emo> <s:emo>:((</s:emo> <s:emo>;(</s:emo></li>
+			<li><s:emo>:|</s:emo> <s:emo>:o</s:emo> <s:emo>:O</s:emo></li>
+		</ul>
+	</slide>
+
+	<slide title="Some Terminal">
+		<s:term src="terminal_output.txt" />
+	</slide>
+</presentation>

@@ -1,2 +1,26 @@
 {
+	"template": {
+		"author": "Johannes Bauer",
+		"name": "pybeamer default template",
+		"license": "CC-BY 4.0"
+	},
+	"references": [
+		{
+			"author": "Jimena Catalina, SlideCarnival",
+			"contribution": "Design elements and layout ideas",
+			"uri": "https://www.slidescarnival.com/antonio-free-presentation-template/84"
+		}
+	],
+	"files": {
+		"css": [
+			"default.css",
+			"font_fira.css"
+		],
+		"static": [
+			"bar.svg",
+			"FiraSans-Regular-latin.woff2",
+			"FiraSans-Light-latin.woff2",
+			"FiraSans-Bold-latin.woff2"
+		]
+	}
 }

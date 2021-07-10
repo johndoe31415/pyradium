@@ -25,6 +25,14 @@ class RenderingParameters():
 		self._honor_pauses = honor_pauses
 
 	@property
+	def geometry_x(self):
+		return 1280
+
+	@property
+	def geometry_y(self):
+		return 720
+
+	@property
 	def template_style(self):
 		return self._template_style
 

@@ -1,6 +1,6 @@
 div.slide {
-	width: ${renderer.geometry[0]}px;
-	height: ${renderer.geometry[1]}px;
+	width: ${renderer.rendering_params.geometry_x}px;
+	height: ${renderer.rendering_params.geometry_y}px;
 	border: 1px solid #aaa;
 	margin-bottom: 10px;
 }

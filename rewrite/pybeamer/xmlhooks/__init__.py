@@ -24,4 +24,5 @@ from .SymbolHook import SymbolHook
 from .ArrowHook import ArrowHook
 from .QuoteHook import QuoteHook
 from .TexHook import TexHook
+from .TerminalHook import TerminalHook
 from .DebugHook import DebugHook

@@ -34,13 +34,16 @@ class TexHook(BaseHook):
 		}
 		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
 		rendered_formula = tex_renderer.render(properties)
+		local_filename = "rendered/latex/%s.png" % (rendered_formula.keyhash)
 
 		scale_factor = 0.5
 		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
 		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
 
 		replacement_node = node.ownerDocument.createElement("img")
-		replacement_node.setAttribute("src", "latex_%s.png" % (rendered_formula.keyhash))
+		replacement_node.setAttribute("src", local_filename)
 		replacement_node.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
 		replacement_node.setAttribute("alt", properties["formula"])
+
+		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])
 		return replacement_node

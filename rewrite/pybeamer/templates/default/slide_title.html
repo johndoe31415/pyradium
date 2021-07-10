@@ -1,6 +1,8 @@
 <%inherit file="template_slide.html" />
+<%block name="slide_classes">title</%block>
 <%block name="content">
-${presentation.meta.get("author")}
-${presentation.meta.get("title")}
-${presentation.meta.get("date")}
+<img src="bar.svg" class="bar">
+<div class="author">${presentation.meta.get("author")}</div>
+<div class="title">${presentation.meta.get("title")}</div>
+<div class="date">${presentation.meta.get("date")}</div>
 </%block>

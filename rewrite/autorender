@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+#
+
+while true; do
+	./pybeamer.py render -f examples/example.xml rendered
+	inotifywait -q --exclude '\..*\.sw[a-z]' -e modify -e close_write -e create -r pybeamer examples 
+done
