@@ -33,6 +33,6 @@ class ActionRender(BaseAction):
 			sys.exit(1)
 
 		presentation = Presentation.load_from_file(self._args.infile)
-		rendering_parameters = RenderingParameters()
+		rendering_parameters = RenderingParameters(include_dirs = [ os.path.dirname(self._args.infile) ])
 		renderer = PresentationRenderer(presentation, rendering_parameters)
 		rendered_presentation = renderer.render(deploy_directory = self._args.outdir)

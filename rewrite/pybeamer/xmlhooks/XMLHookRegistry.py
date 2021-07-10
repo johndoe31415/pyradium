@@ -83,7 +83,7 @@ class InnerTextHook(BaseHook):
 	@classmethod
 	def handle(cls, rendered_presentation, node):
 		if node.hasAttribute("src"):
-			with open(rendered_presentation.renderer.get_include(node.getAttribute("src"))) as f:
+			with open(rendered_presentation.renderer.lookup_include(node.getAttribute("src"))) as f:
 				text = f.read()
 		else:
 			text = XMLTools.inner_text(node)

@@ -24,6 +24,7 @@ import json
 import contextlib
 from .RendererCache import RendererCache
 from .TOC import TOC
+from .Exceptions import FailedToLookupFileException
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 import mako.lookup
 
@@ -75,6 +76,9 @@ class RenderedPresentation():
 		with open(source_filename, "rb") as f:
 			self.add_file(destination_relpath, f.read())
 
+	def copy_template_file(self, template_filename, destination_relpath):
+		return self.copy_file(self._renderer.lookup_template_file(template_filename), destination_relpath)
+
 class PresentationRenderer():
 	def __init__(self, presentation, rendering_params):
 		self._rendered_slides = [ ]
@@ -83,10 +87,14 @@ class PresentationRenderer():
 		self._custom_renderers = {
 			"latex":	RendererCache(LatexFormulaRenderer()),
 		}
-		self._template_directory = os.path.dirname(os.path.realpath(__file__)) + "/templates"
-		self._lookup = mako.lookup.TemplateLookup([ self._template_directory, self._template_directory + "/" + self._rendering_params.template_style ], strict_undefined = True, input_encoding = "utf-8")
-		with open(self._template_directory + "/" + self._rendering_params.template_style + "/configuration.json") as f:
+		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8")
+		with open(self.lookup_template_file(self._rendering_params.template_style + "/configuration.json")) as f:
 			self._template_config = json.load(f)
+
+	def _get_mako_lookup_directories(self):
+		for dirname in self._rendering_params.template_dirs:
+			yield dirname
+			yield dirname + "/" + self._rendering_params.template_style
 
 	@property
 	def rendering_params(self):
@@ -95,9 +103,22 @@ class PresentationRenderer():
 	def get_custom_renderer(self, name):
 		return self._custom_renderers[name]
 
-	def get_include(self, filename):
-		# TODO FIXME
-		return "examples/" + filename
+	def _search_file(self, filename, search_dirs):
+		search_dirs = list(search_dirs)
+		for dirname in search_dirs:
+			path = dirname + "/" + filename
+			if os.path.isfile(path):
+				return path
+		if len(search_dirs) == 0:
+			raise FailedToLookupFileException("No such file: %s (no directories given to look up)" % (filename))
+		else:
+			raise FailedToLookupFileException("No such file: %s (looked in %s)" % (filename, ", ".join(search_dirs)))
+
+	def lookup_template_file(self, filename):
+		return self._search_file(filename, self._rendering_params.template_dirs)
+
+	def lookup_include(self, filename):
+		return self._search_file(filename, self._rendering_params.include_dirs)
 
 	def _compute_renderable_slides(self, rendered_presentation):
 		renderable_slides = [ ]
@@ -109,13 +130,12 @@ class PresentationRenderer():
 
 	def render(self, deploy_directory):
 		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
-		rendered_presentation.copy_file(self._template_directory + "/base/pybeamer.js", "pybeamer.js")
+		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
 
 		for filename in self._template_config.get("files", { }).get("static", [ ]):
-			rendered_presentation.copy_file("%s/%s/%s" % (self._template_directory, self._rendering_params.template_style, filename), filename)
-
+			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
 		for filename in self._template_config.get("files", { }).get("css", [ ]):
-			rendered_presentation.copy_file("%s/%s/%s" % (self._template_directory, self._rendering_params.template_style, filename), filename)
+			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
 			rendered_presentation.add_css(filename)
 
 		template_args = {

@@ -19,10 +19,19 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
+
 class RenderingParameters():
-	def __init__(self, template_style = "default", honor_pauses = True):
+	def __init__(self, template_style = "default", honor_pauses = True, extra_template_dirs = None, include_dirs = None):
 		self._template_style = template_style
 		self._honor_pauses = honor_pauses
+		self._template_dirs = [ os.path.expanduser("~/.config/pybeamer/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
+		if extra_template_dirs is not None:
+			self._template_dirs += extra_template_dirs
+		if include_dirs is None:
+			self._include_dirs = [ ]
+		else:
+			self._include_dirs = list(include_dirs)
 
 	@property
 	def geometry_x(self):
@@ -39,3 +48,11 @@ class RenderingParameters():
 	@property
 	def honor_pauses(self):
 		return self._honor_pauses
+
+	@property
+	def template_dirs(self):
+		return iter(self._template_dirs)
+
+	@property
+	def include_dirs(self):
+		return iter(self._include_dirs)
