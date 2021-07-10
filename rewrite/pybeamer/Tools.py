@@ -145,6 +145,8 @@ class XMLTools():
 
 	@classmethod
 	def xml_to_dict(cls, node):
+		if node is None:
+			return None
 		if cls.has_sub_elements(node):
 			result = { }
 			for child in node.childNodes:

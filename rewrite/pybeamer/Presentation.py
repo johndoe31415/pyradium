@@ -21,55 +21,48 @@
 
 import os
 import xml.dom.minidom
-#from Slide import Slide
 from .Tools import XMLTools
-#from Metadata import Metadata
-#from TOC import TOC
+from .TOC import TOCElement, TOCDirective
+from .Slide import RenderSlideDirective
 
 class Presentation():
-	def __init__(self):
-		self._meta = None
-		#self._toc = TOC()
-		self._content = [ ]
+	def __init__(self, meta, content):
+		self._meta = meta
+		self._content = content
 
 	@property
 	def meta(self):
 		return self._meta
 
 	@property
-	def slides(self):
-		return self._slides
-
-	def _parse(self, filename):
-		dom = xml.dom.minidom.parse(filename)
-		if self._meta is None:
-			self._meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")))
-
-		for child in XMLTools.child_tagname(dom, "presentation").childNodes:
-			if child.nodeType != child.ELEMENT_NODE:
-				continue
-			if child.tagName == "slide":
-				slide = Slide(child)
-				slide.set_meta("section", self._toc.section)
-				slide.set_meta("subsection", self._toc.subsection)
-				slide.set_meta("slideno", len(self._slides) + 1)
-				self._slides.append(slide)
-			elif child.tagName == "include":
-				dirname = os.path.dirname(self._filename)
-				sub_presentation = dirname + "/" + child.getAttribute("src")
-				self._parse(sub_presentation)
-			elif child.tagName == "section":
-				self._toc.section = XMLTools.inner_text(child)
-			elif child.tagName == "subsection":
-				self._toc.subsection = XMLTools.inner_text(child)
-
-		for slide in self._slides:
-			slide.set_meta("slidecnt", len(self._slides))
-			slide.set_meta("toc", self._toc)
+	def content(self):
+		return self._content
 
 	@classmethod
 	def load_from_file(cls, filename):
-		return cls()._parse(filename)
+		dom = xml.dom.minidom.parse(filename)
+		meta = None
+		content = [ ]
+		for child in XMLTools.child_tagname(dom, "presentation").childNodes:
+			if child.nodeType != child.ELEMENT_NODE:
+				continue
+
+			if child.tagName == "meta":
+				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")))
+			elif child.tagName == "slide":
+				content.append(RenderSlideDirective(child))
+			elif child.tagName == "include":
+				dirname = os.path.dirname(filename)
+				sub_presentation_filename = dirname + "/" + child.getAttribute("src")
+				sub_presentation = cls.load_from_file(sub_presentation_filename)
+				content += sub_presentation.content
+			elif child.tagName in [ "chapter", "section", "subsection" ]:
+				toc_element = TOCElement(child.tagName)
+				toc_directive = TOCDirective(toc_element, XMLTools.inner_text(child))
+				content.append(toc_directive)
+			else:
+				print("Warning: Ignored unknown tag '%s'." % (child.tagName))
+		return cls(meta, content)
 
 	def __iter__(self):
 		return iter(self._content)
