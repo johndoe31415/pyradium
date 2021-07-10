@@ -20,7 +20,8 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from .BaseAction import BaseAction
+from .Presentation import Presentation
 
 class ActionRender(BaseAction):
 	def run(self):
-		print("!")
+		presentation = Presentation.load_from_file(self._args.infile)

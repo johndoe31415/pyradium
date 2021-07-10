@@ -33,8 +33,7 @@ def main():
 		parser.add_argument("outdir", help = "Output directory the presentation is put into.")
 	mc.register("render", "Render a slide show", genparser, action = ActionRender)
 
-	mc.run(sys.argv[1:])
-
+	return mc.run(sys.argv[1:])
 
 if __name__ == "__main__":
 	main()
