@@ -38,7 +38,6 @@ class RenderSlideDirective(BaseDirective):
 			self._content_containers[content_node.getAttribute("name")] = content_node
 		if len(self._content_containers) == 0:
 			self._content_containers["default"] = self._dom
-		self._enumerate_pause_nodes()
 
 	@property
 	def containers(self):
@@ -58,29 +57,6 @@ class RenderSlideDirective(BaseDirective):
 			(key, value) = (node.getAttribute("name"), node.getAttribute("value"))
 			slide_vars[key] = value
 		return slide_vars
-
-#	def _get_pause_order_
-
-	def _enumerate_pause_nodes_of(self, root_node, start_order):
-		pause_node_count = 0
-		order = start_order
-		for pause_node in XMLTools.findall_recurse(root_node, "s:pause"):
-			if not pause_node.hasAttribute("order"):
-				pause_node.setAttribute("order", str(order))
-			else:
-				pause_node.setAttribute("order", str(int(pause_node.getAttribute("order"))))
-			pause_node_count += 1
-			order += 1
-		return pause_node_count
-
-	def _enumerate_pause_nodes(self):
-		order = 1
-		total_pause_node_count = 0
-		for (name, container_node) in sorted(self._content_containers.items()):
-			pause_node_count = self._enumerate_pause_nodes_of(container_node, order)
-			total_pause_node_count += pause_node_count
-			order += pause_node_count
-		return total_pause_node_count
 
 	def render(self, renderer):
 		paused_containers = PauseRenderer(self, honor_pauses = renderer.rendering_params.honor_pauses).render()

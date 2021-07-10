@@ -31,7 +31,10 @@ class PauseRenderer():
 	def _enumerate_pause_nodes_of(self, root_node):
 		for pause_node in XMLTools.findall_recurse(root_node, "s:pause"):
 			if not pause_node.hasAttribute("order"):
-				assigned_order_id = max(self._user_order_ids) + 1
+				if len(self._used_order_ids) == 0:
+					assigned_order_id = 1
+				else:
+					assigned_order_id = max(self._used_order_ids) + 1
 			else:
 				assigned_order_id = int(pause_node.getAttribute("order"))
 			if assigned_order_id in self._used_order_ids:
