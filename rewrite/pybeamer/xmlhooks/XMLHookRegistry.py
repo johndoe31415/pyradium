@@ -19,9 +19,9 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import textwrap
 from pybeamer.Exceptions import XMLHookRegistryException
 from pybeamer.Tools import XMLTools
-
 
 class XMLHookRegistry():
 	_HOOKS = { }
@@ -75,4 +75,21 @@ class ReplacementHook(BaseHook):
 			replacement_node = node.ownerDocument.createTextNode(replacement_text)
 			return replacement_node
 
+class InnerTextHook(BaseHook):
+	@classmethod
+	def handle_text(cls, text, rendered_presentation, node):
+		raise NotImplementedError(__class__.__name__)
 
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		if node.hasAttribute("src"):
+			with open(rendered_presentation.renderer.get_include(node.getAttribute("src"))) as f:
+				text = f.read()
+		else:
+			text = XMLTools.inner_text(node)
+
+		text = text.strip("\n")
+		text = textwrap.dedent(text)
+		text = text.strip("\n")
+
+		return cls.handle_text(text, rendered_presentation, node)

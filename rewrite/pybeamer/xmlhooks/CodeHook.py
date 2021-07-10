@@ -20,16 +20,21 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import textwrap
+import xml.dom.minidom
+import pygments
 from pybeamer.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
 from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
-class TerminalHook(InnerTextHook):
-	_TAG_NAME = "term"
+class CodeHook(InnerTextHook):
+	_TAG_NAME = "code"
 
 	@classmethod
 	def handle_text(cls, text, rendered_presentation, node):
-		replacement_node = node.ownerDocument.createElement("pre")
-		replacement_node.setAttribute("class", "terminal")
-		replacement_node.appendChild(node.ownerDocument.createTextNode(text))
+		lexer = pygments.lexers.get_lexer_by_name(node.getAttribute("lang"))
+		highlighted_code = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter(cssclass = "code_highlight"))
+
+		replacement_node = xml.dom.minidom.parseString(highlighted_code).firstChild
+		rendered_presentation.add_css("pygments.css")
+
 		return replacement_node
