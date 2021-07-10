@@ -129,15 +129,21 @@ class XMLTools():
 		for (uri, key) in assigned_namespaces.items():
 			node.setAttribute("xmlns:%s" % (key), uri)
 
-		# Finally, traverse the tree again and change tag Names
+		# Finally, traverse the tree again and change tag names
 		def visit(node):
 			(ns, tag) = cls.get_ns_tag(node)
 			if node.namespaceURI is None:
+				new_prefix = None
 				new_tagname = tag
 			else:
-				new_tagname = assigned_namespaces[node.namespaceURI] + ":" + tag
+				new_prefix = assigned_namespaces[node.namespaceURI]
+				new_tagname = new_prefix + ":" + tag
+			node.prefix = new_prefix
 			node.tagName = new_tagname
+			node.nodeName = new_tagname
 		cls.walk_elements(node, visit)
+
+		return assigned_namespaces
 
 	@classmethod
 	def inner_toxml(cls, node):

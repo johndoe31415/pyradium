@@ -26,6 +26,10 @@ from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 
 class Presentation():
+	_NAMESPACES = {
+		"https://github.com/johndoe31415/pybeamer":		"s",
+	}
+
 	def __init__(self, meta, content):
 		self._meta = meta
 		self._content = content
@@ -41,9 +45,7 @@ class Presentation():
 	@classmethod
 	def load_from_file(cls, filename):
 		dom = xml.dom.minidom.parse(filename)
-		XMLTools.normalize_ns(dom.documentElement, {
-			"https://github.com/johndoe31415/pybeamer":		"s",
-		})
+		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))
 		meta = None
 		content = [ ]
 		for child in XMLTools.child_tagname(dom, "presentation").childNodes:

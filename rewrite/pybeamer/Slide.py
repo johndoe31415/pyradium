@@ -23,6 +23,7 @@ from .Tools import XMLTools
 from .Exceptions import UndefinedContentException
 from .BaseDirective import BaseDirective
 from .RenderableSlide import RenderableSlide
+from .PauseRenderer import PauseRenderer
 from pybeamer.xmlhooks.XMLHookRegistry import XMLHookRegistry
 
 class RenderSlideDirective(BaseDirective):
@@ -37,10 +38,11 @@ class RenderSlideDirective(BaseDirective):
 			self._content_containers[content_node.getAttribute("name")] = content_node
 		if len(self._content_containers) == 0:
 			self._content_containers["default"] = self._dom
+		self._enumerate_pause_nodes()
 
 	@property
-	def dom(self):
-		return self._dom
+	def containers(self):
+		return self._content_containers
 
 	def clone_containers(self):
 		return { name: container.cloneNode(deep = True) for (name, container) in self._content_containers.items() }
@@ -49,30 +51,44 @@ class RenderSlideDirective(BaseDirective):
 	def slide_type(self):
 		return self._dom.getAttribute("type")
 
-	def content(self, content_name = None):
-		if content_name is None:
-			# All inner
-			return XMLTools.inner_toxml(self._dom)
-		else:
-			for child in self._dom.getElementsByTagNameNS("http://github.com/johndoe31415/pybeamer", "content"):
-				if child.getAttribute("name") == content_name:
-					return XMLTools.inner_toxml(child)
-			else:
-				raise UndefinedContentException("Template tried to access content named '%s', but no such content defined in slide." % (content_name))
-
 	def _get_slide_vars(self):
 		# First search DOM for any variables
 		slide_vars = { }
-		for node in XMLTools.findall(self.dom, "s:var"):
+		for node in XMLTools.findall(self._dom, "s:var"):
 			(key, value) = (node.getAttribute("name"), node.getAttribute("value"))
 			slide_vars[key] = value
 		return slide_vars
 
+#	def _get_pause_order_
+
+	def _enumerate_pause_nodes_of(self, root_node, start_order):
+		pause_node_count = 0
+		order = start_order
+		for pause_node in XMLTools.findall_recurse(root_node, "s:pause"):
+			if not pause_node.hasAttribute("order"):
+				pause_node.setAttribute("order", str(order))
+			else:
+				pause_node.setAttribute("order", str(int(pause_node.getAttribute("order"))))
+			pause_node_count += 1
+			order += 1
+		return pause_node_count
+
+	def _enumerate_pause_nodes(self):
+		order = 1
+		total_pause_node_count = 0
+		for (name, container_node) in sorted(self._content_containers.items()):
+			pause_node_count = self._enumerate_pause_nodes_of(container_node, order)
+			total_pause_node_count += pause_node_count
+			order += pause_node_count
+		return total_pause_node_count
+
 	def render(self, renderer):
-		containers = self.clone_containers()
-		for container_node in containers.values():
-			XMLHookRegistry.mangle(container_node)
-		yield RenderableSlide(slide_type = self.slide_type, content_containers = containers, slide_vars = self._slide_vars)
+		paused_containers = PauseRenderer(self).render()
+
+		for paused_container in paused_containers:
+			for container_node in paused_container.values():
+				XMLHookRegistry.mangle(container_node)
+			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = self._slide_vars)
 
 	def __repr__(self):
 		return "Slide<%s>" % (self.slide_type)

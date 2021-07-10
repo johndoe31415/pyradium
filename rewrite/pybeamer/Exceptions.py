@@ -25,3 +25,5 @@ class SlideException(PyBeamerException): pass
 class UndefinedContentException(SlideException): pass
 
 class XMLHookRegistryException(PyBeamerException): pass
+
+class DuplicateOrderException(PyBeamerException): pass
