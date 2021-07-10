@@ -22,6 +22,7 @@
 from .Tools import XMLTools
 from .Exceptions import UndefinedContentException
 from .BaseDirective import BaseDirective
+from .RenderableSlide import RenderableSlide
 
 class RenderSlideDirective(BaseDirective):
 	def __init__(self, xmlnode):
@@ -29,26 +30,23 @@ class RenderSlideDirective(BaseDirective):
 		self._dom = xmlnode
 		if not self._dom.hasAttribute("type"):
 			self._dom.setAttribute("type", "default")
-
-	def clone(self):
-		dom = self._dom.cloneNode(deep = True)
-		clone = Slide(xmlnode = dom)
-		clone._meta = dict(self._meta)
-		return clone
-
-	@property
-	def slide_type(self):
-		return self._dom.getAttribute("type")
+		self._slide_vars = self._get_slide_vars()
+		self._content_containers = { }
+		for content_node in XMLTools.findall(self._dom, "s:content"):
+			self._content_containers[content_node.getAttribute("name")] = content_node
+		if len(self._content_containers) == 0:
+			self._content_containers["default"] = self._dom
 
 	@property
 	def dom(self):
 		return self._dom
 
-	def __getattr__(self, key):
-		if self._dom.hasAttribute(key):
-			return self._dom.getAttribute(key)
-		else:
-			return None
+	def clone_containers(self):
+		return { name: container.cloneNode(deep = True) for (name, container) in self._content_containers.items() }
+
+	@property
+	def slide_type(self):
+		return self._dom.getAttribute("type")
 
 	def content(self, content_name = None):
 		if content_name is None:
@@ -61,8 +59,16 @@ class RenderSlideDirective(BaseDirective):
 			else:
 				raise UndefinedContentException("Template tried to access content named '%s', but no such content defined in slide." % (content_name))
 
-	def dump(self):
-		print("Slide<%s>" % (self.slide_type))
+	def _get_slide_vars(self):
+		# First search DOM for any variables
+		slide_vars = { }
+		for node in XMLTools.findall(self.dom, "s:var"):
+			(key, value) = (node.getAttribute("name"), node.getAttribute("value"))
+			slide_vars[key] = value
+		return slide_vars
+
+	def render(self, renderer):
+		yield RenderableSlide(slide_type = self.slide_type, content_containers = self._content_containers, slide_vars = self._slide_vars)
 
 	def __repr__(self):
 		return "Slide<%s>" % (self.slide_type)

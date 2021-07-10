@@ -29,6 +29,7 @@ class TOCElement(enum.Enum):
 
 class TOCDirective(BaseDirective):
 	def __init__(self, toc_element, value):
+		assert(isinstance(toc_element, TOCElement))
 		self._toc_element = toc_element
 		self._value = value
 
@@ -39,3 +40,41 @@ class TOCDirective(BaseDirective):
 	@property
 	def value(self):
 		return self._value
+
+	def render(self, renderer):
+		if self.toc_element == TOCElement.Chapter:
+			renderer.toc.chapter = self.value
+		elif self.toc_element == TOCElement.Section:
+			renderer.toc.section = self.value
+		elif self.toc_element == TOCElement.SubSection:
+			renderer.toc.subsection = self.value
+		else:
+			raise NotImplementedError(self.toc_element)
+
+class TOC():
+	def __init__(self):
+		pass
+
+	@property
+	def chapter(self):
+		return self._chapter
+
+	@chapter.setter
+	def chapter(self, value):
+		self._chapter = value
+
+	@property
+	def section(self):
+		return self._section
+
+	@section.setter
+	def section(self, value):
+		self._section = value
+
+	@property
+	def subsection(self):
+		return self._subsection
+
+	@subsection.setter
+	def subsection(self, value):
+		self._subsection = value

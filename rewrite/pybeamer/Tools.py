@@ -70,8 +70,8 @@ class XMLTools():
 	def walk(cls, node, callback, predicate = None):
 		if (predicate is None) or predicate(node):
 			callback(node)
-		for child in node.childNodes:
-			cls.walk(child, callback)
+			for child in node.childNodes:
+				cls.walk(child, callback, predicate)
 
 	@classmethod
 	def walk_elements(cls, node, callback):
@@ -80,15 +80,23 @@ class XMLTools():
 	@classmethod
 	def findall_recurse_predicate(cls, root_node, predicate):
 		result = [ ]
-		def callback(node, parent):
+		def callback(node):
 			if predicate(node):
-				result.append((node, parent))
+				result.append(node)
 		cls.walk_elements(root_node, callback)
 		return result
 
 	@classmethod
 	def findall_recurse(cls, root_node, name):
-		return cls.findall_recurse_predicate(root_node, predicate = lambda node: node.tag == name)
+		return cls.findall_recurse_predicate(root_node, predicate = lambda node: (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name))
+
+	@classmethod
+	def findall(cls, root_node, name):
+		result = [ ]
+		for node in root_node.childNodes:
+			if (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name):
+				result.append(node)
+		return result
 
 	@classmethod
 	def normalize_ns(cls, node, known_namespaces = None):

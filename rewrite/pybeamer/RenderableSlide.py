@@ -1,5 +1,5 @@
 #	pybeamer - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2021-2021 Johannes Bauer
 #
 #	This file is part of pybeamer.
 #
@@ -19,14 +19,17 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .BaseAction import BaseAction
-from .Presentation import Presentation
-from .RenderingParameters import RenderingParameters
-from .PresentationRenderer import PresentationRenderer
+class RenderableSlide():
+	def __init__(self, slide_type, content_containers, slide_vars):
+		self._slide_type = slide_type
+		self._content_containers = content_containers
+		self._slide_vars = slide_vars
 
-class ActionRender(BaseAction):
-	def run(self):
-		presentation = Presentation.load_from_file(self._args.infile)
-		rendering_parameters = RenderingParameters()
-		renderer = PresentationRenderer(presentation, rendering_parameters)
-		rendered_presentation = renderer.render()
+	@property
+	def slide_type(self):
+		return self._slide_type
+
+	def content(self, key = None):
+		if key is None:
+			key = "default"
+		return self._content_containers.get(key)

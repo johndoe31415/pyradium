@@ -41,6 +41,9 @@ class Presentation():
 	@classmethod
 	def load_from_file(cls, filename):
 		dom = xml.dom.minidom.parse(filename)
+		XMLTools.normalize_ns(dom.documentElement, {
+			"https://github.com/johndoe31415/pybeamer":		"s",
+		})
 		meta = None
 		content = [ ]
 		for child in XMLTools.child_tagname(dom, "presentation").childNodes:
