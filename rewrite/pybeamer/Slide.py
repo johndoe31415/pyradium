@@ -23,6 +23,7 @@ from .Tools import XMLTools
 from .Exceptions import UndefinedContentException
 from .BaseDirective import BaseDirective
 from .RenderableSlide import RenderableSlide
+from pybeamer.xmlhooks.XMLHookRegistry import XMLHookRegistry
 
 class RenderSlideDirective(BaseDirective):
 	def __init__(self, xmlnode):
@@ -68,7 +69,10 @@ class RenderSlideDirective(BaseDirective):
 		return slide_vars
 
 	def render(self, renderer):
-		yield RenderableSlide(slide_type = self.slide_type, content_containers = self._content_containers, slide_vars = self._slide_vars)
+		containers = self.clone_containers()
+		for container_node in containers.values():
+			XMLHookRegistry.mangle(container_node)
+		yield RenderableSlide(slide_type = self.slide_type, content_containers = containers, slide_vars = self._slide_vars)
 
 	def __repr__(self):
 		return "Slide<%s>" % (self.slide_type)

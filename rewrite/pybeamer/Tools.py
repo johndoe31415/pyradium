@@ -70,8 +70,8 @@ class XMLTools():
 	def walk(cls, node, callback, predicate = None):
 		if (predicate is None) or predicate(node):
 			callback(node)
-			for child in node.childNodes:
-				cls.walk(child, callback, predicate)
+		for child in node.childNodes:
+			cls.walk(child, callback, predicate)
 
 	@classmethod
 	def walk_elements(cls, node, callback):

@@ -1,5 +1,5 @@
 #	pybeamer - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2015-2021 Johannes Bauer
 #
 #	This file is part of pybeamer.
 #
@@ -19,19 +19,23 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .Tools import XMLTools
+from pybeamer.xmlhooks.XMLHookRegistry import ReplacementHook, XMLHookRegistry
+from pybeamer.Tools import XMLTools
 
-class RenderableSlide():
-	def __init__(self, slide_type, content_containers, slide_vars):
-		self._slide_type = slide_type
-		self._content_containers = content_containers
-		self._slide_vars = slide_vars
-
-	@property
-	def slide_type(self):
-		return self._slide_type
-
-	def content(self, key = None):
-		if key is None:
-			key = "default"
-		return XMLTools.inner_toxml(self._content_containers.get(key))
+@XMLHookRegistry.register_hook
+class EmoHook(ReplacementHook):
+	_TAG_NAME = "emo"
+	_REPLACEMENTS = {
+		";)":	"😉",
+		":)":	"🙂",
+		":))":	"😀",
+		":(":	"🙁",
+		":((":	"☹",
+		";(":	"😢",
+		";((":	"😭",
+		":D":	"😁",
+		":?":	"🤔",
+		":|":	"😐",
+		":o":	"😲",
+		":O":	"😮",
+	}
