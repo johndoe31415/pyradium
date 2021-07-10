@@ -22,33 +22,12 @@
 import os
 import contextlib
 import hashlib
-import json
 import datetime
-import base64
 import collections
+import json
+from .ExtendedJSONEncoder import ExtendedJSONEncoder
 
 RenderedResult = collections.namedtuple("RenderedResult", [ "key", "keyhash", "from_cache", "data" ])
-
-class BytesEncoder(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, bytes):
-			return {
-				"__internal_object__":	"6bbc5f9e-6aba-40f4-878c-1ce5f5f50055",
-				"data":					base64.b64encode(obj).decode("ascii"),
-			}
-		return json.JSONEncoder.default(self, obj)
-
-	@classmethod
-	def load_object_hook(cls, obj):
-		if isinstance(obj, dict) and ("__internal_object__" in obj):
-			uuid = obj["__internal_object__"]
-			if uuid == "6bbc5f9e-6aba-40f4-878c-1ce5f5f50055":
-				# Uncompressed base64 bytes
-				return base64.b64decode(obj["data"])
-			else:
-				raise Exception("Unable to decode special cached object with UUID %s." % (uuid))
-		else:
-			return obj
 
 class BaseRenderer():
 	@property
@@ -71,7 +50,7 @@ class RendererCache():
 
 	@staticmethod
 	def _hash_key(key):
-		binkey = json.dumps(key, separators = (",", ":"), sort_keys = True).encode("utf-8")
+		binkey = ExtendedJSONEncoder.dumps(key, minify = True, sort_keys = True).encode("utf-8")
 		keyhash = hashlib.md5(binkey).hexdigest()
 		return keyhash
 
@@ -79,7 +58,7 @@ class RendererCache():
 		filename = self._directory + keyhash + ".json"
 		try:
 			with open(filename) as f:
-				file_representation = json.load(f, object_hook = BytesEncoder.load_object_hook)
+				file_representation = ExtendedJSONEncoder.load(f)
 		except (FileNotFoundError, json.decoder.JSONDecodeError):
 			return None
 
@@ -91,17 +70,13 @@ class RendererCache():
 			"meta": {
 				"rendered":	datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
 				"keyhash":	keyhash,
-				"objtype":	"bytes" if isinstance(object_data, bytes) else "plain",
 			},
+			"object": object_data,
 		}
-		if isinstance(object_data, bytes):
-			file_representation["object"] = "AAAA=="
-		else:
-			file_representation["object"] = object_data
 
 		filename = self._directory + keyhash + ".json"
 		with open(filename, "w") as f:
-			json.dump(file_representation, f, separators = (",", ":"), cls = BytesEncoder)
+			ExtendedJSONEncoder.dump(file_representation, f, minify = True)
 
 	def render(self, property_dict):
 		key = {
@@ -119,10 +94,10 @@ class RendererCache():
 			return RenderedResult(key = key, keyhash = keyhash, from_cache = False, data = object_data)
 
 if __name__ == "__main__":
-	class LetterRenderer(BaseRenderer):
+	class DebugRenderer(BaseRenderer):
 		@property
 		def name(self):
-			return "letter"
+			return "debug"
 
 		@property
 		def properties(self):
@@ -131,10 +106,10 @@ if __name__ == "__main__":
 		def render(self, property_dict):
 			return {
 				"text":		property_dict["letter"] * property_dict["count"],
-				"data":		b"foobar",
+				"bytes":	b"foobar" * 1000,
 			}
 
-	cache = RendererCache(LetterRenderer())
+	cache = RendererCache(DebugRenderer())
 	print("Result = ", cache.render({
 		"letter":	"Q",
 		"count":	10,

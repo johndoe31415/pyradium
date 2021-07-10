@@ -146,10 +146,10 @@ class LatexFormulaRenderer(BaseRenderer):
 			# Then render the PDF to PNG
 			subprocess.check_call([ "convert", "-define", "profile:skip=ICC", "-density", str(self._rendering_dpi), "-trim", "+repage", pdf_filename, png_filename ])
 
-			print("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s" % (left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename))
+#			print("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s" % (left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename))
 			image_info = self._get_image_info(png_filename, eval_baseline_at_x)
 
-			print("Determined baseline y-offset at %d pixels (measured from bottom)" % (image_info["baseline"]))
+#			print("Determined baseline y-offset at %d pixels (measured from bottom)" % (image_info["baseline"]))
 
 			# Then crop the image finally
 			png_data = subprocess.check_output([ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", png_filename, "png:-" ])
