@@ -62,6 +62,9 @@ class PresentationRenderer():
 	def toc(self):
 		return self._toc
 
+	def get_custom_renderer(self, name):
+		return self._custom_renderers[name]
+
 	def _render_directive(self, directive):
 		return directive.render(self)
 

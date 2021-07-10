@@ -63,7 +63,7 @@ class RenderSlideDirective(BaseDirective):
 
 		for paused_container in paused_containers:
 			for container_node in paused_container.values():
-				XMLHookRegistry.mangle(container_node)
+				XMLHookRegistry.mangle(renderer, container_node)
 			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = self._slide_vars)
 
 	def __repr__(self):

@@ -37,14 +37,14 @@ class XMLHookRegistry():
 		return hook_class
 
 	@classmethod
-	def mangle(cls, root_node):
+	def mangle(cls, renderer, root_node):
 		def callback(node):
 			if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName.startswith("s:")):
 				hook_name = node.nodeName[2:]
 				if hook_name not in cls._SPECIAL:
 					if hook_name in cls._HOOKS:
 						hook_class = cls._HOOKS[hook_name]
-						replace_by = hook_class.handle(node)
+						replace_by = hook_class.handle(renderer, node)
 						if replace_by is None:
 							# Delete node
 							XMLTools.remove_node(node)
@@ -58,14 +58,14 @@ class BaseHook():
 	_TAG_NAME = None
 
 	@classmethod
-	def handle(cls, node):
+	def handle(cls, renderer, node):
 		raise NotImplementedError(__class__.__name__)
 
 class ReplacementHook(BaseHook):
 	_REPLACEMENTS = None
 
 	@classmethod
-	def handle(cls, node):
+	def handle(cls, renderer, node):
 		text = XMLTools.inner_text(node).strip()
 		if text not in cls._REPLACEMENTS:
 			print("Warning: %s(%s) not available. Ignored the sequence." % (cls._TAG_NAME, text))

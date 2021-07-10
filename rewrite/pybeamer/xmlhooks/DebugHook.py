@@ -26,5 +26,5 @@ class DebugHook(BaseHook):
 	_TAG_NAME = "debug"
 
 	@classmethod
-	def handle(cls, node):
+	def handle(cls, renderer, node):
 		print("Debug hook:", node)
