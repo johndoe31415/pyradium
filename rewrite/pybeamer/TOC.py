@@ -41,13 +41,13 @@ class TOCDirective(BaseDirective):
 	def value(self):
 		return self._value
 
-	def render(self, renderer):
+	def render(self, rendered_presentation):
 		if self.toc_element == TOCElement.Chapter:
-			renderer.toc.chapter = self.value
+			rendered_presentation.toc.chapter = self.value
 		elif self.toc_element == TOCElement.Section:
-			renderer.toc.section = self.value
+			rendered_presentation.toc.section = self.value
 		elif self.toc_element == TOCElement.SubSection:
-			renderer.toc.subsection = self.value
+			rendered_presentation.toc.subsection = self.value
 		else:
 			raise NotImplementedError(self.toc_element)
 

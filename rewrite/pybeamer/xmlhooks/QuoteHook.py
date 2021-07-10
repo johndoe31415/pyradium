@@ -27,7 +27,7 @@ class QuoteHook(BaseHook):
 	_TAG_NAME = "enq"
 
 	@classmethod
-	def handle(cls, renderer, node):
+	def handle(cls, rendered_presentation, node):
 		text = XMLTools.inner_text(node).strip()
 		style = {
 			"fr":	"«»",

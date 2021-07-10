@@ -38,56 +38,6 @@ _TEX_TEMPLATE = r"""
 \end{document}
 """
 
-class RenderedLatexFormula():
-	def __init__(self, formula, png_data, image_info, rendering_parameters):
-		self._formula = formula
-		self._png_data = png_data
-		self._image_info = image_info
-		self._rendering_parameters = rendering_parameters
-
-	@classmethod
-	def calculate_cachekey(cls, formula, rendering_parameters):
-		input_data = formula + " || " + str(sorted(rendering_parameters.items()))
-		return hashlib.md5(input_data.encode("utf-8")).hexdigest()
-
-	@property
-	def cachekey(self):
-		return self.calculate_cachekey(self._formula, self._rendering_parameters)
-
-	@property
-	def width(self):
-		return self._image_info["width"]
-
-	@property
-	def height(self):
-		return self._image_info["height"]
-
-	@property
-	def baseline(self):
-		return self._image_info["baseline"]
-
-	@classmethod
-	def read_jsonfile(cls, filename):
-		with open(filename) as f:
-			json_data = json.load(f)
-		assert(json_data["object"] == "formula")
-		return cls(formula = json_data["formula"], png_data = base64.b64decode(json_data["image"]), image_info = json_data["image_info"], rendering_parameters = json_data["rendering_parameters"])
-
-	def write_jsonfile(self, filename):
-		json_data = {
-			"object":					"formula",
-			"formula":					self._formula,
-			"rendering_parameters":		self._rendering_parameters,
-			"image_info":				self._image_info,
-			"image":					base64.b64encode(self._png_data).decode("ascii"),
-		}
-		with open(filename, "w") as f:
-			json.dump(json_data, f)
-
-	def write_png(self, filename):
-		with open(filename, "wb") as f:
-			f.write(self._png_data)
-
 class LatexFormulaRenderer(BaseRenderer):
 	def __init__(self, rendering_dpi = 600):
 		super().__init__()
@@ -135,10 +85,10 @@ class LatexFormulaRenderer(BaseRenderer):
 			left_crop_pixel_safe = round((2 / 25.4) * self._rendering_dpi)
 			eval_baseline_at_x = round((0.5 / 25.4) * self._rendering_dpi)
 
-			if property_dict.get("short", False):
-				content = r"$" + baseline + property_dict["formula"] + r"$"
-			else:
+			if property_dict.get("long", False):
 				content = r"\[" + baseline + property_dict["formula"] + r" \]"
+			else:
+				content = r"$" + baseline + property_dict["formula"] + r"$"
 			with open(tex_filename, "w") as tex_file:
 				tex_file.write(_TEX_TEMPLATE % { "content": content })
 			subprocess.check_call([ "pdflatex", "-output-directory=%s" % (tex_dir), tex_filename ])

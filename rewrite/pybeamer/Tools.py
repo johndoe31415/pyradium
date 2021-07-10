@@ -19,6 +19,8 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from pybeamer.Exceptions import InvalidBooleanValueException
+
 class XMLTools():
 	@classmethod
 	def child_tagname(cls, node, tag_name):
@@ -171,3 +173,15 @@ class XMLTools():
 			return result
 		else:
 			return cls.inner_text(node)
+
+	@classmethod
+	def get_bool_attr(cls, node, attr_name, default_value = False):
+		if not node.hasAttribute(attr_name):
+			return default_value
+		value = node.getAttribute(attr_name).lower().strip()
+		if value in [ "1", "on", "true", "yes" ]:
+			return True
+		elif value in [ "0", "off", "false", "no" ]:
+			return False
+		else:
+			raise InvalidBooleanValueException("Invalid boolean value for attribute %s of node %s." % (attr_name, node))

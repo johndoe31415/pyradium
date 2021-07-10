@@ -20,11 +20,27 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pybeamer.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
-class DebugHook(BaseHook):
-	_TAG_NAME = "debug"
+class TexHook(BaseHook):
+	_TAG_NAME = "tex"
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		print("Debug hook:", node)
+		properties = {
+			"formula":	XMLTools.inner_text(node),
+			"long":		XMLTools.get_bool_attr(node, "long"),
+		}
+		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
+		rendered_formula = tex_renderer.render(properties)
+
+		scale_factor = 0.5
+		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
+		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
+
+		replacement_node = node.ownerDocument.createElement("img")
+		replacement_node.setAttribute("src", "latex_%s.png" % (rendered_formula.keyhash))
+		replacement_node.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
+		replacement_node.setAttribute("alt", properties["formula"])
+		return replacement_node

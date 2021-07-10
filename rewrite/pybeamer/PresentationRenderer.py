@@ -25,9 +25,15 @@ from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 import mako.lookup
 
 class RenderedPresentation():
-	def __init__(self):
+	def __init__(self, renderer):
+		self._renderer = renderer
 		self._rendered_slides = [ ]
 		self._css = set()
+		self._toc = TOC()
+
+	@property
+	def renderer(self):
+		return self._renderer
 
 	@property
 	def rendered_slides(self):
@@ -36,6 +42,10 @@ class RenderedPresentation():
 	@property
 	def css(self):
 		return iter(self._css)
+
+	@property
+	def toc(self):
+		return self._toc
 
 	def append_slide(self, rendered_slide):
 		self._rendered_slides.append(rendered_slide)
@@ -51,16 +61,11 @@ class PresentationRenderer():
 		self._custom_renderers = {
 			"latex":	RendererCache(LatexFormulaRenderer()),
 		}
-		self._toc = TOC()
-		self._lookup = mako.lookup.TemplateLookup([ "pybeamer/templates", "pybeamer/templates/default" ], strict_undefined = True, input_encoding = "utf-8")
+		self._lookup = mako.lookup.TemplateLookup([ "pybeamer/templates", "pybeamer/templates/default" ], strict_undefined = True, input_encoding = "utf-8")		# TODO fix path
 
 	@property
 	def rendering_params(self):
 		return self._rendering_params
-
-	@property
-	def toc(self):
-		return self._toc
 
 	def get_custom_renderer(self, name):
 		return self._custom_renderers[name]
@@ -69,13 +74,14 @@ class PresentationRenderer():
 		return directive.render(self)
 
 	def render(self):
+		rendered_presentation = RenderedPresentation(self)
+
 		renderable_slides = [ ]
 		for directive in self._presentation:
-			generator = self._render_directive(directive)
+			generator = directive.render(rendered_presentation)
 			if generator is not None:
 				renderable_slides += generator
 
-		rendered_presentation = RenderedPresentation()
 		for renderable_slide in renderable_slides:
 			args = {
 				"slide":			renderable_slide,

@@ -58,12 +58,12 @@ class RenderSlideDirective(BaseDirective):
 			slide_vars[key] = value
 		return slide_vars
 
-	def render(self, renderer):
-		paused_containers = PauseRenderer(self, honor_pauses = renderer.rendering_params.honor_pauses).render()
+	def render(self, rendered_presentation):
+		paused_containers = PauseRenderer(self, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
 
 		for paused_container in paused_containers:
 			for container_node in paused_container.values():
-				XMLHookRegistry.mangle(renderer, container_node)
+				XMLHookRegistry.mangle(rendered_presentation, container_node)
 			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = self._slide_vars)
 
 	def __repr__(self):

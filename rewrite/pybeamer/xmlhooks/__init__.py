@@ -23,4 +23,5 @@ from .EmoHook import EmoHook
 from .SymbolHook import SymbolHook
 from .ArrowHook import ArrowHook
 from .QuoteHook import QuoteHook
+from .TexHook import TexHook
 from .DebugHook import DebugHook
