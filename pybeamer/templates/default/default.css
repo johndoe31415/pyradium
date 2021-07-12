@@ -107,9 +107,14 @@ div.leftright div.left, div.leftright div.right {
 }
 
 ul li {
-	background-image: url("triangle.svg");
+	background-image: url("triangle1.svg");
 	background-repeat: no-repeat;
-	background-position-y: center;
+	background-position-x: 5px;
+	background-position-y: 15px;
 	padding-left: 38px;	
 	list-style: none;
+}
+
+ul li li {
+	background-image: url("triangle2.svg");
 }

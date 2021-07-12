@@ -48,9 +48,21 @@
 	<subsection>After Include Subsection</subsection>
 	<slide>
 		<s:var name="heading" value="After include" />
-		<s:var name="heading" value="After include" />
 		<ul>
 			<li>This is the slide which directly follows an include.</li>
+		</ul>
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="Nested ULs" />
+		<ul>
+			<li>Level 1 Moo</li>
+			<li>Level 1 Koo
+				<ul>
+					<li>Nested 1</li>
+					<li>Nested 2</li>
+				</ul>
+			</li>
 		</ul>
 	</slide>
 

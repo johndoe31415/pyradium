@@ -18,7 +18,8 @@
 		],
 		"static": [
 			"bar.svg",
-			"triangle.svg",
+			"triangle1.svg",
+			"triangle2.svg",
 			"FiraSans-Regular-latin.woff2",
 			"FiraSans-Light-latin.woff2",
 			"FiraSans-Bold-latin.woff2"
