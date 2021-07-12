@@ -105,3 +105,11 @@ div.leftright {
 div.leftright div.left, div.leftright div.right {
 	width: 45%;
 }
+
+ul li {
+	background-image: url("triangle.svg");
+	background-repeat: no-repeat;
+	background-position-y: center;
+	padding-left: 38px;	
+	list-style: none;
+}
