@@ -40,3 +40,6 @@ class SymbolHook(ReplacementHook):
 		"mod":		"≡",
 		"inf":		"∞",
 	}
+	_SPAN_ATTRIBUTES = {
+		"class":	"symbol",
+	}

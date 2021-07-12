@@ -42,7 +42,10 @@ class TexHook(BaseHook):
 
 		replacement_node = node.ownerDocument.createElement("img")
 		replacement_node.setAttribute("src", local_filename)
-		replacement_node.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
+		if properties["long"]:
+			replacement_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
+		else:
+			replacement_node.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
 		replacement_node.setAttribute("alt", properties["formula"])
 
 		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])

@@ -31,6 +31,12 @@ class RenderableSlide():
 	def slide_type(self):
 		return self._slide_type
 
+	def var(self, name, default_value = None):
+		return self._slide_vars.get(name, default_value)
+
+	def has(self, name):
+		return name in self._slide_vars
+
 	def content(self, key = None):
 		if key is None:
 			key = "default"

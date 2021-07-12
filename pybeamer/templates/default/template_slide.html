@@ -1,14 +1,24 @@
 <%inherit file="base/slide.html" />
+<%block name="slide_classes">headerfooter</%block>
 <%block name="content">
-	<%block name="header">
-		<div class="header">
-		</div>
-	</%block>
-	<div class="body">
-		${next.body()}
+	<div class="header">
+		<%block name="header">
+			<div class="heading">${slide.var("heading", "")}</div>
+		</%block>
 	</div>
-	<%block name="footer">
-		<div class="footer">
+	<div class="body">
+		<div class="content">
+			${next.body()}
 		</div>
-	</%block>
+	</div>
+	<div class="footer">
+		<%block name="footer">
+			<div class="flex">
+				<div>Chapter</div>
+				<div>Section</div>
+				<div>11 / 87</div>
+			</div>
+			<img src="bar.svg" class="bar" />
+		</%block>
+	</div>
 </%block>

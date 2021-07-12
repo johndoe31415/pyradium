@@ -22,7 +22,8 @@
 		<s:var name="end" value="2.3" />
 	</slide>
 
-	<slide title="Pausing Slides">
+	<slide>
+		<s:var name="heading" value="Pausing Slides" />
 		<ul>
 			<li>This is a test! Pause1</li>
 			<s:pause />
@@ -32,46 +33,58 @@
 		</ul>
 	</slide>
 
-	<slide title="That's the second slide">
+	<slide>
+		<s:var name="heading" value="That's the second slide" />
 		<ul>
 			<li>This is a test!</li>
 			<s:debug>This is debugging text.</s:debug>
 			<li>Should be slide number two!</li>
+			<li>Next up: include!</li>
 		</ul>
 	</slide>
 
 	<include src="example_sub.xml" />
 
 	<subsection>After Include Subsection</subsection>
-	<slide title="After include">
+	<slide>
+		<s:var name="heading" value="After include" />
+		<s:var name="heading" value="After include" />
 		<ul>
-			<li>Second slide</li>
+			<li>This is the slide which directly follows an include.</li>
 		</ul>
 	</slide>
 
-	<slide title="Left/Right slide" type="leftright">
+	<slide type="leftright">
+		<s:var name="heading" value="Left/Right slide" />
 		<s:content name="left">
-			This is on the left side.
+			This is on the left side. It's a long text, so it gets wrapped. You get a nice feeling as to how wide it is.
 		</s:content>
 		<s:content name="right">
-			This is on the right side.
+			This is on the right side. It's a long text, so it gets wrapped. You get a nice feeling as to how wide it is.
 		</s:content>
 	</slide>
 
-	<slide title="Formula in Text">
+	<slide>
+		<s:var name="heading" value="Formula in Text" />
 		<ul>
 			<li>Short Weierstrass: <s:tex>y^2 = x^3 + ax + b</s:tex></li>
 			<li>Some Sum: <s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></li>
 		</ul>
+		<p>
+			In general, the short Weierstrass form is given as the formula <s:tex>y^2 = x^3 + ax + b</s:tex> and that's just great.
+		</p>
 	</slide>
 
-	<slide title="Long Formula">
-		<ul>
-			<li><s:tex long="1">y^2 = x^3 + ax + b</s:tex></li>
-		</ul>
+	<slide>
+		<s:var name="heading" value="Long Formula" />
+		<p>This is the long form:</p>
+		<div><s:tex long="1">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></div>
+		<p>While this is the short one for comparison:</p>
+		<div><s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></div>
 	</slide>
 
-	<slide title="Some Python Code">
+	<slide>
+		<s:var name="heading" value="Some Python Code" />
 		<s:code lang="python3"><![CDATA[
 			if foo == "bar":
 				print("foo was 'bar'")
@@ -82,7 +95,8 @@
 		]]></s:code>
 	</slide>
 
-	<slide title="Some C Code">
+	<slide>
+		<s:var name="heading" value="Some C Code" />
 		<s:code lang="c"><![CDATA[
 			int main(int argc, char **argv) {
 				printf("Foo: %d -> %p\n", argc, argv);
@@ -91,11 +105,13 @@
 		]]></s:code>
 	</slide>
 
-	<slide title="Some Python Code from File">
+	<slide>
+		<s:var name="heading" value="Some Python Code from a File" />
 		<s:code lang="python3" src="my_data.py" />
 	</slide>
 
-	<slide title="Some Terminal">
+	<slide>
+		<s:var name="heading" value="Some Terminal" />
 		<s:term><![CDATA[
 			$ ls /
 			bin
@@ -103,7 +119,13 @@
 		]]></s:term>
 	</slide>
 
-	<slide title="Quotation Marks">
+	<slide>
+		<s:var name="heading" value="Some Terminal from a File" />
+		<s:term src="terminal_output.txt" />
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="Quotation Marks" />
 		<ul>
 			<li><s:enq>US style</s:enq></li>
 			<li><s:enq type="fr">French style</s:enq></li>
@@ -112,7 +134,8 @@
 		</ul>
 	</slide>
 
-	<slide title="Arrows">
+	<slide>
+		<s:var name="heading" value="Arrows" />
 		<ul>
 			<li><s:ar>-)</s:ar> Right and long right <s:ar>--)</s:ar></li>
 			<li><s:ar>(-</s:ar> Left and long left <s:ar>(--</s:ar></li>
@@ -124,7 +147,8 @@
 		</ul>
 	</slide>
 
-	<slide title="Symbols">
+	<slide>
+		<s:var name="heading" value="Symbols" />
 		<ul>
 			<li><s:sym>xor</s:sym> XOR and <s:sym>xmul</s:sym> XMUL</li>
 			<li>Operators <s:sym>le</s:sym> <s:sym>lt</s:sym> <s:sym>eq</s:sym> <s:sym>neq</s:sym> <s:sym>gt</s:sym><s:sym>ge</s:sym></li>
@@ -132,15 +156,12 @@
 		</ul>
 	</slide>
 
-	<slide title="Emojis">
+	<slide>
+		<s:var name="heading" value="Emojis" />
 		<ul>
 			<li><s:emo>:)</s:emo> <s:emo>:))</s:emo> <s:emo>;)</s:emo></li>
 			<li><s:emo>:(</s:emo> <s:emo>:((</s:emo> <s:emo>;(</s:emo></li>
 			<li><s:emo>:|</s:emo> <s:emo>:o</s:emo> <s:emo>:O</s:emo></li>
 		</ul>
-	</slide>
-
-	<slide title="Some Terminal">
-		<s:term src="terminal_output.txt" />
 	</slide>
 </presentation>

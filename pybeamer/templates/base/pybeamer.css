@@ -42,3 +42,41 @@ div.menu input {
 	width: 75px;
 	padding: 10px 10px;
 }
+
+span.symbol {
+	font-family: math;
+}
+
+div.slide {
+	font-family: "Arial";
+	font-size: 48px;
+	background: #fff;
+}
+
+pre {
+	font-size: 75%;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+ul, ol, p {
+	margin-block-start: 0.5em;
+	margin-block-end: 0.5em;
+}
+
+pre.terminal {
+	background: #111;
+	color: #eee;
+	border: 1px gray dotted;
+	margin-left: 3%;
+	margin-right: 3%;
+	padding: 10px;
+}
+
+div.code_highlight {
+	background: #eee;
+	border: 1px gray dotted;
+	margin-left: 3%;
+	margin-right: 3%;
+	padding: 10px;
+}

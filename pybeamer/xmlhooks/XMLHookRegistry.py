@@ -63,6 +63,7 @@ class BaseHook():
 
 class ReplacementHook(BaseHook):
 	_REPLACEMENTS = None
+	_SPAN_ATTRIBUTES = None
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
@@ -72,7 +73,16 @@ class ReplacementHook(BaseHook):
 			return None
 		else:
 			replacement_text = cls._REPLACEMENTS[text]
-			replacement_node = node.ownerDocument.createTextNode(replacement_text)
+
+			text_node = node.ownerDocument.createTextNode(replacement_text)
+			if cls._SPAN_ATTRIBUTES is None:
+				replacement_node = text_node
+			else:
+				replacement_node = node.ownerDocument.createElement("span")
+				for (key, value) in cls._SPAN_ATTRIBUTES.items():
+					replacement_node.setAttribute(key, value)
+				replacement_node.appendChild(text_node)
+
 			return replacement_node
 
 class InnerTextHook(BaseHook):
@@ -91,5 +101,6 @@ class InnerTextHook(BaseHook):
 		text = text.strip("\n")
 		text = textwrap.dedent(text)
 		text = text.strip("\n")
+		text = text.expandtabs(4)
 
 		return cls.handle_text(text, rendered_presentation, node)

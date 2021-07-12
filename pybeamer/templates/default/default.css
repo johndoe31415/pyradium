@@ -1,6 +1,5 @@
 div.slide {
 	font-family: "Fira Sans";
-	font-size: 32px;
 }
 
 div.title img.bar {
@@ -9,7 +8,7 @@ div.title img.bar {
 	left: 2%;
 }
 
-div.title div.title {
+div.slide.title div.title {
 	font-weight: bold;
 	font-size: 150%;
 	position: absolute;
@@ -18,28 +17,85 @@ div.title div.title {
 	color: #2185c5;
 }
 
-div.title div.author {
+div.slide.title div.author {
+	font-size: 90%;
 	position: absolute;
 	top: 63%;
 	left: 5%;
 	color: #677480;
 }
 
-div.title div.date {
+div.slide.title div.date {
+	font-size: 89%;
+	font-weight: 100;
 	position: absolute;
-	top: 67%;
+	top: 69%;
 	left: 5%;
 	color: #97abbc;
 }
 
-pre.terminal {
-	background: #000;
-	color: #fff;
-	border: 1px gray dotted;
-	margin-left: 3%;
-	margin-right: 3%;
+div.slide.headerfooter div.header {
+	position: relative;
+	height: 10%;
+	/*background-color: #eee;*/
+}
+
+div.header div.heading {
+	font-weight: bold;
+	margin-left: 15px;
 	padding: 10px;
 }
 
-div.code {
+div.slide.headerfooter div.body {
+	position: relative;
+	height: 82%;
+}
+
+div.body div.content {
+	padding: 25px;
+}
+
+div.slide.headerfooter div.footer {
+	position: relative;
+	height: 8%;
+	/*background-color: #eee;*/
+	color: #97abbc;
+	font-size: 75%;
+	font-weight: 100;
+}
+
+div.footer div.flex {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	width: 95%;
+	margin: 0 auto;
+}
+
+div.footer img.bar {
+	position: absolute;
+	width: 100%;
+	bottom: 0px;
+}
+
+div.slidetype-leftright div.content-left {
+	position: relative;
+	float: left;
+	width: 50%;
+}
+
+div.slidetype-leftright div.content-right {
+	position: relative;
+	float: right;
+	width: 50%;
+}
+
+div.leftright {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+}
+
+div.leftright div.left, div.leftright div.right {
+	width: 45%;
 }
