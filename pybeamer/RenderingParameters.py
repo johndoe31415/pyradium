@@ -34,6 +34,10 @@ class RenderingParameters():
 			self._include_dirs = list(include_dirs)
 
 	@property
+	def image_max_dimension(self):
+		return 1000
+
+	@property
 	def geometry_x(self):
 		return 1280
 

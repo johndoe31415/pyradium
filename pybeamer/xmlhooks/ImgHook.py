@@ -30,7 +30,7 @@ class ImgHook(BaseHook):
 	def handle(cls, rendered_presentation, node):
 		properties = {
 			"src":				rendered_presentation.renderer.lookup_include(node.getAttribute("src")),
-			"max_dimension":	1000,
+			"max_dimension":	rendered_presentation.renderer.rendering_params.image_max_dimension,
 		}
 		img_renderer = rendered_presentation.renderer.get_custom_renderer("img")
 		rendered_image = img_renderer.render(properties)
