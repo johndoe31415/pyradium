@@ -3,6 +3,7 @@ div.slide {
 	height: ${renderer.rendering_params.geometry_y}px;
 	border: 1px solid #aaa;
 	margin-bottom: 10px;
+	overflow: hidden;
 }
 
 /* Menu bar on top */

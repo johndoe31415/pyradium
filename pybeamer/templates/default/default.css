@@ -49,10 +49,13 @@ div.header div.heading {
 div.slide.headerfooter div.body {
 	position: relative;
 	height: 82%;
+	overflow: hidden;
 }
 
 div.body div.content {
+	color: #34495e;
 	padding: 25px;
+	overflow: hidden;
 }
 
 div.slide.headerfooter div.footer {
@@ -62,6 +65,7 @@ div.slide.headerfooter div.footer {
 	color: #97abbc;
 	font-size: 75%;
 	font-weight: 100;
+	overflow: hidden;
 }
 
 div.footer div.flex {
