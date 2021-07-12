@@ -146,6 +146,11 @@ class PresentationRenderer():
 			"rendered_presentation":	rendered_presentation,
 		}
 
+
+		# Run it first to build the TOC
+		self._compute_renderable_slides(rendered_presentation)
+		rendered_presentation.toc.freeze()
+
 		for renderable_slide in self._compute_renderable_slides(rendered_presentation):
 			args = dict(template_args)
 			args.update({

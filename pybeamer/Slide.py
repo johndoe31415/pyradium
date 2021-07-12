@@ -59,12 +59,22 @@ class RenderSlideDirective(BaseDirective):
 		return slide_vars
 
 	def render(self, rendered_presentation):
+		rendered_presentation.toc.advance_slide()
+		slide_vars = dict(self._slide_vars)
+		slide_vars.update({
+			"current_slide_number":	rendered_presentation.toc.current_slide_no,
+			"total_slide_count":	rendered_presentation.toc.total_slide_count,
+			"chapter":				rendered_presentation.toc.chapter,
+			"section":				rendered_presentation.toc.section,
+			"subsection":			rendered_presentation.toc.subsection,
+		})
+
 		paused_containers = PauseRenderer(self, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
 
 		for paused_container in paused_containers:
 			for container_node in paused_container.values():
 				XMLHookRegistry.mangle(rendered_presentation, container_node)
-			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = self._slide_vars)
+			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = slide_vars)
 
 	def __repr__(self):
 		return "Slide<%s>" % (self.slide_type)
