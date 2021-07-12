@@ -23,30 +23,26 @@ from pybeamer.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
-class TexHook(BaseHook):
-	_TAG_NAME = "tex"
+class ImgHook(BaseHook):
+	_TAG_NAME = "img"
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
 		properties = {
-			"formula":	XMLTools.inner_text(node),
-			"long":		XMLTools.get_bool_attr(node, "long"),
+			"src":				rendered_presentation.renderer.lookup_include(node.getAttribute("src")),
+			"max_dimension":	1000,
 		}
-		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
-		rendered_formula = tex_renderer.render(properties)
-		local_filename = "imgs/latex/%s.png" % (rendered_formula.keyhash)
+		img_renderer = rendered_presentation.renderer.get_custom_renderer("img")
+		rendered_image = img_renderer.render(properties)
+		local_filename = "imgs/img/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
 
-		scale_factor = 0.5
-		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
-		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
+		replacement_node = node.ownerDocument.createElement("div")
+		replacement_node.setAttribute("class", "fillimg")
 
-		replacement_node = node.ownerDocument.createElement("img")
-		replacement_node.setAttribute("src", local_filename)
-		if properties["long"]:
-			replacement_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
-		else:
-			replacement_node.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
-		replacement_node.setAttribute("alt", properties["formula"])
+		img_node = node.ownerDocument.createElement("img")
+		img_node.setAttribute("src", local_filename)
+		img_node.setAttribute("class", "fill")
+		replacement_node.appendChild(img_node)
 
-		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])
+		rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
 		return replacement_node

@@ -31,14 +31,15 @@ class ExtendedJSONObjects(enum.Enum):
 class ExtendedJSONEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, bytes):
-			# Try to compress first
-			compressed = zlib.compress(obj)
+			if len(obj) > 1000:
+				# Try to compress first
+				compressed = zlib.compress(obj)
 
-			# Evaluate if it was worth it
-			saved_size_bytes = len(obj) - len(compressed)
-			saved_size_percent = 100 * saved_size_bytes / len(obj)
+				# Evaluate if it was worth it
+				saved_size_bytes = len(obj) - len(compressed)
+				saved_size_percent = 100 * saved_size_bytes / len(obj)
 
-			if (saved_size_bytes < 1000) or (saved_size_percent < 1):
+			if (len(obj) <= 1000) or (saved_size_bytes < 1000) or (saved_size_percent < 1):
 				# Save raw, not worth it.
 				return {
 					"__internal_object__":	ExtendedJSONObjects.UncompressedBytes.value,

@@ -26,6 +26,7 @@ from .RendererCache import RendererCache
 from .TOC import TOC
 from .Exceptions import FailedToLookupFileException
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
+from pybeamer.renderer.ImageRenderer import ImageRenderer
 import mako.lookup
 
 class RenderedPresentation():
@@ -86,6 +87,7 @@ class PresentationRenderer():
 		self._rendering_params = rendering_params
 		self._custom_renderers = {
 			"latex":	RendererCache(LatexFormulaRenderer()),
+			"img":		RendererCache(ImageRenderer()),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8")
 		with open(self.lookup_template_file(self._rendering_params.template_style + "/configuration.json")) as f:

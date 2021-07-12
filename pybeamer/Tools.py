@@ -19,6 +19,8 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import json
+import subprocess
 from pybeamer.Exceptions import InvalidBooleanValueException
 
 class XMLTools():
@@ -185,3 +187,9 @@ class XMLTools():
 			return False
 		else:
 			raise InvalidBooleanValueException("Invalid boolean value for attribute %s of node %s." % (attr_name, node))
+
+class ImageTools():
+	@classmethod
+	def get_image_info(cls, filename):
+		image_info = json.loads(subprocess.check_output([ "convert", filename, "json:-" ]))[0]
+		return image_info

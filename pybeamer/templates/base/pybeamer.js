@@ -6,12 +6,12 @@ export class Presentation {
 
 	start() {
 		this._mode = "run";
-		console.log("presentation started");
+		console.log("Presentation started.");
 	}
 
 	stop() {
 		this._mode = "stop";
-		console.log("presentation stopped");
+		console.log("Presentation stopped.");
 	}
 
 	next_slide() {

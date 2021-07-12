@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import json
-import base64
 import tempfile
 import hashlib
 import subprocess

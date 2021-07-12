@@ -164,4 +164,9 @@
 			<li><s:emo>:|</s:emo> <s:emo>:o</s:emo> <s:emo>:O</s:emo></li>
 		</ul>
 	</slide>
+
+	<slide>
+		<s:var name="heading" value="Image Rendering" />
+		<s:img src="3dbox.svg" />
+	</slide>
 </presentation>

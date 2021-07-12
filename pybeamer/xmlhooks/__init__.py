@@ -26,4 +26,5 @@ from .QuoteHook import QuoteHook
 from .TexHook import TexHook
 from .TerminalHook import TerminalHook
 from .CodeHook import CodeHook
+from .ImgHook import ImgHook
 from .DebugHook import DebugHook
