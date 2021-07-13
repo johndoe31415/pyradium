@@ -73,9 +73,14 @@ class RenderSlideDirective(BaseDirective):
 
 		paused_containers = PauseRenderer(self, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
 
-		for paused_container in paused_containers:
+		for (sub_slide_index, paused_container) in enumerate(paused_containers):
 			for container_node in paused_container.values():
 				XMLHookRegistry.mangle(rendered_presentation, container_node)
+
+			slide_vars = dict(slide_vars)
+			slide_vars.update({
+				"sub_slide_index":	sub_slide_index,
+			})
 			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = slide_vars)
 
 	def __repr__(self):

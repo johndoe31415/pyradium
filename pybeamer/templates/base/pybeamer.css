@@ -1,9 +1,15 @@
-div.slide {
+div.size_container {
 	width: ${renderer.rendering_params.geometry_x}px;
 	height: ${renderer.rendering_params.geometry_y}px;
 	border: 1px solid #aaa;
 	margin-bottom: 10px;
 	overflow: hidden;
+}
+
+div.slide {
+	position: relative;
+	height: 100%;
+	width: 100%;
 }
 
 /* Menu bar on top */

@@ -2,6 +2,10 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
+		%if presentation.meta.get("author") is not None:
+		<meta name="author" content="${presentation.meta.get("author")}" />
+		%endif
+		<meta name="generator" content="https://github.com/johndoe31415/pybeamer" />
 		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
 		<link rel="stylesheet" href="pybeamer.css">
 		%for css_filename in rendered_presentation.css:
@@ -12,17 +16,28 @@
 	<body>
 		<div class="menu">
 			<input type="text" value="1" id="current_slideno" class="control" />
-			<button id="btn_present" class="control">Present</button>
+			<button id="btn_goto_slide" class="control">Goto</button>
+			<button id="btn_present" class="control">Start Presentation</button>
 		</div>
 
 		%for slide in rendered_presentation.rendered_slides:
 		${slide}
 		%endfor
 
+		<div id="full_screen_div" style="display: hidden" />
+
 		<script type="module">
 			import {Presentation} from "./pybeamer.js";
-			const presentation = new Presentation();
+			const ui_elements = {
+				"slides":			document.querySelectorAll("div.slide"),
+				"slideno_text":		document.querySelector("#current_slideno"),
+				"full_screen_div":	document.querySelector("#full_screen_div"),
+			};
+			const presentation = new Presentation(ui_elements);
 			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start());
+			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
+			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
+			document.addEventListener("wheel", (event) => presentation.event_wheel(event));
 		</script>
 	</body>
 </html>

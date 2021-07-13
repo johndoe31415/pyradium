@@ -22,6 +22,7 @@
 import sys
 from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
+from .ActionServe import ActionServe
 
 def main():
 	mc = MultiCommand()
@@ -32,6 +33,13 @@ def main():
 		parser.add_argument("infile", help = "Input XML file of the slide show.")
 		parser.add_argument("outdir", help = "Output directory the presentation is put into.")
 	mc.register("render", "Render a slide show", genparser, action = ActionRender)
+
+	def genparser(parser):
+		parser.add_argument("-b", "--bind-addr", metavar = "addr", type = str, default = "127.0.0.1", help = "Address to bind to. Defaults to %(default)s.")
+		parser.add_argument("-p", "--port", metavar = "port", type = int, default = 8123, help = "Port to serve directory under. Defaults to %(default)s.")
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("dirname", metavar = "dirname", help = "Directory that should be served.")
+	mc.register("serve", "Serve a slide show as HTTP", genparser, action = ActionServe)
 
 	return mc.run(sys.argv[1:])
 

@@ -1,3 +1,5 @@
-<div class="slide <%block name="slide_classes"></%block>">
-	${next.body()}
+<div class="size_container">
+	<div class="slide <%block name="slide_classes"></%block>" slide_no="${slide.var("current_slide_number")}" sub_slide_index="${slide.var("sub_slide_index")}">
+		${next.body()}
+	</div>
 </div>
