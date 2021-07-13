@@ -20,9 +20,11 @@
 			<button id="btn_present" class="control">Start Presentation</button>
 		</div>
 
+		<div class="slides">
 		%for slide in rendered_presentation.rendered_slides:
 		${slide}
 		%endfor
+		</div>
 
 		<div id="full_screen_div" class="size_container" style="display: none;"></div>
 
