@@ -24,7 +24,7 @@
 		${slide}
 		%endfor
 
-		<div id="full_screen_div" style="display: hidden" />
+		<div id="full_screen_div" class="size_container" style="display: none;"></div>
 
 		<script type="module">
 			import {Presentation} from "./pybeamer.js";
@@ -34,10 +34,11 @@
 				"full_screen_div":	document.querySelector("#full_screen_div"),
 			};
 			const presentation = new Presentation(ui_elements);
-			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start());
+			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start_presentation());
 			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
 			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
 			document.addEventListener("wheel", (event) => presentation.event_wheel(event));
+			document.addEventListener("fullscreenchange", (event) => presentation.event_fullscreen(event));
 		</script>
 	</body>
 </html>

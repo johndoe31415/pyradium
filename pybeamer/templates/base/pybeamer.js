@@ -26,6 +26,8 @@ export class Presentation {
 		this._ui_elements = ui_elements;
 		this._enumerate_slides();
 		this._internal_slide_index = 0;
+		this._resize_obs = new ResizeObserver((event) => this.event_resize(event));
+		this._resize_obs.observe(this._ui_elements.full_screen_div);
 	}
 
 	get slide_count() {
@@ -46,12 +48,21 @@ export class Presentation {
 		});
 	}
 
+	_hide_full_screen_div() {
+		this._ui_elements.full_screen_div.style.display = "none";
+	}
+
 	_prepare_full_screen_div() {
 		const size_container = this.current_slide.parentElement;
+		const zoom_factor = this._ui_elements.full_screen_div.offsetWidth / this.current_slide.offsetWidth;
+		this._ui_elements.full_screen_div.style.display = "";
 		this._ui_elements.full_screen_div.innerHTML = size_container.innerHTML;
 	}
 
-	start() {
+	start_presentation() {
+		if (this.presentation_mode) {
+			return;
+		}
 		console.log("Presentation started.");
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
@@ -76,6 +87,8 @@ export class Presentation {
 	event_keypress(event) {
 		if (event.key == "g") {
 			this.goto_slide();
+		} else if (event.key == "s") {
+			this.start_presentation();
 		} else {
 			console.log(event);
 		}
@@ -89,6 +102,28 @@ export class Presentation {
 			} else {
 				this.prev_slide();
 			}
+		}
+	}
+
+	event_fullscreen(event) {
+		if (!this.presentation_mode) {
+			this._hide_full_screen_div();
+		}
+	}
+
+	event_resize(event) {
+		if (this.presentation_mode) {
+			const screen_width = screen.width;
+			const screen_height = screen.height;
+
+			const slide_width = this._ui_elements.slides[0].offsetWidth;
+			const slide_height = this._ui_elements.slides[0].offsetHeight;
+			const zoom_x = screen_width / slide_width;
+			const zoom_y = screen_height / slide_height;
+			const zoom = (zoom_x < zoom_y) ? zoom_x : zoom_y;
+
+			console.log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
+			this._ui_elements.full_screen_div.style = "zoom: " + zoom;
 		}
 	}
 
