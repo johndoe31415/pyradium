@@ -56,6 +56,7 @@ class RenderSlideDirective(BaseDirective):
 		for node in XMLTools.findall(self._dom, "s:var"):
 			(key, value) = (node.getAttribute("name"), node.getAttribute("value"))
 			slide_vars[key] = value
+			XMLTools.remove_node(node)
 		return slide_vars
 
 	def render(self, rendered_presentation):
