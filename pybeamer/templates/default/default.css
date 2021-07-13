@@ -118,3 +118,8 @@ ul li {
 ul li li {
 	background-image: url("triangle2.svg");
 }
+
+ul.bare li {
+	background-image: none;
+	padding-left: 0px;	
+}

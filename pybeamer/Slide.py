@@ -59,14 +59,15 @@ class RenderSlideDirective(BaseDirective):
 		return slide_vars
 
 	def render(self, rendered_presentation):
-		rendered_presentation.toc.advance_slide()
+		rendered_presentation.advance_slide()
 		slide_vars = dict(self._slide_vars)
 		slide_vars.update({
-			"current_slide_number":	rendered_presentation.toc.current_slide_no,
-			"total_slide_count":	rendered_presentation.toc.total_slide_count,
-			"chapter":				rendered_presentation.toc.chapter,
-			"section":				rendered_presentation.toc.section,
-			"subsection":			rendered_presentation.toc.subsection,
+			"current_slide_number":	rendered_presentation.current_slide_number,
+			"total_slide_count":	rendered_presentation.total_slide_count,
+			"chapter":				rendered_presentation.toc.current_text(0),
+			"section":				rendered_presentation.toc.current_text(1),
+			"subsection":			rendered_presentation.toc.current_text(2),
+			"toc":					rendered_presentation.frozen_toc,
 		})
 
 		paused_containers = PauseRenderer(self, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()

@@ -1,2 +1,18 @@
 <%inherit file="template_slide.html" />
-${slide.content()}
+<%block name="header">
+	<div class="heading">${slide.var("heading", "Table of Contents")}</div>
+</%block>
+<% toc = slide.var("toc") %>
+%if toc is None:
+TOC not rendered yet.
+%else:
+%for (command, entry) in toc:
+%if command.name == "NestingIncrease":
+<ul class="bare">
+%elif command.name == "NestingDecrease":
+</ul>
+%else:
+<li>${entry.full_number} ${entry.text}</li>
+%endif
+%endfor
+%endif

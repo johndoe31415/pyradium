@@ -9,7 +9,7 @@
 		<date>2020-01-01</date>
 		<schedule>14:00-14:45</schedule>
 		<format>
-			<x>Foo</x>
+			<date>%d.%m.%Y</date>
 		</format>
 	</meta>
 
@@ -45,6 +45,7 @@
 
 	<include src="example_sub.xml" />
 
+	<section>Finalization</section>
 	<subsection>After Include Subsection</subsection>
 	<slide>
 		<s:var name="heading" value="After include" />
@@ -95,6 +96,7 @@
 		<div><s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></div>
 	</slide>
 
+	<subsection>Code Highlighting</subsection>
 	<slide>
 		<s:var name="heading" value="Some Python Code" />
 		<s:code lang="python3"><![CDATA[

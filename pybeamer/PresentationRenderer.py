@@ -23,8 +23,8 @@ import os
 import json
 import contextlib
 from .RendererCache import RendererCache
-from .TOC import TOC
 from .Exceptions import FailedToLookupFileException
+from .GenericTOC import GenericTOC
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
 import mako.lookup
@@ -34,9 +34,29 @@ class RenderedPresentation():
 		self._renderer = renderer
 		self._rendered_slides = [ ]
 		self._css = set()
-		self._toc = TOC()
+		self._toc = GenericTOC()
+		self._frozen_toc = None
 		self._deploy_directory = deploy_directory
 		self._added_files = set()
+		self._current_slide_number = 0
+		self._total_slide_count = 0
+
+	@property
+	def current_slide_number(self):
+		return self._current_slide_number
+
+	@property
+	def total_slide_count(self):
+		return self._total_slide_count
+
+	def advance_slide(self):
+		self._current_slide_number += 1
+		self._total_slide_count = max(self._total_slide_count, self._current_slide_number)
+
+	def finalize_toc(self):
+		self._frozen_toc = self._toc.finalize()
+		self._toc = GenericTOC()
+		self._current_slide_number = 0
 
 	@property
 	def renderer(self):
@@ -56,6 +76,10 @@ class RenderedPresentation():
 	@property
 	def toc(self):
 		return self._toc
+
+	@property
+	def frozen_toc(self):
+		return self._frozen_toc
 
 	def append_slide(self, rendered_slide):
 		self._rendered_slides.append(rendered_slide)
@@ -149,7 +173,7 @@ class PresentationRenderer():
 
 		# Run it first to build the TOC
 		self._compute_renderable_slides(rendered_presentation)
-		rendered_presentation.toc.freeze()
+		rendered_presentation.finalize_toc()
 
 		for renderable_slide in self._compute_renderable_slides(rendered_presentation):
 			args = dict(template_args)
