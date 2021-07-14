@@ -44,13 +44,15 @@ _TOCItem = collections.namedtuple("TOCItem", [ "level", "text", "pages" ])
 _TOCInstruction = collections.namedtuple("TOCInstruction", [ "opcode", "data" ])
 
 class FrozenTOC():
-	TOCEntry = collections.namedtuple("TOCEntry", [ "order", "local_number", "full_number", "text", "full_text" ])
+	TOCEntry = collections.namedtuple("TOCEntry", [ "index", "order", "depth", "local_number", "full_number", "text", "full_text" ])
 
 	def __init__(self, toc):
 		self._toc = toc
+		self._current_index = 0
 		self._levels = self._determine_levels(toc)
 		self._instructions = self._normalize_instructions(toc)
 		self._entries = [ ]
+		self._index_by_full_number = { }
 
 		self._text = collections.defaultdict(str)
 		self._counter = collections.defaultdict(int)
@@ -125,7 +127,13 @@ class FrozenTOC():
 		full_text = [ ]
 		for level in range(at_level + 1):
 			full_text.append(self._text[level])
-		return self.TOCEntry(order = order, local_number = local_number, full_number = full_number, text = self._text[at_level], full_text = full_text)
+		self._current_index += 1
+
+		entry_index = len(self._entries)
+		if full_number not in self._index_by_full_number:
+			self._index_by_full_number[full_number] = entry_index
+
+		return self.TOCEntry(index = self._current_index - 1, order = order, depth = at_level + 1, local_number = local_number, full_number = full_number, text = self._text[at_level], full_text = full_text)
 
 	def _unroll(self):
 		previous_level = -1
@@ -168,6 +176,38 @@ class FrozenTOC():
 
 	def __iter__(self):
 		return iter(self._entries)
+
+	def subset(self, start_at = None, end_before = None, max_items = None):
+		index = 0
+		if start_at is not None:
+			index = self._index_by_full_number[start_at]
+		seen = 0
+		current_depth = 0
+
+		while index < len(self._entries):
+			(command, entry) = self._entries[index]
+			if command == TOCCommand.NestingIncrease:
+				current_depth += 1
+			elif command == TOCCommand.NestingDecrease:
+				current_depth -= 1
+			elif command == TOCCommand.Item:
+				if current_depth < entry.depth:
+					for i in range(entry.depth - current_depth):
+						yield (TOCCommand.NestingIncrease, None)
+				current_depth = entry.depth
+
+				if (end_before is not None) and (entry.full_number == end_before):
+					break
+
+				seen += 1
+				if (max_items is not None) and (seen > max_items):
+					break
+
+			yield (command, entry)
+			index += 1
+
+		for i in range(current_depth):
+			yield (TOCCommand.NestingDecrease, None)
 
 class GenericTOC():
 	def __init__(self):
@@ -214,7 +254,7 @@ if __name__ == "__main__":
 	toc.new_heading(1, "Apparatus")
 	toc.new_heading(5, "Design")
 	toc.new_heading(5, "Implementation")
-	for x in range(30):
+	for x in range(3):
 		toc.new_heading(6, "fooo %d" % (x))
 	toc.new_heading(1, "Setup")
 	toc.new_heading(5, "Initital")
@@ -226,5 +266,13 @@ if __name__ == "__main__":
 	toc.new_heading(1, "Foobar")
 	toc.new_heading(1, "Barfoo")
 	toc.new_heading(1, "Mookoo")
-	for cmd in toc.finalize():
+
+	frozen_toc = toc.finalize()
+	for cmd in frozen_toc:
 		print(cmd)
+
+	print("-" * 120)
+	for cmd in frozen_toc.subset(start_at = "2.1", end_before = "3", max_items = 4):
+		print(cmd)
+
+
