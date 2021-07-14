@@ -113,12 +113,14 @@ export class Presentation {
 		}
 	}
 
-	event_scroll_in_viewport(event) {
-		if (event[0].isIntersecting) {
-			const slide = event[0].target;
-			const internal_slide_index = slide.getAttribute("internal_slide_index") | 0;
-			this._goto_slide(internal_slide_index, false);
-		}
+	event_scroll_in_viewport(events) {
+		events.forEach((event) => {
+			if (event.isIntersecting) {
+				const slide = event.target;
+				const internal_slide_index = slide.getAttribute("internal_slide_index") | 0;
+				this._goto_slide(internal_slide_index, false);
+			}
+		});
 	}
 
 	event_fullscreen(event) {
