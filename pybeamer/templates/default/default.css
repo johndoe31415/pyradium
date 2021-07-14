@@ -2,6 +2,10 @@ div.slide {
 	font-family: "Fira Sans";
 }
 
+pre {
+	font-family: "Latin Modern Mono";
+}
+
 div.title img.bar {
 	position: absolute;
 	top: 58%;

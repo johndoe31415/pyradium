@@ -14,15 +14,18 @@
 	"files": {
 		"css": [
 			"default.css",
-			"font_fira.css"
+			"font_fira.css",
+			"font_latinmodernmono.css"
 		],
 		"static": [
 			"bar.svg",
 			"triangle1.svg",
 			"triangle2.svg",
-			"FiraSans-Regular-latin.woff2",
-			"FiraSans-Light-latin.woff2",
-			"FiraSans-Bold-latin.woff2"
+			"font_fira/FiraSans-Regular-latin.woff2",
+			"font_fira/FiraSans-Light-latin.woff2",
+			"font_fira/FiraSans-Bold-latin.woff2",
+			"font_latinmodernmono/lmmono10-regular.otf",
+			"font_latinmodernmono/lmmono10-italic.otf"
 		]
 	},
 	"controllers": {

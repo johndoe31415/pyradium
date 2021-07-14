@@ -39,13 +39,6 @@ class RenderSlideDirective(BaseDirective):
 		if len(self._content_containers) == 0:
 			self._content_containers["default"] = self._dom
 
-#	@property
-#	def containers(self):
-#		return self._content_containers
-
-#	def clone_containers(self):
-#		return { name: container.cloneNode(deep = True) for (name, container) in self._content_containers.items() }
-
 	@property
 	def slide_type(self):
 		return self._dom.getAttribute("type")

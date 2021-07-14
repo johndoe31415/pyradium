@@ -28,13 +28,14 @@ from .GenericTOC import GenericTOC
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
 from pybeamer.Controller import ControllerManager
+from pybeamer.OrderedSet import OrderedSet
 import mako.lookup
 
 class RenderedPresentation():
 	def __init__(self, renderer, deploy_directory):
 		self._renderer = renderer
 		self._rendered_slides = [ ]
-		self._css = set()
+		self._css = OrderedSet()
 		self._toc = GenericTOC()
 		self._frozen_toc = None
 		self._deploy_directory = deploy_directory
@@ -182,7 +183,6 @@ class PresentationRenderer():
 			"presentation":				self._presentation,
 			"rendered_presentation":	rendered_presentation,
 		}
-
 
 		# Run it first to build the TOC
 		self._compute_renderable_slides(rendered_presentation)

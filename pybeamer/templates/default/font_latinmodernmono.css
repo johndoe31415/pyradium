@@ -1,0 +1,7 @@
+@font-face {
+  font-family: 'Latin Modern Mono';
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+  src: local('lmmono10-regular.otf') format('otf');
+}
