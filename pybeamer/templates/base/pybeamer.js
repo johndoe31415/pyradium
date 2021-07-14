@@ -28,6 +28,12 @@ export class Presentation {
 		this._internal_slide_index = 0;
 		this._resize_obs = new ResizeObserver((event) => this.event_resize(event));
 		this._resize_obs.observe(this._ui_elements.full_screen_div);
+		this._intersect_obs = new IntersectionObserver((event) => this.event_scroll_in_viewport(event), {
+			"threshold":	0.75,
+		});
+		this._ui_elements.slides.forEach((slide) => {
+			this._intersect_obs.observe(slide);
+		});
 	}
 
 	get slide_count() {
@@ -92,7 +98,7 @@ export class Presentation {
 		} else if (event.key == "s") {
 			this.start_presentation();
 		} else {
-			console.log(event);
+			//console.log(event);
 		}
 	}
 
@@ -104,6 +110,14 @@ export class Presentation {
 			} else {
 				this.prev_slide();
 			}
+		}
+	}
+
+	event_scroll_in_viewport(event) {
+		if (event[0].isIntersecting) {
+			const slide = event[0].target;
+			const internal_slide_index = slide.getAttribute("internal_slide_index") | 0;
+			this._goto_slide(internal_slide_index, false);
 		}
 	}
 

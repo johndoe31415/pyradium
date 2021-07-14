@@ -14,9 +14,9 @@
 	<div class="footer">
 		<%block name="footer">
 			<div class="flex">
-				<div>${slide.var("section", "")}</div>
-				<div>${slide.var("subsection", "")}</div>
-				<div>${slide.var("current_slide_number")} / ${slide.var("total_slide_count")}</div>
+				<div class="flexchild left">${slide.var("section", "")}</div>
+				<div class="flexchild center">${slide.var("subsection", "")}</div>
+				<div class="flexchild right">${slide.var("current_slide_number")} / ${slide.var("total_slide_count")}</div>
 			</div>
 			<img src="bar.svg" class="bar" />
 		</%block>

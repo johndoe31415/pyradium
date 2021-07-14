@@ -75,9 +75,25 @@ div.slide.headerfooter div.footer {
 div.footer div.flex {
 	display: flex;
 	flex-wrap: nowrap;
-	justify-content: space-between;
 	width: 95%;
 	margin: 0 auto;
+}
+
+div.flex div.flexchild {
+	flex: 1;
+	display: flex;
+}
+
+div.flexchild.left {
+	justify-content: flex-start;
+}
+
+div.flexchild.center {
+	justify-content: center;
+}
+
+div.flexchild.right {
+	justify-content: flex-end;
 }
 
 div.footer img.bar {
