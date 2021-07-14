@@ -114,7 +114,7 @@ class PresentationRenderer():
 			"latex":	RendererCache(LatexFormulaRenderer()),
 			"img":		RendererCache(ImageRenderer()),
 		}
-		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8")
+		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])
 		with open(self.lookup_styled_template_file("configuration.json")) as f:
 			self._template_config = json.load(f)
 		self._ctrlr_mgr = ControllerManager(self)

@@ -183,4 +183,12 @@
 		<s:var name="heading" value="Image Rendering" />
 		<s:img src="3dbox.svg" />
 	</slide>
+
+	<subsection>Esc&lt;&gt;ping</subsection>
+	<slide>
+		<s:var name="heading" value="Escaped &lt;&gt; Characters" />
+		<ul>
+			<li>This is verbatim: &lt; &gt;</li>
+		</ul>
+	</slide>
 </presentation>

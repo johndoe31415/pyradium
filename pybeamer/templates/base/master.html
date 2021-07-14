@@ -22,7 +22,7 @@
 
 		<div class="slides">
 		%for slide in rendered_presentation.rendered_slides:
-		${slide}
+		${slide | n}
 		%endfor
 		</div>
 
