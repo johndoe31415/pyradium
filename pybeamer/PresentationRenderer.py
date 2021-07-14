@@ -27,6 +27,7 @@ from .Exceptions import FailedToLookupFileException
 from .GenericTOC import GenericTOC
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
+from pybeamer.Controller import ControllerManager
 import mako.lookup
 
 class RenderedPresentation():
@@ -114,8 +115,9 @@ class PresentationRenderer():
 			"img":		RendererCache(ImageRenderer()),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8")
-		with open(self.lookup_template_file(self._rendering_params.template_style + "/configuration.json")) as f:
+		with open(self.lookup_styled_template_file("configuration.json")) as f:
 			self._template_config = json.load(f)
+		self._ctrlr_mgr = ControllerManager(self)
 
 	def _get_mako_lookup_directories(self):
 		for dirname in self._rendering_params.template_dirs:
@@ -125,6 +127,14 @@ class PresentationRenderer():
 	@property
 	def rendering_params(self):
 		return self._rendering_params
+
+	@property
+	def template_config(self):
+		return self._template_config
+
+	@property
+	def controllers(self):
+		return self._ctrlr_mgr
 
 	def get_custom_renderer(self, name):
 		return self._custom_renderers[name]
@@ -142,6 +152,9 @@ class PresentationRenderer():
 
 	def lookup_template_file(self, filename):
 		return self._search_file(filename, self._rendering_params.template_dirs)
+
+	def lookup_styled_template_file(self, filename):
+		return self.lookup_template_file(self._rendering_params.template_style + "/" + filename)
 
 	def lookup_include(self, filename):
 		return self._search_file(filename, self._rendering_params.include_dirs)

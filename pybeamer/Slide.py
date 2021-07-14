@@ -32,7 +32,7 @@ class RenderSlideDirective(BaseDirective):
 		self._dom = xmlnode
 		if not self._dom.hasAttribute("type"):
 			self._dom.setAttribute("type", "default")
-		self._slide_vars = self._get_slide_vars()
+		self._xml_slide_vars = self._get_xml_slide_vars()
 		self._content_containers = { }
 		for content_node in XMLTools.findall(self._dom, "s:content"):
 			self._content_containers[content_node.getAttribute("name")] = content_node
@@ -50,7 +50,7 @@ class RenderSlideDirective(BaseDirective):
 	def slide_type(self):
 		return self._dom.getAttribute("type")
 
-	def _get_slide_vars(self):
+	def _get_xml_slide_vars(self):
 		# First search DOM for any variables
 		slide_vars = { }
 		for node in XMLTools.findall(self._dom, "s:var"):
@@ -59,9 +59,8 @@ class RenderSlideDirective(BaseDirective):
 			XMLTools.remove_node(node)
 		return slide_vars
 
-	def render(self, rendered_presentation):
-		rendered_presentation.advance_slide()
-		slide_vars = dict(self._slide_vars)
+	def compute_slide_vars(self, rendered_presentation, sub_slide_index):
+		slide_vars = dict(self._xml_slide_vars)
 		slide_vars.update({
 			"current_slide_number":	rendered_presentation.current_slide_number,
 			"total_slide_count":	rendered_presentation.total_slide_count,
@@ -69,7 +68,15 @@ class RenderSlideDirective(BaseDirective):
 			"section":				rendered_presentation.toc.current_text(1),
 			"subsection":			rendered_presentation.toc.current_text(2),
 			"toc":					rendered_presentation.frozen_toc,
+			"sub_slide_index":		sub_slide_index,
 		})
+		return slide_vars
+
+	def render(self, rendered_presentation):
+		controller = rendered_presentation.renderer.controllers.get_controller(self, rendered_presentation)
+		print(controller)
+
+		rendered_presentation.advance_slide()
 
 		paused_containers = PauseRenderer(self, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
 
@@ -77,10 +84,7 @@ class RenderSlideDirective(BaseDirective):
 			for container_node in paused_container.values():
 				XMLHookRegistry.mangle(rendered_presentation, container_node)
 
-			slide_vars = dict(slide_vars)
-			slide_vars.update({
-				"sub_slide_index":	sub_slide_index,
-			})
+			slide_vars = self.compute_slide_vars(rendered_presentation, sub_slide_index)
 			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = slide_vars)
 
 	def __repr__(self):

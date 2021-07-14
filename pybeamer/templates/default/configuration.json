@@ -24,5 +24,11 @@
 			"FiraSans-Light-latin.woff2",
 			"FiraSans-Bold-latin.woff2"
 		]
+	},
+	"controllers": {
+		"toc": {
+			"file":			"controller.py",
+			"class":		"TOCController"
+		}
 	}
 }
