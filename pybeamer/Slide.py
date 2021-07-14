@@ -43,6 +43,9 @@ class RenderSlideDirective(BaseDirective):
 	def slide_type(self):
 		return self._dom.getAttribute("type")
 
+	def get_xml_slide_var(self, key):
+		return self._xml_slide_vars.get(key)
+
 	def _get_xml_slide_vars(self):
 		# First search DOM for any variables
 		slide_vars = { }

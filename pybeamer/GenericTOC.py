@@ -23,6 +23,18 @@ import enum
 import string
 import collections
 
+"""
+'levels' are arbitrary IDs, not necessarily consecutive
+	e.g. chapter is level 4
+	section is level 9
+	subsection is level 10
+
+They are mapped to 'depths', which are index 1. In the aforementioned example
+	chapter is level 4 but depth 1
+	section is level 9 but depth 2
+	subsection is level 10 but depth 3
+"""
+
 class TOCCommand(enum.IntEnum):
 	NestingIncrease = 0
 	NestingDecrease = 1
@@ -41,14 +53,14 @@ class _TOCInstructionOpcode(enum.IntEnum):
 	SeparatorUpdate = 4
 
 _TOCItem = collections.namedtuple("TOCItem", [ "level", "text", "pages" ])
+_NormalizedTOCItem = collections.namedtuple("NormalizedTOCItem", [ "depth", "text", "pages" ])
 _TOCInstruction = collections.namedtuple("TOCInstruction", [ "opcode", "data" ])
 
 class FrozenTOC():
-	TOCEntry = collections.namedtuple("TOCEntry", [ "index", "order", "depth", "local_number", "full_number", "text", "full_text" ])
+	TOCEntry = collections.namedtuple("TOCEntry", [ "order", "index", "depth", "local_number", "full_number", "text", "full_text" ])
 
 	def __init__(self, toc):
 		self._toc = toc
-		self._current_index = 0
 		self._levels = self._determine_levels(toc)
 		self._instructions = self._normalize_instructions(toc)
 		self._entries = [ ]
@@ -61,6 +73,14 @@ class FrozenTOC():
 		self._unroll()
 
 	@property
+	def max_depth(self):
+		return self.level_count
+
+	@property
+	def toc_item_count(self):
+		return len(self._entries)
+
+	@property
 	def level_count(self):
 		return len(self._levels)
 
@@ -68,8 +88,8 @@ class FrozenTOC():
 	def toc(self):
 		return self._toc
 
-	def _seperator(self, level):
-		return self._separators.get(level, ".")
+	def _seperator(self, depth):
+		return self._separators.get(depth, ".")
 
 	def _determine_levels(self, toc):
 		levels = set()
@@ -90,8 +110,8 @@ class FrozenTOC():
 			letters.append(alphabet[0])
 		return "".join(reversed(letters))
 
-	def _transcribe(self, level, value):
-		transcriptor = self._transcriptions.get(level, TOCTranscription.Integer)
+	def _transcribe(self, depth, value):
+		transcriptor = self._transcriptions.get(depth, TOCTranscription.Integer)
 		if transcriptor == TOCTranscription.Integer:
 			return str(value)
 		elif transcriptor == TOCTranscription.LowerAlpha:
@@ -102,41 +122,40 @@ class FrozenTOC():
 			raise NotImplementedError(transcriptor)
 
 	def _normalize_instructions(self, toc):
-		level_map = { level: index for (index, level) in enumerate(self._levels) }
+		depth_by_level = { level: depth for (depth, level) in enumerate(self._levels, 1) }
 
 		normalized_instructions = [ ]
 		for item in toc.instructions:
 			if item.opcode == _TOCInstructionOpcode.TOCItem:
-				normalized_instructions.append(_TOCInstruction(opcode = item.opcode, data = _TOCItem(level = level_map[item.data.level], text = item.data.text, pages = item.data.pages)))
+				normalized_instructions.append(_TOCInstruction(opcode = item.opcode, data = _NormalizedTOCItem(depth = depth_by_level[item.data.level], text = item.data.text, pages = item.data.pages)))
 			else:
-				normalized_instructions.append(_TOCInstruction(opcode = item.opcode, data = { level_map[level]: data for (level, data) in item.data.items() if (level in level_map) }))
+				normalized_instructions.append(_TOCInstruction(opcode = item.opcode, data = { depth_by_level[level]: data for (level, data) in item.data.items() if (level in depth_by_level) }))
 		return normalized_instructions
 
-	def _create_entry(self, at_level):
+	def _create_entry(self, depth):
 		order = tuple(depth for (level, depth) in sorted(self._counter.items()))
 
-		local_number = self._transcribe(at_level, self._counter[at_level]) + self._seperator(at_level)
+		local_number = self._transcribe(depth, self._counter[depth]) + self._seperator(depth)
 
 		full_number = [ ]
-		for level in range(at_level + 1):
-			full_number.append(self._transcribe(level, self._counter[level]))
-			if level != at_level:
-				full_number.append(self._seperator(level))
+		for i in range(1, depth + 1):
+			full_number.append(self._transcribe(i, self._counter[i]))
+			if i != depth:
+				full_number.append(self._seperator(i))
 		full_number = "".join(full_number)
 
 		full_text = [ ]
-		for level in range(at_level + 1):
-			full_text.append(self._text[level])
-		self._current_index += 1
+		for i in range(1, depth + 1):
+			full_text.append(self._text[i])
 
 		entry_index = len(self._entries)
 		if full_number not in self._index_by_full_number:
 			self._index_by_full_number[full_number] = entry_index
 
-		return self.TOCEntry(index = self._current_index - 1, order = order, depth = at_level + 1, local_number = local_number, full_number = full_number, text = self._text[at_level], full_text = full_text)
+		return self.TOCEntry(order = order, index = entry_index, depth = depth, local_number = local_number, full_number = full_number, text = self._text[depth], full_text = full_text)
 
 	def _unroll(self):
-		previous_level = -1
+		current_depth = -1
 		for instruction in self._instructions:
 			if instruction.opcode == _TOCInstructionOpcode.TranscriptionUpdate:
 				self._transcriptions.update(instruction.data)
@@ -146,68 +165,62 @@ class FrozenTOC():
 				for (key, value) in instruction.data.items():
 					self._counter[key] += value
 			elif instruction.opcode == 	_TOCInstructionOpcode.TOCItem:
-				at_level = instruction.data.level
+				depth = instruction.data.depth
 
-				if at_level != previous_level:
-					for level in range(at_level + 1, self.level_count):
-						self._counter[level] = 0
-						self._text[level] = ""
+				if depth != current_depth:
+					for i in range(depth + 1, self.max_depth + 1):
+						self._counter[i] = 0
+						self._text[i] = ""
 
-				if at_level > previous_level:
-					for level in range(at_level - previous_level):
-						self._entries.append((TOCCommand.NestingIncrease, None))
-				elif at_level < previous_level:
-					for i in range(previous_level - at_level):
-						self._entries.append((TOCCommand.NestingDecrease, None))
+				self._counter[depth] += 1
+				self._text[depth] = instruction.data.text
+				self._entries.append(self._create_entry(depth))
 
-				self._counter[at_level] += 1
-				self._text[at_level] = instruction.data.text
-				entry = self._create_entry(at_level)
-				self._entries.append((TOCCommand.Item, entry))
-
-				previous_level = at_level
-
-
+				current_depth = depth
 			else:
 				raise NotImplementedError(instruction.opcode)
 
-		for i in range(previous_level + 1):
-			self._entries.append((TOCCommand.NestingDecrease, None))
 
-	def __iter__(self):
-		return iter(self._entries)
-
-	def subset(self, start_at = None, end_before = None, max_items = None):
-		index = 0
-		if start_at is not None:
-			index = self._index_by_full_number[start_at]
-		seen = 0
+	def emit_commands(self, toc_items):
 		current_depth = 0
-
-		while index < len(self._entries):
-			(command, entry) = self._entries[index]
-			if command == TOCCommand.NestingIncrease:
-				current_depth += 1
-			elif command == TOCCommand.NestingDecrease:
-				current_depth -= 1
-			elif command == TOCCommand.Item:
-				if current_depth < entry.depth:
-					for i in range(entry.depth - current_depth):
-						yield (TOCCommand.NestingIncrease, None)
-				current_depth = entry.depth
-
-				if (end_before is not None) and (entry.full_number == end_before):
-					break
-
-				seen += 1
-				if (max_items is not None) and (seen > max_items):
-					break
-
-			yield (command, entry)
-			index += 1
+		for entry in toc_items:
+			if entry.depth > current_depth:
+				for i in range(entry.depth - current_depth):
+					yield (TOCCommand.NestingIncrease, None)
+			elif entry.depth < current_depth:
+				for i in range(current_depth - entry.depth):
+					yield (TOCCommand.NestingDecrease, None)
+			current_depth = entry.depth
+			yield (TOCCommand.Item, entry)
 
 		for i in range(current_depth):
 			yield (TOCCommand.NestingDecrease, None)
+
+	def subset(self, start_at = None, end_before = None, max_items = None):
+		start_index = 0
+		if start_at is not None:
+			if isinstance(start_at, str):
+				start_index = self._index_by_full_number[start_at]
+			else:
+				start_index = start_at
+		seen = 0
+		current_depth = 0
+
+		for entry in self._entries[start_index : ]:
+			if (end_before is not None) and (entry.full_number == end_before):
+				break
+
+			seen += 1
+			if (max_items is not None) and (seen > max_items):
+				break
+
+			yield entry
+
+	def count_toc_items(self, start_at = None, end_before = None):
+		return len(list(self.subset(start_at = start_at, end_before = end_before)))
+
+	def __iter__(self):
+		return self.emit_commands(self._entries)
 
 class GenericTOC():
 	def __init__(self):

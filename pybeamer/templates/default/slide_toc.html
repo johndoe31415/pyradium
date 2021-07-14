@@ -2,7 +2,7 @@
 <%block name="header">
 	<div class="heading">${slide.var("heading", "Table of Contents")}</div>
 </%block>
-<% toc = slide.var("toc") %>
+<% toc = slide.var("partial_toc") %>
 %if toc is None:
 TOC not rendered yet.
 %else:

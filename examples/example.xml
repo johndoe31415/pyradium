@@ -17,10 +17,7 @@
 
 	<section>Introduction</section>
 	<subsection>Nomenclature</subsection>
-	<slide type="toc">
-		<s:var name="begin" value="1" />
-		<s:var name="end" value="2.3" />
-	</slide>
+	<slide type="toc" />
 
 	<slide>
 		<s:var name="heading" value="Pausing Slides" />
