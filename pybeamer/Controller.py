@@ -22,8 +22,9 @@
 import importlib
 
 class BaseController():
-	def __init__(self, slide, rendered_presentation):
+	def __init__(self, slide, content_containers, rendered_presentation):
 		self._slide = slide
+		self._content_containers = content_containers
 		self._rendered_presentation = rendered_presentation
 
 	@property
@@ -31,11 +32,15 @@ class BaseController():
 		return self._slide
 
 	@property
+	def content_containers(self):
+		return self._content_containers
+
+	@property
 	def rendered_presentation(self):
 		return self._rendered_presentation
 
-	def render(self, rendered_presentation):
-		pass
+	def render(self):
+		return self._slide.emit_slide(self._rendered_presentation, self._content_containers)
 
 class ControllerManager():
 	def __init__(self, renderer):
@@ -45,7 +50,7 @@ class ControllerManager():
 	def _controller_definition(self, name):
 		return self._renderer.template_config.get("controllers", { }).get(name)
 
-	def get_controller(self, slide, rendered_presentation):
+	def get_controller(self, slide, content_containers, rendered_presentation):
 		if slide.slide_type not in self._cached:
 			definition = self._controller_definition(slide.slide_type)
 			if definition is not None:
@@ -61,5 +66,5 @@ class ControllerManager():
 		if handler_class is None:
 			return
 
-		controller = handler_class(slide, rendered_presentation)
+		controller = handler_class(slide, content_containers, rendered_presentation)
 		return controller

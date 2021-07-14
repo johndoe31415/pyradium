@@ -153,6 +153,9 @@ class XMLTools():
 	def inner_toxml(cls, node):
 		return "".join(child.toxml() for child in node.childNodes)
 
+	@classmethod
+	def clone(cls, node):
+		return node.cloneNode(deep = True)
 
 	@classmethod
 	def has_sub_elements(cls, node):

@@ -39,12 +39,12 @@ class RenderSlideDirective(BaseDirective):
 		if len(self._content_containers) == 0:
 			self._content_containers["default"] = self._dom
 
-	@property
-	def containers(self):
-		return self._content_containers
+#	@property
+#	def containers(self):
+#		return self._content_containers
 
-	def clone_containers(self):
-		return { name: container.cloneNode(deep = True) for (name, container) in self._content_containers.items() }
+#	def clone_containers(self):
+#		return { name: container.cloneNode(deep = True) for (name, container) in self._content_containers.items() }
 
 	@property
 	def slide_type(self):
@@ -72,20 +72,25 @@ class RenderSlideDirective(BaseDirective):
 		})
 		return slide_vars
 
-	def render(self, rendered_presentation):
-		controller = rendered_presentation.renderer.controllers.get_controller(self, rendered_presentation)
-		print(controller)
-
+	def emit_slide(self, rendered_presentation, content_containers, additional_slide_vars = None):
 		rendered_presentation.advance_slide()
-
-		paused_containers = PauseRenderer(self, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
+		paused_containers = PauseRenderer(content_containers, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
 
 		for (sub_slide_index, paused_container) in enumerate(paused_containers):
 			for container_node in paused_container.values():
 				XMLHookRegistry.mangle(rendered_presentation, container_node)
 
 			slide_vars = self.compute_slide_vars(rendered_presentation, sub_slide_index)
+			if additional_slide_vars is not None:
+				slide_vars.update(additional_slide_vars)
 			yield RenderableSlide(slide_type = self.slide_type, content_containers = paused_container, slide_vars = slide_vars)
+
+	def render(self, rendered_presentation):
+		controller = rendered_presentation.renderer.controllers.get_controller(self, self._content_containers, rendered_presentation)
+		if controller is None:
+			yield from self.emit_slide(rendered_presentation, self._content_containers)
+		else:
+			yield from controller.render()
 
 	def __repr__(self):
 		return "Slide<%s>" % (self.slide_type)

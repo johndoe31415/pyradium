@@ -23,10 +23,13 @@ from .Tools import XMLTools
 from .Exceptions import DuplicateOrderException
 
 class PauseRenderer():
-	def __init__(self, slide_directive, honor_pauses = True):
-		self._slide = slide_directive
+	def __init__(self, content_containers, honor_pauses = True):
+		self._content_containers = content_containers
 		self._honor_pauses = honor_pauses
 		self._used_order_ids = set()
+
+	def _clone_containers(self):
+		return { name: XMLTools.clone(container_node) for (name, container_node) in self._content_containers.items() }
 
 	def _enumerate_pause_nodes_of(self, root_node):
 		for pause_node in XMLTools.findall_recurse(root_node, "s:pause"):
@@ -43,7 +46,7 @@ class PauseRenderer():
 			pause_node.setAttribute("order", str(assigned_order_id))
 
 	def _enumerate_pause_nodes(self):
-		for (name, container_node) in sorted(self._slide.containers.items()):
+		for (name, container_node) in sorted(self._content_containers.items()):
 			self._enumerate_pause_nodes_of(container_node)
 
 	def _debug_result(self, rendered_containers):
@@ -60,7 +63,8 @@ class PauseRenderer():
 	def render(self):
 		if self._honor_pauses:
 			self._enumerate_pause_nodes()
-			rendered_containers = [ self._slide.clone_containers() for _ in range(len(self._used_order_ids) + 1) ]
+
+			rendered_containers = [ self._clone_containers() for _ in range(len(self._used_order_ids) + 1) ]
 			sorted_order_ids = list(sorted(self._used_order_ids))
 
 			for (max_order_id, rendered_container) in zip(sorted_order_ids, rendered_containers):
