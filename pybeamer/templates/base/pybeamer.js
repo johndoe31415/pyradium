@@ -102,16 +102,29 @@ export class Presentation {
 	event_keypress(event) {
 		if (event.key == "g") {
 			this.goto_slide();
-		} else if (event.key == "s") {
+		} else if (event.key == "f") {
 			this.start_presentation();
 		} else if (event.key == "c") {
 			this.toggle_cursor();
 		} else {
-			//console.log(event);
+//			console.log("keypress event", event);
+		}
+	}
+
+	event_keydown(event) {
+		if (event.key == "PageDown") {
+			this.next_slide();
+			event.preventDefault();
+		} else if (event.key == "PageUp") {
+			this.prev_slide();
+			event.preventDefault();
+		} else {
+//			console.log("keydown event", event);
 		}
 	}
 
 	event_wheel(event) {
+//		console.log("wheel event", event);
 		const scroll_up = event.deltaY > 0;
 		if (this.presentation_mode) {
 			if (scroll_up) {
