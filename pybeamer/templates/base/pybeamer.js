@@ -24,6 +24,7 @@
 export class Presentation {
 	constructor(ui_elements) {
 		this._ui_elements = ui_elements;
+		this._show_cursor = false;
 		this._enumerate_slides();
 		this._internal_slide_index = 0;
 		this._resize_obs = new ResizeObserver((event) => this.event_resize(event));
@@ -58,10 +59,15 @@ export class Presentation {
 		this._ui_elements.full_screen_div.style.display = "none";
 	}
 
+	_set_cursor_style() {
+		this._ui_elements.full_screen_div.style.cursor = this._show_cursor ? "inherit" : "none";
+	}
+
 	_prepare_full_screen_div() {
 		const size_container = this.current_slide.parentElement;
 		const zoom_factor = this._ui_elements.full_screen_div.offsetWidth / this.current_slide.offsetWidth;
 		this._ui_elements.full_screen_div.style.display = "";
+		this._set_cursor_style()
 		this._ui_elements.full_screen_div.innerHTML = size_container.innerHTML;
 	}
 
@@ -70,6 +76,7 @@ export class Presentation {
 			return;
 		}
 		console.log("Presentation started.");
+		this._show_cursor = false;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
 	}
@@ -97,6 +104,8 @@ export class Presentation {
 			this.goto_slide();
 		} else if (event.key == "s") {
 			this.start_presentation();
+		} else if (event.key == "c") {
+			this.toggle_cursor();
 		} else {
 			//console.log(event);
 		}
@@ -141,8 +150,13 @@ export class Presentation {
 			const zoom = (zoom_x < zoom_y) ? zoom_x : zoom_y;
 
 			console.log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
-			this._ui_elements.full_screen_div.style = "zoom: " + zoom;
+			this._ui_elements.full_screen_div.style.zoom = zoom;
 		}
+	}
+
+	toggle_cursor() {
+		this._show_cursor = !this._show_cursor;
+		this._set_cursor_style();
 	}
 
 	goto_slide() {
