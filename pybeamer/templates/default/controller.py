@@ -40,3 +40,14 @@ class TOCController(BaseController):
 					"partial_toc":	toc.emit_commands(subset),
 				}
 				yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)
+
+class AcronymController(BaseController):
+	_ACRONYMS_PER_SLIDE = 8
+
+	def render(self):
+		acronyms = self.rendered_presentation.renderer.get_custom_renderer("acronym")
+		used_acronyms = list(acronyms.get_all_used_acronyms())
+		pages = (len(used_acronyms) + self._ACRONYMS_PER_SLIDE - 1) // self._ACRONYMS_PER_SLIDE
+		for page in range(pages):
+			page_content = used_acronyms[page * self._ACRONYMS_PER_SLIDE : (page + 1) * self._ACRONYMS_PER_SLIDE]
+			yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, { "acronyms": page_content })

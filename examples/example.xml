@@ -13,6 +13,8 @@
 		</format>
 	</meta>
 
+	<acronyms src="acronyms.json" />
+
 	<slide type="title" />
 
 	<section>Introduction</section>
@@ -22,11 +24,11 @@
 	<slide>
 		<s:var name="heading" value="Pausing Slides" />
 		<ul>
-			<li>This is a test! Pause1</li>
+			<li>This is a test! Pause1 <s:ac>WEP</s:ac></li>
 			<s:pause />
-			<li>After the first pause! Pause2</li>
+			<li>After the first pause! <s:ac>DES</s:ac></li>
 			<s:pause />
-			<li>After the second pause! Pause3</li>
+			<li>After the second pause! Explaining <s:ac>AES</s:ac>-<s:ac>CBC</s:ac></li>
 		</ul>
 	</slide>
 
@@ -188,4 +190,6 @@
 			<li>This is verbatim: &lt; &gt;</li>
 		</ul>
 	</slide>
+
+	<slide type="acronyms" />
 </presentation>

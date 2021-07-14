@@ -32,6 +32,10 @@
 		"toc": {
 			"file":			"controller.py",
 			"class":		"TOCController"
+		},
+		"acronyms": {
+			"file":			"controller.py",
+			"class":		"AcronymController"
 		}
 	}
 }

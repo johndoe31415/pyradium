@@ -25,6 +25,7 @@ import contextlib
 from .RendererCache import RendererCache
 from .Exceptions import FailedToLookupFileException
 from .GenericTOC import GenericTOC
+from .Acronyms import Acronyms
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
 from pybeamer.Controller import ControllerManager
@@ -114,6 +115,7 @@ class PresentationRenderer():
 		self._custom_renderers = {
 			"latex":	RendererCache(LatexFormulaRenderer()),
 			"img":		RendererCache(ImageRenderer()),
+			"acronym":	Acronyms(),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])
 		with open(self.lookup_styled_template_file("configuration.json")) as f:

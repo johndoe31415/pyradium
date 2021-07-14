@@ -1,0 +1,14 @@
+<%inherit file="template_slide.html" />
+<%block name="header">
+	<div class="heading">${slide.var("heading", "Acronyms")}</div>
+</%block>
+<% acronyms = slide.var("acronyms") %>
+%if acronyms is None:
+Acronyms not available yet.
+%else:
+<ul>
+	%for acronym in acronyms:
+	<li>${acronym.acronym}: ${acronym.text}</li>
+	%endfor
+</ul>
+%endif

@@ -1,0 +1,6 @@
+{
+	"AES": { "text": "Advanced Encryption Standard" },
+	"DES": { "text": "Data Encryption Standard" },
+	"WEP": { "text": "Wired Equivalent Privacy" },
+	"CBC": { "text": "Cipher Block Chaining" }
+}

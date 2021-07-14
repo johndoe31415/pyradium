@@ -24,6 +24,7 @@ import xml.dom.minidom
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
+from .Acronyms import AcronymDirective
 
 class Presentation():
 	_NAMESPACES = {
@@ -65,6 +66,8 @@ class Presentation():
 				toc_element = TOCElement(child.tagName)
 				toc_directive = TOCDirective(toc_element, XMLTools.inner_text(child))
 				content.append(toc_directive)
+			elif child.tagName == "acronyms":
+				content.append(AcronymDirective(child))
 			else:
 				print("Warning: Ignored unknown tag '%s'." % (child.tagName))
 		return cls(meta, content)

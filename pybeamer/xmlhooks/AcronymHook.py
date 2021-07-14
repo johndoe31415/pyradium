@@ -19,13 +19,23 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .AcronymHook import AcronymHook
-from .DebugHook import DebugHook
+from pybeamer.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pybeamer.Tools import XMLTools
+
+@XMLHookRegistry.register_hook
+class AcronymHook(BaseHook):
+	_TAG_NAME = "ac"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		acronym_id = XMLTools.inner_text(node)
+
+		acronym = rendered_presentation.renderer.get_custom_renderer("acronym")
+		resolved = acronym.resolve(acronym_id)
+		if resolved is None:
+			text_node = node.ownerDocument.createTextNode(acronym_id)
+		else:
+			text_node = node.ownerDocument.createTextNode(resolved.acronym)
+
+		replacement_node = text_node
+		return replacement_node
