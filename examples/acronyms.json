@@ -1,6 +1,6 @@
 {
-	"AES": { "text": "Advanced Encryption Standard" },
-	"DES": { "text": "Data Encryption Standard" },
-	"WEP": { "text": "Wired Equivalent Privacy" },
-	"CBC": { "text": "Cipher Block Chaining" }
+	"AES": { "text": "Advanced Encryption Standard", "uri": "https://en.wikipedia.org/wiki/Advanced_Encryption_Standard" },
+	"DES": { "text": "Data Encryption Standard", "uri": "https://en.wikipedia.org/wiki/Data_Encryption_Standard" },
+	"WEP": { "text": "Wired Equivalent Privacy", "uri": "https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" },
+	"CBC": { "text": "Cipher Block Chaining", "uri": "https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)" }
 }

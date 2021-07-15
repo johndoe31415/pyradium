@@ -8,7 +8,13 @@ Acronyms not available yet.
 %else:
 <ul>
 	%for acronym in acronyms:
-	<li>${acronym.acronym}: ${acronym.text}</li>
+	<li>${acronym.acronym}:
+	%if acronym.uri is None:
+	${acronym.text}
+	%else:
+	<a href="${acronym.uri}">${acronym.text}</a>
+	%endif
+	</li>
 	%endfor
 </ul>
 %endif
