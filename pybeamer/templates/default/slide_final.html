@@ -3,7 +3,9 @@
 <div class="body">
 	<div class="final_flex">
 		<div class="final_main">${slide.var("title", "Thank you!")}</div>
-		<div class="final_sub">${slide.var("subtitle", "Any questions?")}</div>
+		%if slide.var("subtitle") != "":
+			<div class="final_sub">${slide.var("subtitle", "Any questions?")}</div>
+		%endif
 	</div>
 </div>
 <div class="footer">
