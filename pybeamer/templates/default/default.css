@@ -53,6 +53,11 @@ div.slide.title div.date {
 	color: #97abbc;
 }
 
+div.slide div.body {
+	position: relative;
+	height: 100%;
+}
+
 div.slide.headerfooter div.header {
 	position: relative;
 	height: 10%;
@@ -162,4 +167,23 @@ ul li li:before {
 ul.bare li {
 	background-image: none;
 	padding-left: 0px;
+}
+
+div.final_flex {
+	position: relative;
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+div.final_flex div.final_main {
+	font-size: 200%;
+	font-weight: bold;
+	color: #2185c5;
+}
+
+div.final_flex div.final_sub {
+	color: #677480;
 }
