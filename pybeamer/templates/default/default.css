@@ -53,13 +53,11 @@ div.header div.heading {
 div.slide.headerfooter div.body {
 	position: relative;
 	height: 82%;
-	overflow: hidden;
 }
 
 div.body div.content {
 	color: #34495e;
 	padding: 25px;
-	overflow: hidden;
 	position: relative;
 	width: 100%;
 	height: 100%;

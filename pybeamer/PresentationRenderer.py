@@ -170,9 +170,26 @@ class PresentationRenderer():
 				renderable_slides += generator
 		return renderable_slides
 
+	def _render_file(self, template_filename, rendered_presentation, template_args):
+		target_filename = os.path.basename(template_filename)
+		template = self._lookup.get_template(template_filename)
+		result = template.render(**template_args)
+		rendered_presentation.add_file(target_filename, result)
+		if target_filename.endswith(".css"):
+			rendered_presentation.add_css(target_filename)
+
 	def render(self, deploy_directory):
 		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
+		template_args = {
+			"renderer":					self,
+			"presentation":				self._presentation,
+			"rendered_presentation":	rendered_presentation,
+		}
+
 		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
+		self._render_file("base/pybeamer.css", rendered_presentation, template_args)
+		self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
+		self._render_file("base/pybeamer_tooltip.css", rendered_presentation, template_args)
 
 		for filename in self._template_config.get("files", { }).get("static", [ ]):
 			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
@@ -180,11 +197,6 @@ class PresentationRenderer():
 			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
 			rendered_presentation.add_css(filename)
 
-		template_args = {
-			"renderer":					self,
-			"presentation":				self._presentation,
-			"rendered_presentation":	rendered_presentation,
-		}
 
 		# Run it first to build the TOC
 		self._compute_renderable_slides(rendered_presentation)
@@ -199,7 +211,4 @@ class PresentationRenderer():
 			result = template.render(**args)
 			rendered_presentation.append_slide(result)
 
-		for (template_filename, target_filename) in [ ("base/master.html", "index.html"), ("base/pybeamer.css", "pybeamer.css") ]:
-			template = self._lookup.get_template(template_filename)
-			result = template.render(**template_args)
-			rendered_presentation.add_file(target_filename, result)
+		self._render_file("base/index.html", rendered_presentation, template_args)

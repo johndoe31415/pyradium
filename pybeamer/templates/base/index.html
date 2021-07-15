@@ -7,9 +7,8 @@
 		%endif
 		<meta name="generator" content="https://github.com/johndoe31415/pybeamer" />
 		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
-		<link rel="stylesheet" href="pybeamer.css">
 		%for css_filename in rendered_presentation.css:
-		<link rel="stylesheet" href="${css_filename}">
+		<link rel="stylesheet" href="${css_filename}" />
 		%endfor
 	</head>
 
@@ -26,7 +25,7 @@
 		%endfor
 		</div>
 
-		<div id="full_screen_div" class="size_container" style="display: none;"></div>
+		<div id="full_screen_div" class="fullscreen size_container" style="display: none;"></div>
 
 		<script type="module">
 			import {Presentation} from "./pybeamer.js";
