@@ -30,10 +30,10 @@ class Presentation():
 		"https://github.com/johndoe31415/pybeamer":		"s",
 	}
 
-	def __init__(self, meta, content):
+	def __init__(self, meta, content, sources):
 		self._meta = meta
 		self._content = content
-		self._sources = [ ]
+		self._sources = sources
 
 	@property
 	def meta(self):
@@ -43,12 +43,17 @@ class Presentation():
 	def content(self):
 		return self._content
 
+	@property
+	def sources(self):
+		return self._sources
+
 	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
 		dom = xml.dom.minidom.parse(filename)
 		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))
 		meta = None
 		content = [ ]
+		sources = [ filename ]
 		for child in XMLTools.child_tagname(dom, "presentation").childNodes:
 			if child.nodeType != child.ELEMENT_NODE:
 				continue
@@ -61,6 +66,7 @@ class Presentation():
 				sub_presentation_filename = rendering_parameters.include_dirs.lookup(child.getAttribute("src"))
 				sub_presentation = cls.load_from_file(sub_presentation_filename)
 				content += sub_presentation.content
+				sources += sub_presentation.sources
 			elif child.tagName in [ "chapter", "section", "subsection" ]:
 				toc_element = TOCElement(child.tagName)
 				toc_directive = TOCDirective(toc_element, XMLTools.inner_text(child))
@@ -69,7 +75,7 @@ class Presentation():
 				content.append(AcronymDirective(child))
 			else:
 				print("Warning: Ignored unknown tag '%s'." % (child.tagName))
-		return cls(meta, content)
+		return cls(meta, content, sources)
 
 	def __iter__(self):
 		return iter(self._content)
