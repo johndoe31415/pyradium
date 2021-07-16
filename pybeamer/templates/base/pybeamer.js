@@ -99,7 +99,15 @@ export class Presentation {
 		}
 	}
 
+	_should_capture_event(event) {
+		const tag_name = event.target.tagName;
+		return (tag_name != "INPUT") && (tag_name != "TEXTAREA");
+	}
+
 	event_keypress(event) {
+		if (!this._should_capture_event(event)) {
+			return;
+		}
 		if (event.key == "g") {
 			this.goto_slide();
 		} else if (event.key == "f") {
@@ -112,6 +120,9 @@ export class Presentation {
 	}
 
 	event_keydown(event) {
+		if (!this._should_capture_event(event)) {
+			return;
+		}
 		if (event.key == "PageDown") {
 			this.next_slide();
 			event.preventDefault();
