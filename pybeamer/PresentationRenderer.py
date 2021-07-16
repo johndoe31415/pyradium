@@ -22,6 +22,7 @@
 import os
 import json
 import contextlib
+import pybeamer
 from .RendererCache import RendererCache
 from .Exceptions import FailedToLookupFileException
 from .GenericTOC import GenericTOC
@@ -183,6 +184,7 @@ class PresentationRenderer():
 	def render(self, deploy_directory):
 		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
 		template_args = {
+			"pybeamer_version":			pybeamer.VERSION,
 			"renderer":					self,
 			"presentation":				self._presentation,
 			"rendered_presentation":	rendered_presentation,

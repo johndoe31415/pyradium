@@ -5,7 +5,7 @@
 		%if presentation.meta.get("author") is not None:
 		<meta name="author" content="${presentation.meta.get("author")}" />
 		%endif
-		<meta name="generator" content="https://github.com/johndoe31415/pybeamer" />
+		<meta name="generator" content="https://github.com/johndoe31415/pybeamer v${pybeamer_version}" />
 		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
 		%for css_filename in rendered_presentation.css:
 		<link rel="stylesheet" href="${css_filename}" />
