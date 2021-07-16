@@ -30,7 +30,7 @@ class ActionRender(BaseAction):
 	def run(self):
 		if (not self._args.force) and os.path.exists(self._args.outdir):
 			print("Refusing to overwrite: %s" % (self._args.outdir))
-			sys.exit(1)
+			return 1
 
 		presentation = Presentation.load_from_file(self._args.infile)
 		rendering_parameters = RenderingParameters(include_dirs = [ os.path.dirname(self._args.infile) ])

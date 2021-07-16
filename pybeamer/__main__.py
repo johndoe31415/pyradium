@@ -23,6 +23,7 @@ import sys
 from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
 from .ActionServe import ActionServe
+from .ActionAcroSort import ActionAcroSort
 
 def main():
 	mc = MultiCommand()
@@ -38,8 +39,13 @@ def main():
 		parser.add_argument("-b", "--bind-addr", metavar = "addr", type = str, default = "127.0.0.1", help = "Address to bind to. Defaults to %(default)s.")
 		parser.add_argument("-p", "--port", metavar = "port", type = int, default = 8123, help = "Port to serve directory under. Defaults to %(default)s.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
-		parser.add_argument("dirname", metavar = "dirname", help = "Directory that should be served.")
+		parser.add_argument("dirname", help = "Directory that should be served.")
 	mc.register("serve", "Serve a slide show as HTTP", genparser, action = ActionServe)
+
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("acrofile", help = "Acronym database JSON file.")
+	mc.register("acrosort", "Sort an acryonym database", genparser, action = ActionAcroSort)
 
 	return mc.run(sys.argv[1:])
 
