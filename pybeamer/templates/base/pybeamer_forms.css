@@ -1,22 +1,29 @@
 div.form-grid {
+	padding: 25px;
 	display: grid;
 	align-items: center;
+	grid-template-columns: 1fr 2fr;
+	grid-column-gap: 25px;
+	grid-row-gap: 15px;
 }
 
 div.form-grid div.form-label {
 	grid-column: 1;
-	align-self: center;
 	justify-self: end;
+	font-size: 75%;
 }
 
 div.form-grid div.form-input {
 	grid-column: 2;
-	align-self: center;
 }
 
 div.form-grid div.form-span {
 	grid-column: 1 / span 2;
 	justify-self: center;
+}
+
+div.form-input input, div.form-input textarea {
+	vertical-align: middle;
 }
 
 label.button-checkbox {

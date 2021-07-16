@@ -33,16 +33,27 @@ button {
 	background-color: #eee;
 	padding: 10px 30px;
 	border: 1px solid #aaa;
+	font-size: 18px;
 }
 
 button:hover {
 	background-color: #ccc;
 }
 
+button:active {
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+input {
+	width: 40%;
+}
+
 input, textarea {
 	border-radius: 5px;
 	border: 1px solid #aaa;
 	padding: 10px;
+	font-family: "Arial";
+	font-size: 18px;
 }
 
 span.symbol {

@@ -4,9 +4,12 @@
 <div class="body" id="${uid}">
 
 	<div class="form-grid">
+		<div class="form-span feedback-header">
+			Feedback
+		</div>
 
 		<div class="form-label">Rating:</div>
-		<div class="form-input button-checkbox-group" lid="rating">
+		<div class="form-input button-checkbox-group" name="rating" lid="rating">
 %for (rating, emoji) in enumerate("🤮🙁🙂😁"):
 			<label class="button-checkbox">
 				<input type="checkbox" value="${rating}">
@@ -16,18 +19,18 @@
 		</div>
 
 		<div class="form-label">Your name:</div>
-		<div class="form-input"><input type="text" name="name" placeholder="optional" /></div>
+		<div class="form-input"><input type="text" name="name" placeholder="optional" class="collect" /></div>
 
 		<div class="form-label">Email:</div>
-		<div class="form-input"><input type="text" name="email" placeholder="optional" /></div>
+		<div class="form-input"><input type="text" name="email" placeholder="optional" class="collect" /></div>
 
 		<div class="form-label">Comments:</div>
 		<div class="form-input">
-			<textarea placeholder="Typos, recommendations, criticizm. Anything you like." cols="80" rows="10"></textarea>
+			<textarea placeholder="Typos, recommendations, criticizm. Anything you like." cols="80" rows="10" name="comments" class="collect"></textarea>
 		</div>
 
 		<div class="form-span">
-			<button>Submit</button>
+			<button lid="submit">Submit</button>
 		</div>
 
 	</div>
@@ -38,7 +41,22 @@
 
 <script type="module">
 	import {ButtonCheckbox} from "./pybeamer_forms.js";
+	import {FeedbackSender} from "./pybeamer_feedback.js";
+
 	const parent_div = document.querySelector("#${uid}");
 	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
 	const button_checkbox = new ButtonCheckbox(checkbox_group);
+
+	const feedback_sender = new FeedbackSender("https://foo.com", {
+		"on_success":	console.log,
+		"on_error":		console.log,
+	});
+
+	feedback_sender.add_source(button_checkbox);
+	parent_div.querySelectorAll(".collect").forEach((element) => {
+		feedback_sender.add_source(element);
+	});
+
+	const submit_button = parent_div.querySelector("[lid=\"submit\"]");
+	submit_button.addEventListener("click", (event) => feedback_sender.submit());
 </script>

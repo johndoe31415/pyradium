@@ -203,6 +203,7 @@ class PresentationRenderer():
 
 		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
 		rendered_presentation.copy_template_file("base/pybeamer_forms.js", "pybeamer_forms.js")
+		rendered_presentation.copy_template_file("base/pybeamer_feedback.js", "pybeamer_feedback.js")		# TODO do not always include this, only when needed
 		self._render_file("base/pybeamer.css", rendered_presentation, template_args)
 		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
 			self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)

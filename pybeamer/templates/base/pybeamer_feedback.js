@@ -21,43 +21,16 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-export class ButtonCheckbox {
-	constructor(button_checkbox_group) {
-		this._button_checkbox_group = button_checkbox_group;
-		this._button_checkbox_group.querySelectorAll("input").forEach((element) => {
-			element.addEventListener("change", (event) => this._button_event(event));
-			element.checked = false;
-		});
-		this._value = null;
+export class FeedbackSender {
+	constructor(target_uri, handlers) {
+		this._target_uri = target_uri;
+		this._sources = [ ];
 	}
 
-	get name() {
-		return this._button_checkbox_group.name;
+	add_source(element) {
+		this._sources.push(element);
 	}
 
-	get value() {
-		return this._value;
-	}
-
-	_disable_others() {
-		this._button_checkbox_group.querySelectorAll("input").forEach((element) => {
-			if (element.value != this._value) {
-				element.checked = false;
-			}
-		});
-	}
-
-	_button_event(event) {
-		const element = event.srcElement;
-		if (element.checked) {
-			/* Enable element */
-			this._value = element.value;
-			this._disable_others();
-		} else {
-			/* Disable element */
-			if (this._value == element.value) {
-				this._value = null;
-			}
-		}
+	submit() {
 	}
 }
