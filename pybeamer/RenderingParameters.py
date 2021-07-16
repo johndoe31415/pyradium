@@ -21,19 +21,21 @@
 
 import os
 from .Enums import PresentationMode
+from .FileLookup import FileLookup
 
 class RenderingParameters():
 	def __init__(self, template_style = "default", honor_pauses = True, presentation_mode = PresentationMode.Interactive, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", geometry = (1280, 720), image_max_dimension = 1000):
 		self._template_style = template_style
 		self._honor_pauses = honor_pauses
 		self._presentation_mode = presentation_mode
-		self._template_dirs = [ os.path.expanduser("~/.config/pybeamer/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
+		template_dirs = [ os.path.expanduser("~/.config/pybeamer/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
 		if extra_template_dirs is not None:
-			self._template_dirs += extra_template_dirs
+			template_dirs += extra_template_dirs
+		self._template_dirs = FileLookup(template_dirs)
 		if include_dirs is None:
-			self._include_dirs = [ ]
+			self._include_dirs = FileLookup()
 		else:
-			self._include_dirs = list(include_dirs)
+			self._include_dirs = FileLookup(include_dirs)
 		self._index_filename = index_filename
 		self._geometry = geometry
 		self._image_max_dimension = image_max_dimension
@@ -53,11 +55,11 @@ class RenderingParameters():
 
 	@property
 	def template_dirs(self):
-		return iter(self._template_dirs)
+		return self._template_dirs
 
 	@property
 	def include_dirs(self):
-		return iter(self._include_dirs)
+		return self._include_dirs
 
 	@property
 	def index_filename(self):

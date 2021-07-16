@@ -151,25 +151,14 @@ class PresentationRenderer():
 	def get_custom_renderer(self, name):
 		return self._custom_renderers[name]
 
-	def _search_file(self, filename, search_dirs):
-		search_dirs = list(search_dirs)
-		for dirname in search_dirs:
-			path = dirname + "/" + filename
-			if os.path.isfile(path):
-				return path
-		if len(search_dirs) == 0:
-			raise FailedToLookupFileException("No such file: %s (no directories given to look up)" % (filename))
-		else:
-			raise FailedToLookupFileException("No such file: %s (looked in %s)" % (filename, ", ".join(search_dirs)))
-
 	def lookup_template_file(self, filename):
-		return self._search_file(filename, self._rendering_params.template_dirs)
+		return self._rendering_params.template_dirs.lookup(filename)
 
 	def lookup_styled_template_file(self, filename):
-		return self.lookup_template_file(self._rendering_params.template_style + "/" + filename)
+		return self._rendering_params.template_dirs.lookup(self._rendering_params.template_style + "/" + filename)
 
 	def lookup_include(self, filename):
-		return self._search_file(filename, self._rendering_params.include_dirs)
+		return self._rendering_params.include_dirs.lookup(filename)
 
 	def _compute_renderable_slides(self, rendered_presentation):
 		renderable_slides = [ ]

@@ -19,7 +19,6 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import os
 import xml.dom.minidom
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
@@ -34,6 +33,7 @@ class Presentation():
 	def __init__(self, meta, content):
 		self._meta = meta
 		self._content = content
+		self._sources = [ ]
 
 	@property
 	def meta(self):
@@ -44,7 +44,7 @@ class Presentation():
 		return self._content
 
 	@classmethod
-	def load_from_file(cls, filename):
+	def load_from_file(cls, filename, rendering_parameters = None):
 		dom = xml.dom.minidom.parse(filename)
 		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))
 		meta = None
@@ -58,8 +58,7 @@ class Presentation():
 			elif child.tagName == "slide":
 				content.append(RenderSlideDirective(child))
 			elif child.tagName == "include":
-				dirname = os.path.dirname(filename)
-				sub_presentation_filename = dirname + "/" + child.getAttribute("src")
+				sub_presentation_filename = rendering_parameters.include_dirs.lookup(child.getAttribute("src"))
 				sub_presentation = cls.load_from_file(sub_presentation_filename)
 				content += sub_presentation.content
 			elif child.tagName in [ "chapter", "section", "subsection" ]:

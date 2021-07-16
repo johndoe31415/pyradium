@@ -32,7 +32,6 @@ class ActionRender(BaseAction):
 			print("Refusing to overwrite: %s" % (self._args.outdir))
 			return 1
 
-		presentation = Presentation.load_from_file(self._args.infile)
 		rendering_parameters = RenderingParameters(
 				template_style = self._args.template_style,
 				honor_pauses = not self._args.remove_pauses,
@@ -42,5 +41,6 @@ class ActionRender(BaseAction):
 				index_filename = self._args.index_filename,
 				geometry = self._args.geometry,
 				image_max_dimension = self._args.image_max_dimension)
+		presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 		renderer = PresentationRenderer(presentation, rendering_parameters)
 		rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
