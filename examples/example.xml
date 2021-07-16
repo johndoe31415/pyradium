@@ -193,4 +193,8 @@
 
 	<slide type="final" />
 	<slide type="acronyms" />
+
+	<slide type="feedback">
+		<s:var name="endpoint" value="https://myserver.com/feedback-api" />
+	</slide>
 </presentation>

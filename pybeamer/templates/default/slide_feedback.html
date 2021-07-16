@@ -1,0 +1,36 @@
+<%inherit file="base/slide.html" />
+<%block name="slide_classes">feedback</%block>
+<div class="body">
+
+	<div class="form-grid">
+
+		<div class="form-label">Rating:</div>
+		<div class="form-input button-checkbox-group">
+%for (rating, emoji) in enumerate("🤮🙁🙂😁"):
+			<label class="button-checkbox">
+				<input type="checkbox" name="chk_${rating}">
+				<span>${emoji}</span>
+			</label>
+%endfor
+		</div>
+
+		<div class="form-label">Your name:</div>
+		<div class="form-input"><input type="text" name="name" /></div>
+
+		<div class="form-label">Email:</div>
+		<div class="form-input"><input type="text" name="email" /></div>
+
+		<div class="form-span">
+			<div>Comments:</div>
+			<textarea></textarea>
+		</div>
+
+		<div class="form-span">
+			<button>Submit</button>
+		</div>
+
+	</div>
+</div>
+<div class="footer">
+	<img src="bar.svg" class="bar" />
+</div>

@@ -195,6 +195,7 @@ class PresentationRenderer():
 		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
 			self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
 		self._render_file("base/pybeamer_tooltip.css", rendered_presentation, template_args)
+		self._render_file("base/pybeamer_forms.css", rendered_presentation, template_args)
 
 		for filename in self._template_config.get("files", { }).get("static", [ ]):
 			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)

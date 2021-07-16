@@ -15,6 +15,25 @@ div.slide {
 	background: #fff;
 }
 
+button {
+	border-radius: 5px;
+	padding: 10px 30px;
+	transition-duration: 0.1s;
+	background-color: #eee;
+	padding: 10px 30px;
+	border: 1px solid #aaa;
+}
+
+button:hover {
+	background-color: #ccc;
+}
+
+input, textarea {
+	border-radius: 5px;
+	border: 1px solid #aaa;
+	padding: 10px;
+}
+
 span.symbol {
 	font-family: math;
 }

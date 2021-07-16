@@ -36,6 +36,10 @@
 		"acronyms": {
 			"file":			"controller.py",
 			"class":		"AcronymController"
+		},
+		"feedback": {
+			"file":			"../base/feedback_controller.py",
+			"class":		"FeedbackController"
 		}
 	}
 }
