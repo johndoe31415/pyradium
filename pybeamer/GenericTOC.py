@@ -222,6 +222,10 @@ class FrozenTOC():
 	def __iter__(self):
 		return self.emit_commands(self._entries)
 
+	def dump(self):
+		for entry in self._entries:
+			print(entry)
+
 class GenericTOC():
 	def __init__(self):
 		self._instructions = [ ]
@@ -257,6 +261,11 @@ class GenericTOC():
 
 	def finalize(self):
 		return FrozenTOC(self)
+
+	def dump(self):
+		for instruction in self._instructions:
+			if instruction.opcode == _TOCInstructionOpcode.TOCItem:
+				print(instruction.data)
 
 if __name__ == "__main__":
 	toc = GenericTOC()

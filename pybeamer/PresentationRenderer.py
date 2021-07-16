@@ -63,7 +63,6 @@ class RenderedPresentation():
 		self._frozen_toc = self._toc.finalize()
 		self._toc = GenericTOC()
 		self._current_slide_number = 0
-		#print(list(self._frozen_toc))
 
 	@property
 	def renderer(self):
@@ -209,7 +208,12 @@ class PresentationRenderer():
 			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
 			rendered_presentation.add_css(filename)
 
-		# Run it first to build the TOC
+		# Run it first to build the initial TOC
+		self._compute_renderable_slides(rendered_presentation)
+
+		# Then run it again to get the page numbers straight (e.g., the TOC
+		# pages will be emitted, giving different page numbers)
+		rendered_presentation.finalize_toc()
 		self._compute_renderable_slides(rendered_presentation)
 		rendered_presentation.finalize_toc()
 
