@@ -57,7 +57,7 @@ _NormalizedTOCItem = collections.namedtuple("NormalizedTOCItem", [ "depth", "tex
 _TOCInstruction = collections.namedtuple("TOCInstruction", [ "opcode", "data" ])
 
 class FrozenTOC():
-	TOCEntry = collections.namedtuple("TOCEntry", [ "order", "index", "depth", "local_number", "full_number", "text", "full_text" ])
+	TOCEntry = collections.namedtuple("TOCEntry", [ "order", "index", "depth", "local_number", "full_number", "text", "full_text", "pages" ])
 
 	def __init__(self, toc):
 		self._toc = toc
@@ -132,7 +132,7 @@ class FrozenTOC():
 				normalized_instructions.append(_TOCInstruction(opcode = item.opcode, data = { depth_by_level[level]: data for (level, data) in item.data.items() if (level in depth_by_level) }))
 		return normalized_instructions
 
-	def _create_entry(self, depth):
+	def _create_entry(self, depth, pages):
 		order = tuple(depth for (level, depth) in sorted(self._counter.items()))
 
 		local_number = self._transcribe(depth, self._counter[depth]) + self._seperator(depth)
@@ -152,7 +152,7 @@ class FrozenTOC():
 		if full_number not in self._index_by_full_number:
 			self._index_by_full_number[full_number] = entry_index
 
-		return self.TOCEntry(order = order, index = entry_index, depth = depth, local_number = local_number, full_number = full_number, text = self._text[depth], full_text = full_text)
+		return self.TOCEntry(order = order, index = entry_index, depth = depth, local_number = local_number, full_number = full_number, text = self._text[depth], full_text = full_text, pages = pages)
 
 	def _unroll(self):
 		current_depth = -1
@@ -174,7 +174,7 @@ class FrozenTOC():
 
 				self._counter[depth] += 1
 				self._text[depth] = instruction.data.text
-				self._entries.append(self._create_entry(depth))
+				self._entries.append(self._create_entry(depth, instruction.data.pages))
 
 				current_depth = depth
 			else:
@@ -226,6 +226,7 @@ class GenericTOC():
 	def __init__(self):
 		self._instructions = [ ]
 		self._text = { }
+		self._last_toc_item = { }
 
 	def current_text(self, level):
 		return self._text.get(level)
@@ -244,14 +245,15 @@ class GenericTOC():
 	def add_counter(self, level, value):
 		self._instructions.append(_TOCInstruction(opcode = _TOCInstructionOpcode.CounterAdd, data = { level: value }))
 
-	def new_heading(self, level, text):
+	def new_heading(self, level, text, at_page = None):
 		self._text[level] = text
-		self._instructions.append(_TOCInstruction(opcode = _TOCInstructionOpcode.TOCItem, data = _TOCItem(level = level, text = text, pages = [ ])))
+		toc_item = _TOCItem(level = level, text = text, pages = set())
+		self._instructions.append(_TOCInstruction(opcode = _TOCInstructionOpcode.TOCItem, data = toc_item))
+		self._last_toc_item[level] = toc_item
 
 	def at_page(self, page_no):
-		if len(self._items) > 0:
-			last_item = self._items[-1]
-			last_item.pages.append(page_no)
+		for (level, toc_item) in self._last_toc_item.items():
+			toc_item.pages.add(page_no)
 
 	def finalize(self):
 		return FrozenTOC(self)

@@ -12,7 +12,15 @@ TOC not rendered yet.
 %elif command.name == "NestingDecrease":
 </ul>
 %else:
-<li>${entry.full_number} ${entry.text}</li>
+<li>
+%if len(entry.pages) > 0:
+<a href="#slide${min(entry.pages)}">
+%endif
+${entry.full_number} ${entry.text}
+%if len(entry.pages) > 0:
+</a>
+%endif
+</li>
 %endif
 %endfor
 %endif

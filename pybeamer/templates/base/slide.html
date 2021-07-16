@@ -1,3 +1,6 @@
+%if slide.var("sub_slide_index") == 0:
+<a class="slideanchor" name="slide${slide.var("current_slide_number")}"></a>
+%endif
 <div class="size_container">
 	<div class="slide <%block name="slide_classes"></%block>" slide_no="${slide.var("current_slide_number")}" sub_slide_index="${slide.var("sub_slide_index")}">
 		${next.body()}

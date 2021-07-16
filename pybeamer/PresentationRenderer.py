@@ -24,7 +24,7 @@ import json
 import contextlib
 import pybeamer
 from .RendererCache import RendererCache
-from .Exceptions import FailedToLookupFileException
+from .Exceptions import FailedToLookupFileException, TemplateErrorException
 from .GenericTOC import GenericTOC
 from .Acronyms import Acronyms
 from .Enums import PresentationMode
@@ -57,11 +57,13 @@ class RenderedPresentation():
 	def advance_slide(self):
 		self._current_slide_number += 1
 		self._total_slide_count = max(self._total_slide_count, self._current_slide_number)
+		self._toc.at_page(self.current_slide_number)
 
 	def finalize_toc(self):
 		self._frozen_toc = self._toc.finalize()
 		self._toc = GenericTOC()
 		self._current_slide_number = 0
+		#print(list(self._frozen_toc))
 
 	@property
 	def renderer(self):
@@ -182,12 +184,16 @@ class PresentationRenderer():
 			rendered_presentation.add_css(target_filename)
 
 	def render(self, deploy_directory):
+		def _template_error(text):
+			raise TemplateErrorException(text)
+
 		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
 		template_args = {
 			"pybeamer_version":			pybeamer.VERSION,
 			"renderer":					self,
 			"presentation":				self._presentation,
 			"rendered_presentation":	rendered_presentation,
+			"template_error":			_template_error,
 		}
 
 		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
@@ -202,7 +208,6 @@ class PresentationRenderer():
 		for filename in self._template_config.get("files", { }).get("css", [ ]):
 			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
 			rendered_presentation.add_css(filename)
-
 
 		# Run it first to build the TOC
 		self._compute_renderable_slides(rendered_presentation)
