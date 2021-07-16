@@ -26,6 +26,7 @@ from .RendererCache import RendererCache
 from .Exceptions import FailedToLookupFileException
 from .GenericTOC import GenericTOC
 from .Acronyms import Acronyms
+from .Enums import PresentationMode
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
 from pybeamer.Controller import ControllerManager
@@ -170,8 +171,9 @@ class PresentationRenderer():
 				renderable_slides += generator
 		return renderable_slides
 
-	def _render_file(self, template_filename, rendered_presentation, template_args):
-		target_filename = os.path.basename(template_filename)
+	def _render_file(self, template_filename, rendered_presentation, template_args, target_filename = None):
+		if target_filename is None:
+			target_filename = os.path.basename(template_filename)
 		template = self._lookup.get_template(template_filename)
 		result = template.render(**template_args)
 		rendered_presentation.add_file(target_filename, result)
@@ -188,7 +190,8 @@ class PresentationRenderer():
 
 		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
 		self._render_file("base/pybeamer.css", rendered_presentation, template_args)
-		self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
+		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
+			self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
 		self._render_file("base/pybeamer_tooltip.css", rendered_presentation, template_args)
 
 		for filename in self._template_config.get("files", { }).get("static", [ ]):
@@ -211,4 +214,4 @@ class PresentationRenderer():
 			result = template.render(**args)
 			rendered_presentation.append_slide(result)
 
-		self._render_file("base/index.html", rendered_presentation, template_args)
+		self._render_file("base/index.html", rendered_presentation, template_args, target_filename = self.rendering_params.index_filename)

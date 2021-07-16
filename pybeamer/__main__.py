@@ -20,15 +20,31 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import sys
+import argparse
 from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
 from .ActionServe import ActionServe
 from .ActionAcroSort import ActionAcroSort
+from .Enums import PresentationMode
+
+def _geometry(text):
+	text = text.split("x", maxsplit = 1)
+	if len(text) != 2:
+		raise argparse.ArgumentTypeError("Not a valid geometry: %s" % (text))
+	return (int(text[0]), int(text[1]))
 
 def main():
 	mc = MultiCommand()
 
 	def genparser(parser):
+		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1000, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")
+		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
+		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
+		parser.add_argument("-t", "--template-style", metavar = "name", default = "default", help = "Template style to use. Defaults to %(default)s.")
+		parser.add_argument("-g", "--geometry", metavar = "width x height", type = _geometry, default = "1280x720", help = "Slide geometry, in pixels. Defaults to %(default)s.")
+		parser.add_argument("-r", "--remove-pauses", action = "store_true", help = "Ignore all pause directives and just render the final slides.")
+		parser.add_argument("-i", "--index-filename", metavar = "filename", default = "index.html", help = "Gives the name of the presentation index file. Defaults to %(default)s. Useful if you want to render multiple presentations in one subdirectory.")
+		parser.add_argument("-m", "--presentation-mode", metavar = "{%s}" % (",".join(enumitem.value for enumitem in PresentationMode)), type = PresentationMode, default = "interactive", help = "Generate this type of presentation. Can be one of %(choices)s, defaults to %(default)s.")
 		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
 		parser.add_argument("infile", help = "Input XML file of the slide show.")

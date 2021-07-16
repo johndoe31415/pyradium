@@ -76,7 +76,7 @@ class PauseRenderer():
 						else:
 							XMLTools.remove_node(pause_node)
 		else:
-			rendered_containers = [ self._slide.clone_containers() ]
+			rendered_containers = [ self._clone_containers() ]
 
 		# Remove all pause nodes from last container (the one which renders the
 		# whole slide)

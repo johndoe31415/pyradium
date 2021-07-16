@@ -13,11 +13,13 @@
 	</head>
 
 	<body>
+%if renderer.rendering_params.presentation_mode.name == "Interactive":
 		<div class="menu">
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
 			<button id="btn_goto_slide" class="control">Goto</button>
 			<button id="btn_present" class="control">Start Presentation</button>
 		</div>
+%endif
 
 		<div class="slides">
 		%for slide in rendered_presentation.rendered_slides:
@@ -25,6 +27,7 @@
 		%endfor
 		</div>
 
+%if renderer.rendering_params.presentation_mode.name == "Interactive":
 		<div id="full_screen_div" class="fullscreen size_container" style="display: none;"></div>
 
 		<script type="module">
@@ -42,5 +45,6 @@
 			document.addEventListener("fullscreenchange", (event) => presentation.event_fullscreen(event));
 			document.addEventListener("keydown", (event) => presentation.event_keydown(event));
 		</script>
+%endif
 	</body>
 </html>

@@ -20,11 +20,13 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+from .Enums import PresentationMode
 
 class RenderingParameters():
-	def __init__(self, template_style = "default", honor_pauses = True, extra_template_dirs = None, include_dirs = None):
+	def __init__(self, template_style = "default", honor_pauses = True, presentation_mode = PresentationMode.Interactive, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", geometry = (1280, 720), image_max_dimension = 1000):
 		self._template_style = template_style
 		self._honor_pauses = honor_pauses
+		self._presentation_mode = presentation_mode
 		self._template_dirs = [ os.path.expanduser("~/.config/pybeamer/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
 		if extra_template_dirs is not None:
 			self._template_dirs += extra_template_dirs
@@ -32,18 +34,10 @@ class RenderingParameters():
 			self._include_dirs = [ ]
 		else:
 			self._include_dirs = list(include_dirs)
+		self._index_filename = index_filename
+		self._geometry = geometry
+		self._image_max_dimension = image_max_dimension
 
-	@property
-	def image_max_dimension(self):
-		return 1000
-
-	@property
-	def geometry_x(self):
-		return 1280
-
-	@property
-	def geometry_y(self):
-		return 720
 
 	@property
 	def template_style(self):
@@ -54,9 +48,29 @@ class RenderingParameters():
 		return self._honor_pauses
 
 	@property
+	def presentation_mode(self):
+		return self._presentation_mode
+
+	@property
 	def template_dirs(self):
 		return iter(self._template_dirs)
 
 	@property
 	def include_dirs(self):
 		return iter(self._include_dirs)
+
+	@property
+	def index_filename(self):
+		return self._index_filename
+
+	@property
+	def geometry_x(self):
+		return self._geometry[0]
+
+	@property
+	def geometry_y(self):
+		return self._geometry[1]
+
+	@property
+	def image_max_dimension(self):
+		return self._image_max_dimension

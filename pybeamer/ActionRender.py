@@ -33,6 +33,14 @@ class ActionRender(BaseAction):
 			return 1
 
 		presentation = Presentation.load_from_file(self._args.infile)
-		rendering_parameters = RenderingParameters(include_dirs = [ os.path.dirname(self._args.infile) ])
+		rendering_parameters = RenderingParameters(
+				template_style = self._args.template_style,
+				honor_pauses = not self._args.remove_pauses,
+				presentation_mode = self._args.presentation_mode,
+				extra_template_dirs = self._args.template_dir,
+				include_dirs = [ os.path.dirname(self._args.infile) ] + self._args.include_dir,
+				index_filename = self._args.index_filename,
+				geometry = self._args.geometry,
+				image_max_dimension = self._args.image_max_dimension)
 		renderer = PresentationRenderer(presentation, rendering_parameters)
 		rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
