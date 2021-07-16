@@ -23,6 +23,7 @@ from pybeamer.Controller import BaseController
 
 class FeedbackController(BaseController):
 	def render(self):
+		print(self.rendered_presentation.renderer.presentation.version_information)
 		additional_slide_vars = {
 		}
 		yield from self._slide.emit_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)

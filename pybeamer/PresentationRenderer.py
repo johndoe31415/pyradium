@@ -131,6 +131,10 @@ class PresentationRenderer():
 			self._template_config = json.load(f)
 		self._ctrlr_mgr = ControllerManager(self)
 
+	@property
+	def presentation(self):
+		return self._presentation
+
 	def _get_mako_lookup_directories(self):
 		for dirname in self._rendering_params.template_dirs:
 			yield dirname

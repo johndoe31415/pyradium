@@ -19,6 +19,8 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import hashlib
+import subprocess
 import xml.dom.minidom
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
@@ -76,6 +78,26 @@ class Presentation():
 			else:
 				print("Warning: Ignored unknown tag '%s'." % (child.tagName))
 		return cls(meta, content, sources)
+
+	def _determine_sha256(self, filename):
+		with open(filename, "rb") as f:
+			return hashlib.sha256(f.read()).hexdigest()
+
+	def _determine_git_commit(self, filename):
+		try:
+			return subprocess.check_output([ "git", "rev-list", "-1", "--all", filename ], stderr = subprocess.DEVNULL).decode().rstrip("\n")
+		except subprocess.CalledProcessError:
+			return None
+
+	def _determine_version(self, filename):
+		return {
+			"sha256":	self._determine_sha256(filename),
+			"git":		self._determine_git_commit(filename),
+		}
+
+	@property
+	def version_information(self):
+		return { filename: self._determine_version(filename) for filename in self.sources }
 
 	def __iter__(self):
 		return iter(self._content)
