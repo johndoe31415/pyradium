@@ -1,28 +1,29 @@
 <%inherit file="base/slide.html" />
 <%block name="slide_classes">feedback</%block>
-<div class="body">
+<% uid = slide.var("generate_uid")() %>
+<div class="body" id="${uid}">
 
 	<div class="form-grid">
 
 		<div class="form-label">Rating:</div>
-		<div class="form-input button-checkbox-group">
+		<div class="form-input button-checkbox-group" lid="rating">
 %for (rating, emoji) in enumerate("🤮🙁🙂😁"):
 			<label class="button-checkbox">
-				<input type="checkbox" name="chk_${rating}">
+				<input type="checkbox" value="${rating}">
 				<span>${emoji}</span>
 			</label>
 %endfor
 		</div>
 
 		<div class="form-label">Your name:</div>
-		<div class="form-input"><input type="text" name="name" /></div>
+		<div class="form-input"><input type="text" name="name" placeholder="optional" /></div>
 
 		<div class="form-label">Email:</div>
-		<div class="form-input"><input type="text" name="email" /></div>
+		<div class="form-input"><input type="text" name="email" placeholder="optional" /></div>
 
-		<div class="form-span">
-			<div>Comments:</div>
-			<textarea></textarea>
+		<div class="form-label">Comments:</div>
+		<div class="form-input">
+			<textarea placeholder="Typos, recommendations, criticizm. Anything you like." cols="80" rows="10"></textarea>
 		</div>
 
 		<div class="form-span">
@@ -34,3 +35,10 @@
 <div class="footer">
 	<img src="bar.svg" class="bar" />
 </div>
+
+<script type="module">
+	import {ButtonCheckbox} from "./pybeamer_forms.js";
+	const parent_div = document.querySelector("#${uid}");
+	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
+	const button_checkbox = new ButtonCheckbox(checkbox_group);
+</script>

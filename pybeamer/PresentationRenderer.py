@@ -45,6 +45,12 @@ class RenderedPresentation():
 		self._added_files = set()
 		self._current_slide_number = 0
 		self._total_slide_count = 0
+		self._uid = 0
+
+	@property
+	def next_unique_id(self):
+		self._uid += 1
+		return "uid_%x" % (self._uid)
 
 	@property
 	def current_slide_number(self):
@@ -196,6 +202,7 @@ class PresentationRenderer():
 		}
 
 		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
+		rendered_presentation.copy_template_file("base/pybeamer_forms.js", "pybeamer_forms.js")
 		self._render_file("base/pybeamer.css", rendered_presentation, template_args)
 		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
 			self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
