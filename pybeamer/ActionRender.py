@@ -24,7 +24,7 @@ import subprocess
 from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
-from .PresentationRenderer import PresentationRenderer
+from .Renderer import Renderer
 
 class ActionRender(BaseAction):
 	def _wait_for_change(self, renderer):
@@ -58,7 +58,7 @@ class ActionRender(BaseAction):
 					geometry = self._args.geometry,
 					image_max_dimension = self._args.image_max_dimension)
 			presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
-			renderer = PresentationRenderer(presentation, rendering_parameters)
+			renderer = Renderer(presentation, rendering_parameters)
 			rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
 			if not self._args.re_render_loop:
 				break
