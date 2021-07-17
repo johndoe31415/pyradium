@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import unittest
-from pybeamer.Schedule import TimeSpecificationType, TimeSpecification
+from pybeamer.Schedule import TimeSpecificationType, TimeSpecification, TimeRange, TimeRanges
 from pybeamer.Exceptions import TimeSpecificationError
 
 class TimeSpecificationTests(unittest.TestCase):
@@ -80,3 +80,33 @@ class TimeSpecificationTests(unittest.TestCase):
 
 		with self.assertRaises(TimeSpecificationError):
 			TimeSpecification.parse(abs_string = "1.234:30 min")
+
+	def test_timerange_simple(self):
+		tr = TimeRange.parse("11:12 - 22:23")
+		self.assertEqual(tr.range_begin, (11 * 60) + 12)
+		self.assertEqual(tr.range_end, (22 * 60) + 23)
+		self.assertEqual(tr.begin_time, (11, 12))
+		self.assertEqual(tr.end_time, (22, 23))
+		self.assertEqual(tr.duration_mins, 48 + (60 * 10) + 23)
+
+	def test_timerange_crossover(self):
+		tr = TimeRange.parse(" 23:45-0:15 ")
+		self.assertEqual(tr.range_begin, (23 * 60) + 45)
+		self.assertEqual(tr.range_end, 1440 + (0 * 60) + 15)
+		self.assertEqual(tr.begin_time, (23, 45))
+		self.assertEqual(tr.end_time, (0, 15))
+		self.assertEqual(tr.duration_mins, 30)
+
+	def test_timerange_noparse(self):
+		with self.assertRaises(TimeSpecificationError):
+			TimeRange.parse("0 : 10 - 10:12")
+		with self.assertRaises(TimeSpecificationError):
+			TimeRange.parse(" 23:23 - 24:12")
+		with self.assertRaises(TimeSpecificationError):
+			TimeRange.parse(" 23:23 - 24:12")
+		with self.assertRaises(TimeSpecificationError):
+			TimeRange.parse(" 23:23 - 22:x2")
+
+	def test_timeranges_simple(self):
+		trs = TimeRanges.parse("10:00-10:15 10:20-10:30")
+		self.assertEqual(trs.duration_mins, 15 + 10)

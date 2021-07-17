@@ -7,7 +7,10 @@
 		<fullauthor>Jean-Luc Picard, Retired Starfleet Admiral</fullauthor>
 		<affiliation>Starfleet</affiliation>
 		<date>2020-01-01</date>
-		<schedule>14:00-14:45</schedule>
+		<schedule>
+			<time-range>14:00-15:30</time-range>
+			<pause-minutes>15</pause-minutes>
+		</schedule>
 		<format>
 			<date>%d.%m.%Y</date>
 		</format>
