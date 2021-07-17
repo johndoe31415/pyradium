@@ -19,11 +19,17 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import json
+import pybeamer
 from pybeamer.Controller import BaseController
 
 class FeedbackController(BaseController):
 	def render(self):
-		print(self.rendered_presentation.renderer.presentation.version_information)
+		slide_info = {
+			"source":	self.rendered_presentation.renderer.presentation.version_information,
+			"renderer":	pybeamer.VERSION,
+		}
 		additional_slide_vars = {
+			"json_slide_info": json.dumps(slide_info),
 		}
 		yield from self._slide.emit_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)

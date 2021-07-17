@@ -22,8 +22,9 @@
 */
 
 export class FeedbackSender {
-	constructor(target_uri, handlers) {
+	constructor(target_uri, options) {
 		this._target_uri = target_uri;
+		this._options = options;
 		this._sources = [ ];
 	}
 
@@ -31,6 +32,55 @@ export class FeedbackSender {
 		this._sources.push(element);
 	}
 
+	_collect_data() {
+		let collected_data = { };
+		this._sources.forEach((source) => {
+			collected_data[source.name] = source.value;
+		});
+		return collected_data;
+	}
+
+	_data_is_empty(data_source) {
+		for (const value of Object.values(data_source)) {
+			if ((value != null) && (value != "")) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	_fire_handler(name, text) {
+		const handler = this._options["on_" + name] || console.log;
+		handler(text);
+	}
+
 	submit() {
+		const collected = this._collect_data();
+		const is_empty = this._data_is_empty(collected);
+		if (is_empty) {
+			this._fire_handler("form_empty", "Form contains no data for submission.");
+			return;
+		}
+
+		const post_data = {
+			"static_info":	this._options["static_info"],
+			"collected":	collected,
+		};
+
+		fetch(this._target_uri, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(post_data),
+		}).then((response) => {
+	        if (response.ok) {
+				this._fire_handler("success", "Submission successful.");
+			} else {
+				this._fire_handler("error", "Server returned HTTP " + response.status + " error during submission.");
+			}
+		}).catch((error) => {
+			this._fire_handler("error", "Network error during submission.");
+		});
 	}
 }

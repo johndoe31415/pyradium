@@ -32,7 +32,7 @@ export class ButtonCheckbox {
 	}
 
 	get name() {
-		return this._button_checkbox_group.name;
+		return this._button_checkbox_group.getAttribute("name");
 	}
 
 	get value() {

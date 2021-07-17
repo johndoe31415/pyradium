@@ -43,13 +43,16 @@
 	import {ButtonCheckbox} from "./pybeamer_forms.js";
 	import {FeedbackSender} from "./pybeamer_feedback.js";
 
+	const slide_info = ${slide.var("json_slide_info") | n};
 	const parent_div = document.querySelector("#${uid}");
 	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
 	const button_checkbox = new ButtonCheckbox(checkbox_group);
 
 	const feedback_sender = new FeedbackSender("https://foo.com", {
-		"on_success":	console.log,
-		"on_error":		console.log,
+		"static_info":		slide_info,
+		"on_success":		console.log,
+		"on_error":			console.log,
+		"on_form_empty":	console.log,
 	});
 
 	feedback_sender.add_source(button_checkbox);
