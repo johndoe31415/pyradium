@@ -63,7 +63,8 @@ class Presentation():
 			if child.tagName == "meta":
 				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")))
 			elif child.tagName == "slide":
-				content.append(RenderSlideDirective(child))
+				if not XMLTools.get_bool_attr(child, "hide"):
+					content.append(RenderSlideDirective(child))
 			elif child.tagName == "include":
 				sub_presentation_filename = rendering_parameters.include_dirs.lookup(child.getAttribute("src"))
 				sub_presentation = cls.load_from_file(sub_presentation_filename)
