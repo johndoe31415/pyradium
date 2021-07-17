@@ -48,15 +48,21 @@
 	},
 	"controllers": {
 		"toc": {
-			"file":			"antonio/controller.py",
-			"class":		"TOCController"
+			"file":			"base/controller_toc.py",
+			"class":		"TOCController",
+			"options": {
+				"toc_items_per_slide":	8
+			}
 		},
 		"acronyms": {
-			"file":			"antonio/controller.py",
-			"class":		"AcronymController"
+			"file":			"base/controller_acronym.py",
+			"class":		"AcronymController",
+			"options": {
+				"acronyms_per_slide":	8
+			}
 		},
 		"feedback": {
-			"file":			"base/feedback_controller.py",
+			"file":			"base/controller_feedback.py",
 			"class":		"FeedbackController"
 		}
 	},

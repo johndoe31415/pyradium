@@ -22,10 +22,11 @@
 import importlib
 
 class BaseController():
-	def __init__(self, slide, content_containers, rendered_presentation):
+	def __init__(self, slide, content_containers, rendered_presentation, options = None):
 		self._slide = slide
 		self._content_containers = content_containers
 		self._rendered_presentation = rendered_presentation
+		self._options = options
 
 	@property
 	def slide(self):
@@ -51,8 +52,9 @@ class ControllerManager():
 		return self._renderer.template_config.get("controllers", { }).get(name)
 
 	def get_controller(self, slide, content_containers, rendered_presentation):
+		definition = self._controller_definition(slide.slide_type)
+		options = definition.get("options") if (definition is not None) else None
 		if slide.slide_type not in self._cached:
-			definition = self._controller_definition(slide.slide_type)
 			if definition is not None:
 				module_filename = self._renderer.lookup_template_file(definition["file"])
 				loader = importlib.machinery.SourceFileLoader("controller_module", module_filename)
@@ -69,5 +71,5 @@ class ControllerManager():
 		if handler_class is None:
 			return None
 
-		controller = handler_class(slide, content_containers, rendered_presentation)
+		controller = handler_class(slide, content_containers, rendered_presentation, options)
 		return controller

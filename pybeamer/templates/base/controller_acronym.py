@@ -21,32 +21,15 @@
 
 from pybeamer.Controller import BaseController
 
-class TOCController(BaseController):
-	_TOC_ITEMS_PER_SLIDE = 8
-
-	def render(self):
-		toc = self.rendered_presentation.frozen_toc
-		if toc is not None:
-			start_at = self.slide.get_xml_slide_var("start_at")
-			end_before = self.slide.get_xml_slide_var("end_before")
-			toc_item_count = toc.count_toc_items(start_at = start_at, end_before = end_before)
-			toc_slide_count = (toc_item_count + self._TOC_ITEMS_PER_SLIDE - 1) // self._TOC_ITEMS_PER_SLIDE
-
-			for toc_slide_index in range(toc_slide_count):
-				subset = list(toc.subset(start_at = start_at, end_before = end_before, max_items = self._TOC_ITEMS_PER_SLIDE))
-				start_at = subset[-1].index + 1
-				additional_slide_vars = {
-					"partial_toc":	toc.emit_commands(subset),
-				}
-				yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)
-
 class AcronymController(BaseController):
-	_ACRONYMS_PER_SLIDE = 8
+	@property
+	def acronyms_per_slide(self):
+		return self._options["acronyms_per_slide"]
 
 	def render(self):
 		acronyms = self.rendered_presentation.renderer.get_custom_renderer("acronym")
 		used_acronyms = list(acronyms.get_all_used_acronyms())
-		pages = (len(used_acronyms) + self._ACRONYMS_PER_SLIDE - 1) // self._ACRONYMS_PER_SLIDE
+		pages = (len(used_acronyms) + self.acronyms_per_slide - 1) // self.acronyms_per_slide
 		for page in range(pages):
-			page_content = used_acronyms[page * self._ACRONYMS_PER_SLIDE : (page + 1) * self._ACRONYMS_PER_SLIDE]
+			page_content = used_acronyms[page * self.acronyms_per_slide : (page + 1) * self.acronyms_per_slide]
 			yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, { "acronyms": page_content })
