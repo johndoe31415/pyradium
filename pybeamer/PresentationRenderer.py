@@ -39,6 +39,7 @@ class RenderedPresentation():
 		self._renderer = renderer
 		self._rendered_slides = [ ]
 		self._css = OrderedSet()
+		self._js = OrderedSet()
 		self._toc = GenericTOC()
 		self._frozen_toc = None
 		self._deploy_directory = deploy_directory
@@ -79,11 +80,18 @@ class RenderedPresentation():
 		return iter(self._rendered_slides)
 
 	@property
+	def js(self):
+		return iter(self._js)
+
+	@property
 	def css(self):
 		return iter(self._css)
 
 	def add_css(self, filename):
 		return self._css.add(filename)
+
+	def add_js(self, filename):
+		return self._js.add(filename)
 
 	@property
 	def toc(self):
@@ -113,7 +121,14 @@ class RenderedPresentation():
 		with open(source_filename, "rb") as f:
 			self.add_file(destination_relpath, f.read())
 
-	def copy_template_file(self, template_filename, destination_relpath):
+	def copy_template_file(self, template_filename, destination_relpath = None, reference = True):
+		if destination_relpath is None:
+			destination_relpath = os.path.basename(template_filename)
+		if reference:
+			if destination_relpath.endswith(".css"):
+				self.add_css(destination_relpath)
+			elif destination_relpath.endswith(".js"):
+				self.add_js(destination_relpath)
 		return self.copy_file(self._renderer.lookup_template_file(template_filename), destination_relpath)
 
 class PresentationRenderer():
@@ -194,9 +209,7 @@ class PresentationRenderer():
 			"template_error":			_template_error,
 		}
 
-		rendered_presentation.copy_template_file("base/pybeamer.js", "pybeamer.js")
-		rendered_presentation.copy_template_file("base/pybeamer_forms.js", "pybeamer_forms.js")
-		rendered_presentation.copy_template_file("base/pybeamer_feedback.js", "pybeamer_feedback.js")		# TODO do not always include this, only when needed
+		rendered_presentation.copy_template_file("base/pybeamer.js")
 		self._render_file("base/pybeamer.css", rendered_presentation, template_args)
 		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
 			self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
@@ -204,9 +217,9 @@ class PresentationRenderer():
 		self._render_file("base/pybeamer_forms.css", rendered_presentation, template_args)
 
 		for filename in self._template_config.get("files", { }).get("static", [ ]):
-			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
+			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename))
 		for filename in self._template_config.get("files", { }).get("css", [ ]):
-			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), filename)
+			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename))
 			rendered_presentation.add_css(filename)
 
 		# Run it first to build the initial TOC
