@@ -54,7 +54,7 @@ class ControllerManager():
 		if slide.slide_type not in self._cached:
 			definition = self._controller_definition(slide.slide_type)
 			if definition is not None:
-				module_filename = self._renderer.lookup_styled_template_file(definition["file"])
+				module_filename = self._renderer.lookup_template_file(definition["file"])
 				loader = importlib.machinery.SourceFileLoader("controller_module", module_filename)
 				spec = importlib.util.spec_from_loader(loader.name, loader)
 				module = importlib.util.module_from_spec(spec)

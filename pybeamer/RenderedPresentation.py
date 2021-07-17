@@ -27,16 +27,17 @@ from .OrderedSet import OrderedSet
 class RenderedPresentation():
 	def __init__(self, renderer, deploy_directory):
 		self._renderer = renderer
+		self._deploy_directory = deploy_directory
 		self._rendered_slides = [ ]
 		self._css = OrderedSet()
 		self._js = OrderedSet()
 		self._toc = GenericTOC()
 		self._frozen_toc = None
-		self._deploy_directory = deploy_directory
 		self._added_files = set()
 		self._current_slide_number = 0
 		self._total_slide_count = 0
 		self._uid = 0
+		self._features = set()
 
 	@property
 	def next_unique_id(self):
@@ -77,8 +78,10 @@ class RenderedPresentation():
 	def css(self):
 		return iter(self._css)
 
-	def add_css(self, filename):
-		return self._css.add(filename)
+	def add_css(self, filename, target_directory = "/"):
+		assert(target_directory.startswith("/"))
+		assert(target_directory.endswith("/"))
+		return self._css.add(target_directory[1:] + filename)
 
 	def add_js(self, filename):
 		return self._js.add(filename)
@@ -91,32 +94,45 @@ class RenderedPresentation():
 	def frozen_toc(self):
 		return self._frozen_toc
 
+	@property
+	def features(self):
+		return self._features
+
+	def add_feature(self, feature):
+		self._features.add(feature)
+
 	def append_slide(self, rendered_slide):
 		self._rendered_slides.append(rendered_slide)
 
-	def add_file(self, destination_relpath, content):
+	def add_file(self, destination_relpath, content, target_directory = "/"):
+		assert(target_directory.startswith("/"))
+		assert(target_directory.endswith("/"))
 		if destination_relpath in self._added_files:
 			return
 		self._added_files.add(destination_relpath)
-		filename = self._deploy_directory + "/" + destination_relpath
+		filename = self._deploy_directory + target_directory + destination_relpath
 		dirname = os.path.dirname(filename)
 		with contextlib.suppress(FileExistsError):
 			os.makedirs(dirname)
 		with open(filename, "w" if isinstance(content, str) else "wb") as f:
 			f.write(content)
 
-	def copy_file(self, source_filename, destination_relpath):
-		if destination_relpath in self._added_files:
+	def copy_file(self, rel_filename, target_directory = "/"):
+		if rel_filename in self._added_files:
 			return
+		source_filename = self.renderer.lookup_template_file(rel_filename)
 		with open(source_filename, "rb") as f:
-			self.add_file(destination_relpath, f.read())
+			self.add_file(rel_filename, f.read(), target_directory)
 
-	def copy_template_file(self, template_filename, destination_relpath = None, reference = True):
-		if destination_relpath is None:
-			destination_relpath = os.path.basename(template_filename)
-		if reference:
-			if destination_relpath.endswith(".css"):
-				self.add_css(destination_relpath)
-			elif destination_relpath.endswith(".js"):
-				self.add_js(destination_relpath)
-		return self.copy_file(self._renderer.lookup_template_file(template_filename), destination_relpath)
+	def handle_dependencies(self, dependencies):
+		if dependencies is None:
+			return
+		for rel_filename in dependencies.get("static", [ ]):
+			self.copy_file(rel_filename, target_directory = "/template/")
+		for rel_filename in dependencies.get("css", [ ]):
+			self.copy_file(rel_filename, target_directory = "/template/")
+			self.add_css(rel_filename, target_directory = "/template/")
+		for rel_filename in dependencies.get("rendered_css", [ ]):
+			rendered_css = self.renderer.render_file(rel_filename, rendered_presentation = self)
+			self.add_file(rel_filename, rendered_css, target_directory = "/template/")
+			self.add_css(rel_filename, target_directory = "/template/")

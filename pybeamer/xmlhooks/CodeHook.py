@@ -33,7 +33,5 @@ class CodeHook(InnerTextHook):
 		highlighted_code = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter(cssclass = "code_highlight"))
 
 		replacement_node = xml.dom.minidom.parseString(highlighted_code).firstChild
-		rendered_presentation.copy_template_file("base/pygments.css", "pygments.css")
-		rendered_presentation.add_css("pygments.css")
-
+		rendered_presentation.add_feature("pygments")
 		return replacement_node

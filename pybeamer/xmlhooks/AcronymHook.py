@@ -35,6 +35,7 @@ class AcronymHook(BaseHook):
 		if resolved is None:
 			replacement_node = node.ownerDocument.createTextNode(acronym_id)
 		else:
+			rendered_presentation.add_feature("acronym")
 			replacement_node = node.ownerDocument.createElement("span")
 			replacement_node.setAttribute("class", "tooltip")
 			replacement_node.appendChild(node.ownerDocument.createTextNode(resolved.acronym))

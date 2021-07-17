@@ -30,9 +30,8 @@ class TOCController(BaseController):
 			start_at = self.slide.get_xml_slide_var("start_at")
 			end_before = self.slide.get_xml_slide_var("end_before")
 			toc_item_count = toc.count_toc_items(start_at = start_at, end_before = end_before)
-
-
 			toc_slide_count = (toc_item_count + self._TOC_ITEMS_PER_SLIDE - 1) // self._TOC_ITEMS_PER_SLIDE
+
 			for toc_slide_index in range(toc_slide_count):
 				subset = list(toc.subset(start_at = start_at, end_before = end_before, max_items = self._TOC_ITEMS_PER_SLIDE))
 				start_at = subset[-1].index + 1

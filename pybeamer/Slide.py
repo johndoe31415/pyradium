@@ -89,4 +89,4 @@ class RenderSlideDirective(BaseDirective):
 			yield from controller.render()
 
 	def __repr__(self):
-		return "Slide<%s>" % (self.slide_type)
+		return "RenderSlideDirective<%s>" % (self.slide_type)

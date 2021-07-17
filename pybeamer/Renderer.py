@@ -31,6 +31,7 @@ from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
 from .Enums import PresentationMode
 from .Exceptions import TemplateErrorException
+from .Slide import RenderSlideDirective
 
 class Renderer():
 	def __init__(self, presentation, rendering_params):
@@ -80,6 +81,13 @@ class Renderer():
 	def lookup_include(self, filename):
 		return self._rendering_params.include_dirs.lookup(filename)
 
+	def _determine_slide_types(self):
+		slide_types = set()
+		for directive in self._presentation:
+			if isinstance(directive, RenderSlideDirective):
+				slide_types.add(directive.slide_type)
+		return slide_types
+
 	def _compute_renderable_slides(self, rendered_presentation):
 		renderable_slides = [ ]
 		for directive in self._presentation:
@@ -88,43 +96,40 @@ class Renderer():
 				renderable_slides += generator
 		return renderable_slides
 
-	def _render_file(self, template_filename, rendered_presentation, template_args, target_filename = None):
-		if target_filename is None:
-			target_filename = os.path.basename(template_filename)
-		template = self._lookup.get_template(template_filename)
-		result = template.render(**template_args)
-		rendered_presentation.add_file(target_filename, result)
-		if target_filename.endswith(".css"):
-			rendered_presentation.add_css(target_filename)
-
-	def render(self, deploy_directory):
+	def render_file(self, template_filename, rendered_presentation = None, additional_template_args = None):
 		def _template_error(text):
 			raise TemplateErrorException(text)
 
-		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
 		template_args = {
 			"pybeamer_version":			pybeamer.VERSION,
 			"renderer":					self,
 			"presentation":				self._presentation,
-			"rendered_presentation":	rendered_presentation,
 			"template_error":			_template_error,
 		}
+		if rendered_presentation is not None:
+			template_args["rendered_presentation"] = rendered_presentation
+		if additional_template_args is not None:
+			template_args.update(additional_template_args)
 
-		rendered_presentation.copy_template_file("base/pybeamer.js")
-		self._render_file("base/pybeamer.css", rendered_presentation, template_args)
+		template = self._lookup.get_template(template_filename)
+		result = template.render(**template_args)
+		return result
+
+	def render(self, deploy_directory):
+		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
+
 		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
-			self._render_file("base/pybeamer_menu.css", rendered_presentation, template_args)
-		self._render_file("base/pybeamer_tooltip.css", rendered_presentation, template_args)
-		self._render_file("base/pybeamer_forms.css", rendered_presentation, template_args)
+			rendered_presentation.add_feature("interactive")
 
-		for filename in self._template_config.get("files", { }).get("static", [ ]):
-			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), destination_relpath = filename)
-		for filename in self._template_config.get("files", { }).get("css", [ ]):
-			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename))
-			rendered_presentation.add_css(filename)
-
-		# Run it first to build the initial TOC
+		# Run it first to build the initial TOC and determine feature set
 		self._compute_renderable_slides(rendered_presentation)
+
+		# Then copy the dependencies
+		rendered_presentation.handle_dependencies(self._template_config.get("files"))
+		for slide_type in self._determine_slide_types():
+			rendered_presentation.handle_dependencies(self._template_config.get("dependencies", { }).get("slidetype", { }).get(slide_type))
+		for feature in rendered_presentation.features:
+			rendered_presentation.handle_dependencies(self._template_config.get("dependencies", { }).get("feature", { }).get(feature))
 
 		# Then run it again to get the page numbers straight (e.g., the TOC
 		# pages will be emitted, giving different page numbers)
@@ -133,13 +138,13 @@ class Renderer():
 		rendered_presentation.finalize_toc()
 
 		for renderable_slide in self._compute_renderable_slides(rendered_presentation):
-			args = dict(template_args)
-			args.update({
+			additional_template_args = {
 				"slide":			renderable_slide,
-			})
-			template = self._lookup.get_template("slide_%s.html" % (renderable_slide.slide_type))
-			result = template.render(**args)
-			rendered_presentation.append_slide(result)
+			}
+			template_filename = "slide_%s.html" % (renderable_slide.slide_type)
+			rendered_slide = self.render_file(template_filename, rendered_presentation = rendered_presentation, additional_template_args = additional_template_args)
+			rendered_presentation.append_slide(rendered_slide)
 
-		self._render_file("base/index.html", rendered_presentation, template_args, target_filename = self.rendering_params.index_filename)
+		rendered_index = self.render_file("base/index.html", rendered_presentation = rendered_presentation)
+		rendered_presentation.add_file(self.rendering_params.index_filename, rendered_index)
 		return rendered_presentation

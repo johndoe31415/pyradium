@@ -43,13 +43,13 @@
 	</div>
 </div>
 <div class="footer">
-	<img src="bar.svg" class="bar" />
+	<img src="template/default/bar.svg" class="bar" />
 </div>
 
 <script type="module">
-	import {ButtonCheckbox} from "./pybeamer_forms.js";
-	import {FeedbackSender} from "./pybeamer_feedback.js";
-	import {ModalWindow} from "./pybeamer_modal.js";
+	import {ButtonCheckbox} from "./template/base/pybeamer_forms.js";
+	import {FeedbackSender} from "./template/base/pybeamer_feedback.js";
+	import {ModalWindow} from "./template/base/pybeamer_modal.js";
 
 	const slide_info = ${slide.var("json_slide_info") | n};
 	const parent_div = document.querySelector("#${uid}");

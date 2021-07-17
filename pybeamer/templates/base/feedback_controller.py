@@ -25,11 +25,6 @@ from pybeamer.Controller import BaseController
 
 class FeedbackController(BaseController):
 	def render(self):
-		self.rendered_presentation.copy_template_file("base/pybeamer_forms.js")
-		self.rendered_presentation.copy_template_file("base/pybeamer_feedback.js")
-		self.rendered_presentation.copy_template_file("base/pybeamer_modal.js")
-		self.rendered_presentation.copy_template_file("base/pybeamer_modal.css")
-
 		slide_info = {
 			"source":	self.rendered_presentation.renderer.presentation.version_information,
 			"renderer":	pybeamer.VERSION,

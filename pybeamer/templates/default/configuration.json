@@ -29,33 +29,74 @@
 	],
 	"files": {
 		"css": [
-			"default.css",
-			"font_fira.css",
-			"font_latinmodernmono.css"
+			"default/default.css",
+			"default/font_fira.css",
+			"default/font_latinmodernmono.css"
+		],
+		"rendered_css": [
+			"base/pybeamer.css"
 		],
 		"static": [
-			"bar.svg",
-			"triangle1.svg",
-			"triangle2.svg",
-			"font_fira/FiraSans-Regular-latin.woff2",
-			"font_fira/FiraSans-Light-latin.woff2",
-			"font_fira/FiraSans-Bold-latin.woff2",
-			"font_latinmodernmono/lmmono10-regular.otf",
-			"font_latinmodernmono/lmmono10-italic.otf"
+			"base/pybeamer.js",
+			"default/bar.svg",
+			"default/triangle1.svg",
+			"default/triangle2.svg",
+			"default/font_fira/FiraSans-Regular-latin.woff2",
+			"default/font_fira/FiraSans-Light-latin.woff2",
+			"default/font_fira/FiraSans-Bold-latin.woff2",
+			"default/font_latinmodernmono/lmmono10-regular.otf",
+			"default/font_latinmodernmono/lmmono10-italic.otf"
 		]
 	},
 	"controllers": {
 		"toc": {
-			"file":			"controller.py",
+			"file":			"default/controller.py",
 			"class":		"TOCController"
 		},
 		"acronyms": {
-			"file":			"controller.py",
+			"file":			"default/controller.py",
 			"class":		"AcronymController"
 		},
 		"feedback": {
-			"file":			"../base/feedback_controller.py",
+			"file":			"base/feedback_controller.py",
 			"class":		"FeedbackController"
+		}
+	},
+	"dependencies": {
+		"slidetype": {
+			"quote": {
+				"static": [
+					"default/quote.svg"
+				]
+			},
+			"feedback": {
+				"css": [
+					"base/pybeamer_forms.css",
+					"base/pybeamer_modal.css"
+				],
+				"static": [
+					"base/pybeamer_forms.js",
+					"base/pybeamer_modal.js",
+					"base/pybeamer_feedback.js"
+				]
+			}
+		},
+		"feature": {
+			"acronym": {
+				"css": [
+					"base/pybeamer_tooltip.css"
+				]
+			},
+			"interactive": {
+				"css": [
+					"base/pybeamer_menu.css"
+				]
+			},
+			"pygments": {
+				"css": [
+					"base/pygments.css"
+				]
+			}
 		}
 	}
 }
