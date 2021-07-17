@@ -8,7 +8,23 @@
 		{
 			"author": "Jimena Catalina, SlideCarnival",
 			"contribution": "Design elements and layout ideas",
-			"uri": "https://www.slidescarnival.com/antonio-free-presentation-template/84"
+			"uri": "https://www.slidescarnival.com/antonio-free-presentation-template/84",
+			"license": "CC-BY 4.0",
+			"license_uri": "https://creativecommons.org/licenses/by/4.0/"
+		},
+		{
+			"author": "Carrois Apostrophe, Google Fonts",
+			"contribution": "Font: Fira Sans",
+			"uri": "https://fonts.google.com/specimen/Fira+Sans",
+			"license": "SIL Open Font License (OFL)",
+			"license_uri": "https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL"
+		},
+		{
+			"author": "Grupa Użytkowników Systemu TeX (GUST)",
+			"contribution": "Font: Latin Modern",
+			"uri": "http://www.gust.org.pl/projects/e-foundry/latin-modern",
+			"license": "GUST Font License (GFL); LaTeX Project Public License (LPPL) v1.3c or later",
+			"license_uri": "http://www.gust.org.pl/projects/e-foundry/licenses/GUST-FONT-SOURCE-LICENSE.txt/view"
 		}
 	],
 	"files": {
