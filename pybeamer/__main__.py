@@ -45,6 +45,8 @@ def main():
 		parser.add_argument("-r", "--remove-pauses", action = "store_true", help = "Ignore all pause directives and just render the final slides.")
 		parser.add_argument("-i", "--index-filename", metavar = "filename", default = "index.html", help = "Gives the name of the presentation index file. Defaults to %(default)s. Useful if you want to render multiple presentations in one subdirectory.")
 		parser.add_argument("-m", "--presentation-mode", metavar = "{%s}" % (",".join(enumitem.value for enumitem in PresentationMode)), type = PresentationMode, default = "interactive", help = "Generate this type of presentation. Can be one of %(choices)s, defaults to %(default)s.")
+		parser.add_argument("-l", "--re-render-loop", action = "store_true", help = "Stay in a continuous loop, re-rendering the presentation if anything changes.")
+		parser.add_argument("--re-render-watch", metavar = "path", action = "append", default = [ ], help = "By default, all include files and the template directory is being watched for changes. This option gives additional files or directories upon change of which the presentation should be re-rendered.")
 		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
 		parser.add_argument("infile", help = "Input XML file of the slide show.")
