@@ -19,15 +19,17 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-class PyBeamerException(Exception): pass
+from pybeamer.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pybeamer.Schedule import TimeSpecification
 
-class SlideException(PyBeamerException): pass
-class UndefinedContentException(SlideException): pass
-class TemplateErrorException(SlideException): pass
-class TimeSpecificationError(SlideException): pass
+@XMLHookRegistry.register_hook
+class TimeHook(BaseHook):
+	_TAG_NAME = "time"
 
-class XMLHookRegistryException(PyBeamerException): pass
-
-class DuplicateOrderException(PyBeamerException): pass
-class InvalidBooleanValueException(PyBeamerException): pass
-class FailedToLookupFileException(PyBeamerException): pass
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		abs_string = node.getAttribute("abs") if node.hasAttribute("abs") else None
+		rel_string = node.getAttribute("rel") if node.hasAttribute("rel") else None
+		time_spec = TimeSpecification.parse(abs_string = abs_string, rel_string = rel_string)
+#		print(time_spec)
+		return None

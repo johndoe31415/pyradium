@@ -28,4 +28,5 @@ from .TerminalHook import TerminalHook
 from .CodeHook import CodeHook
 from .ImgHook import ImgHook
 from .AcronymHook import AcronymHook
+from .TimeHook import TimeHook
 from .DebugHook import DebugHook

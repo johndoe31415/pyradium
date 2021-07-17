@@ -17,6 +17,7 @@
 		<div class="menu">
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
 			<button id="btn_goto_slide" class="control">Goto</button>
+			<button id="btn_timer" class="control">Timer</button>
 			<button id="btn_present" class="control">Start Presentation</button>
 		</div>
 %endif
@@ -44,6 +45,14 @@
 			document.addEventListener("fullscreenchange", (event) => presentation.event_fullscreen(event));
 			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
 			document.addEventListener("keydown", (event) => presentation.event_keydown(event));
+
+			const bc = new BroadcastChannel("events");
+			function start_timer() {
+				console.log("start");
+				window.open("popup.html");
+				bc.postMessage("sendy");
+			}
+			document.querySelector("#btn_timer").addEventListener("click", (event) => start_timer());
 		</script>
 %endif
 	</body>

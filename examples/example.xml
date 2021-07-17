@@ -22,6 +22,7 @@
 	<slide type="toc" />
 
 	<slide>
+		<s:time rel="1.5" />
 		<s:var name="heading" value="Pausing Slides" />
 		<ul>
 			<li>This is a test! Pause1 <s:ac>WEP</s:ac></li>
@@ -33,6 +34,7 @@
 	</slide>
 
 	<slide>
+		<s:time abs="1 min" />
 		<s:var name="heading" value="That's the second slide" />
 		<ul>
 			<li>This is a test!</li>
@@ -67,6 +69,7 @@
 	</slide>
 
 	<slide type="quote">
+		<s:time abs="15 sec" />
 		Even the best blade will rust and grow dull unless it is cared for.
 		<s:var name="author" value="Klingon Proverb" />
 	</slide>
@@ -196,7 +199,9 @@
 		</ul>
 	</slide>
 
-	<slide type="final" />
+	<slide type="final">
+		<s:time rel="0" />
+	</slide>
 	<slide type="acronyms" />
 
 	<slide type="feedback">

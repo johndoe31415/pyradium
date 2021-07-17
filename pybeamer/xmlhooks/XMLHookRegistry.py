@@ -59,7 +59,7 @@ class BaseHook():
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		raise NotImplementedError(__class__.__name__)
+		raise NotImplementedError("%s.handle" % (cls.__name__))
 
 class ReplacementHook(BaseHook):
 	_REPLACEMENTS = None
@@ -88,7 +88,7 @@ class ReplacementHook(BaseHook):
 class InnerTextHook(BaseHook):
 	@classmethod
 	def handle_text(cls, text, rendered_presentation, node):
-		raise NotImplementedError(__class__.__name__)
+		raise NotImplementedError("%s.handle_text" % (cls.__name__))
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):

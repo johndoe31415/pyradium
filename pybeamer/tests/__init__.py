@@ -19,15 +19,4 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-class PyBeamerException(Exception): pass
-
-class SlideException(PyBeamerException): pass
-class UndefinedContentException(SlideException): pass
-class TemplateErrorException(SlideException): pass
-class TimeSpecificationError(SlideException): pass
-
-class XMLHookRegistryException(PyBeamerException): pass
-
-class DuplicateOrderException(PyBeamerException): pass
-class InvalidBooleanValueException(PyBeamerException): pass
-class FailedToLookupFileException(PyBeamerException): pass
+from .TimeSpecificationTests import TimeSpecificationTests

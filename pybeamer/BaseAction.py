@@ -26,4 +26,4 @@ class BaseAction():
 		self.run()
 
 	def run(self):
-		raise NotImplementedError(self.__class__.__name__)
+		raise NotImplementedError("%s.run" % (self.__class__.__name__))
