@@ -27,29 +27,34 @@ div.form-input input, div.form-input textarea {
 }
 
 label.button-checkbox {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 label.button-checkbox input {
-  position: absolute;
-  top: 0;
-  left: 0;
-  visibility: hidden;
-  pointer-events: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	visibility: hidden;
+	pointer-events: none;
 }
 
 label.button-checkbox span {
-  padding: 11px 21px;
-  border: 1px solid #ccc;
-  display: inline-block;
-  border-radius: 6px;
-  margin: 7px;
-  background: #f5f5f5;
-  user-select: none;
+	padding: 11px 21px;
+	border: 1px solid #ccc;
+	display: inline-block;
+	border-radius: 6px;
+	margin: 7px;
+	background: #f5f5f5;
+	user-select: none;
 }
 
 label.button-checkbox input:checked + span {
-  box-shadow: inset 1px 2px 5px #777;
-  transform: translate(2px 2px);
-  background: #e5e5e5;
+	box-shadow: inset 1px 2px 5px #777;
+	transform: translate(2px 2px);
+	background: #e5e5e5;
+}
+
+label.button-checkbox input:disabled + span {
+	filter: grayscale(100%);
+	background: #efefef;
 }

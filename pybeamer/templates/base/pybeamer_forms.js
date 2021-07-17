@@ -29,6 +29,7 @@ export class ButtonCheckbox {
 			element.checked = false;
 		});
 		this._value = null;
+		this._disabled = false;
 	}
 
 	get name() {
@@ -37,6 +38,31 @@ export class ButtonCheckbox {
 
 	get value() {
 		return this._value;
+	}
+
+	set value(value) {
+		let any_checked = false;
+		this._value = value;
+		this._button_checkbox_group.querySelectorAll("input").forEach((element) => {
+			element.checked = (element.value == this._value);
+			if (element.checked) {
+				any_checked = true;
+			}
+		});
+		if (!any_checked) {
+			this._value = null;
+		}
+	}
+
+	get disabled() {
+		return this._disabled;
+	}
+
+	set disabled(value) {
+		this._disabled = !!value;
+		this._button_checkbox_group.querySelectorAll("input").forEach((element) => {
+			element.disabled = value;
+		});
 	}
 
 	_disable_others() {

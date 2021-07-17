@@ -40,8 +40,33 @@ button:hover {
 	background-color: #ccc;
 }
 
+button:disabled {
+	background-color: #efefef;
+}
+
 button:active {
 	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg) translateY(-1px);
+	}
+
+	100% {
+		transform: rotate(359deg) translateY(-1px);
+	}
+}
+
+button > span.loader {
+	display: none;
+}
+
+button.loading > span.loader {
+	display: inline-block;
+	animation: rotation 1.5s infinite linear;
+	margin-left: 5px;
+	margin-right: 5px;
 }
 
 input {

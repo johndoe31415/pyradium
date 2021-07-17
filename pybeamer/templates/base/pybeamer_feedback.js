@@ -61,6 +61,9 @@ export class FeedbackSender {
 	}
 
 	clear_form() {
+		this._sources.forEach((source) => {
+			source.value = "";
+		});
 	}
 
 	_set_form_elements(disabled) {
@@ -74,10 +77,16 @@ export class FeedbackSender {
 
 	disable_form_elements() {
 		this._set_form_elements(true);
+		this._buttons.forEach((button) => {
+			button.classList.add("loading");
+		});
 	}
 
 	enable_form_elements() {
 		this._set_form_elements(false);
+		this._buttons.forEach((button) => {
+			button.classList.remove("loading");
+		});
 	}
 
 	submit() {
@@ -87,7 +96,7 @@ export class FeedbackSender {
 		const is_empty = this._data_is_empty(collected);
 		if (is_empty) {
 			this._fire_handler("form_empty", "Form contains no data for submission.");
-			this._enable_form_elements();
+			this.enable_form_elements();
 			return;
 		}
 
