@@ -23,6 +23,15 @@ XML namespaces are used to distinguish tags which are renderer commands, i.e.,
 which have some special interpretation.  All other content is essentially pure
 HTML.
 
+## Display
+You can view the presentation in a browser. Hitting "g" lets you goto a
+specific slide while pressing "f" starts the full-screen view. Note that the
+full-screen view uses [the CSS "zoom" property](https://caniuse.com/?search=zoom)
+which is supported by pretty much every browser except for Firefox. On Firefox,
+you can still full-screen a presentation but have to zoom manually in. There exists
+a more than a decade old Firefox [issue for this](https://bugzilla.mozilla.org/show_bug.cgi?id=390936)
+but it appears that this is deliberately not implemented.
+
 ## Third-Party Components
 There are three external components that pybeamer uses:
 
