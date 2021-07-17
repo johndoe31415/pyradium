@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pybeamer.xmlhooks.XMLHookRegistry import ReplacementHook, XMLHookRegistry
-from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
 class EmoHook(ReplacementHook):

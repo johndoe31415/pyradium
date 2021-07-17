@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import json
-import os
 import tempfile
 import shutil
 import contextlib
@@ -70,3 +69,5 @@ class ActionAcroSort(BaseAction):
 				f.write(jsondata)
 				f.flush()
 				shutil.move(f.name, self._args.acrofile)
+
+		return 0

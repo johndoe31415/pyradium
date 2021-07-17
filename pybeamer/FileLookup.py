@@ -23,8 +23,11 @@ import os
 from .Exceptions import FailedToLookupFileException
 
 class FileLookup():
-	def __init__(self, paths):
-		self._paths = tuple(paths)
+	def __init__(self, paths = None):
+		if paths is None:
+			self._paths = tuple()
+		else:
+			self._paths = tuple(paths)
 
 	def lookup(self, filename):
 		for dirname in self._paths:

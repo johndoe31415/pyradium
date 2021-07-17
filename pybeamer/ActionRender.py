@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
-import sys
 from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
@@ -44,3 +43,4 @@ class ActionRender(BaseAction):
 		presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 		renderer = PresentationRenderer(presentation, rendering_parameters)
 		rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
+		return 0

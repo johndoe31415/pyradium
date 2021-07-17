@@ -21,7 +21,6 @@
 
 import json
 import tempfile
-import hashlib
 import subprocess
 from pybeamer.RendererCache import BaseRenderer
 

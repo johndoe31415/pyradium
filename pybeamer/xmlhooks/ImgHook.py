@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pybeamer.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
-from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
 class ImgHook(BaseHook):

@@ -19,9 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import textwrap
 from pybeamer.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
-from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
 class TerminalHook(InnerTextHook):

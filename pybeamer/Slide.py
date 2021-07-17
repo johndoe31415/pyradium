@@ -19,12 +19,11 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from pybeamer.xmlhooks.XMLHookRegistry import XMLHookRegistry
 from .Tools import XMLTools
-from .Exceptions import UndefinedContentException
 from .BaseDirective import BaseDirective
 from .RenderableSlide import RenderableSlide
 from .PauseRenderer import PauseRenderer
-from pybeamer.xmlhooks.XMLHookRegistry import XMLHookRegistry
 
 class RenderSlideDirective(BaseDirective):
 	def __init__(self, xmlnode):

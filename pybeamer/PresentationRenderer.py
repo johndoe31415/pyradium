@@ -22,17 +22,17 @@
 import os
 import json
 import contextlib
+import mako.lookup
 import pybeamer
-from .RendererCache import RendererCache
-from .Exceptions import FailedToLookupFileException, TemplateErrorException
-from .GenericTOC import GenericTOC
-from .Acronyms import Acronyms
-from .Enums import PresentationMode
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
 from pybeamer.Controller import ControllerManager
 from pybeamer.OrderedSet import OrderedSet
-import mako.lookup
+from .RendererCache import RendererCache
+from .Exceptions import TemplateErrorException
+from .GenericTOC import GenericTOC
+from .Acronyms import Acronyms
+from .Enums import PresentationMode
 
 class RenderedPresentation():
 	def __init__(self, renderer, deploy_directory):
@@ -241,3 +241,4 @@ class PresentationRenderer():
 			rendered_presentation.append_slide(result)
 
 		self._render_file("base/index.html", rendered_presentation, template_args, target_filename = self.rendering_params.index_filename)
+		return rendered_presentation

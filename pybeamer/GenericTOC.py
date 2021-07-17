@@ -23,18 +23,6 @@ import enum
 import string
 import collections
 
-"""
-'levels' are arbitrary IDs, not necessarily consecutive
-	e.g. chapter is level 4
-	section is level 9
-	subsection is level 10
-
-They are mapped to 'depths', which are index 1. In the aforementioned example
-	chapter is level 4 but depth 1
-	section is level 9 but depth 2
-	subsection is level 10 but depth 3
-"""
-
 class TOCCommand(enum.IntEnum):
 	NestingIncrease = 0
 	NestingDecrease = 1
@@ -227,6 +215,17 @@ class FrozenTOC():
 			print(entry)
 
 class GenericTOC():
+	"""\
+	'levels' are arbitrary IDs, not necessarily consecutive
+		e.g. chapter is level 4
+		section is level 9
+		subsection is level 10
+
+	They are mapped to 'depths', which are index 1. In the aforementioned example
+		chapter is level 4 but depth 1
+		section is level 9 but depth 2
+		subsection is level 10 but depth 3
+	"""
 	def __init__(self):
 		self._instructions = [ ]
 		self._text = { }
@@ -298,5 +297,3 @@ if __name__ == "__main__":
 	print("-" * 120)
 	for cmd in frozen_toc.subset(start_at = "2.1", end_before = "3", max_items = 4):
 		print(cmd)
-
-

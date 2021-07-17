@@ -55,7 +55,10 @@ class ControllerManager():
 			definition = self._controller_definition(slide.slide_type)
 			if definition is not None:
 				module_filename = self._renderer.lookup_styled_template_file(definition["file"])
-				module = importlib.machinery.SourceFileLoader("controller_module", module_filename).load_module()
+				loader = importlib.machinery.SourceFileLoader("controller_module", module_filename)
+				spec = importlib.util.spec_from_loader(loader.name, loader)
+				module = importlib.util.module_from_spec(spec)
+				loader.exec_module(module)
 				handler_class = getattr(module, definition.get("class", "Controller"))
 			else:
 				handler_class = None
@@ -64,7 +67,7 @@ class ControllerManager():
 			handler_class = self._cached[slide.slide_type]
 
 		if handler_class is None:
-			return
+			return None
 
 		controller = handler_class(slide, content_containers, rendered_presentation)
 		return controller

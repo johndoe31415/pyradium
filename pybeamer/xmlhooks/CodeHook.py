@@ -19,11 +19,9 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import textwrap
 import xml.dom.minidom
 import pygments
 from pybeamer.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
-from pybeamer.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
 class CodeHook(InnerTextHook):

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	MultiCommand - Provide an openssl-style multi-command abstraction
-#	Copyright (C) 2011-2020 Johannes Bauer
+#	Copyright (C) 2011-2021 Johannes Bauer
 #
 #	This file is part of pycommon.
 #
@@ -142,4 +142,3 @@ if __name__ == "__main__":
 	mc.register("export", "Export some file to somewhere", genparser, action = ExportAction)
 
 	mc.run(sys.argv[1:])
-
