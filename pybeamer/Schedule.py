@@ -21,6 +21,7 @@
 
 import re
 import enum
+import collections
 from .Exceptions import TimeSpecificationError
 
 class TimeSpecificationType(enum.IntEnum):
@@ -146,3 +147,79 @@ class TimeRanges():
 
 	def __str__(self):
 		return " ".join(str(time_range) for time_range in self)
+
+class PresentationSchedule():
+	_TimeSlice = collections.namedtuple("TimeSlice", [ "slide_no", "slide_ratio", "begin_ratio", "end_ratio", "time_seconds" ])
+
+	def __init__(self, active_presentation_time_minutes):
+		self._active_presentation_time_seconds = 60 * active_presentation_time_minutes
+		self._time_specs = { }
+		self._timeslices = None
+		self._max_slide_no = 0
+
+	def have_slide(self, slide_no):
+		self._max_slide_no = max(self._max_slide_no, slide_no)
+
+	def set_slide_no(self, slide_no, time_spec):
+		assert(isinstance(time_spec, TimeSpecification))
+		self._time_specs[slide_no] = time_spec
+		self._max_slide_no = max(self._max_slide_no, slide_no)
+
+	def _slide_range(self):
+		return range(1, self._max_slide_no + 1)
+
+	def _slide_no_timespec(self):
+		for slide_no in self._slide_range():
+			yield (slide_no, self._time_specs.get(slide_no))
+
+	def compute(self):
+		if self._timeslices is None:
+			abs_sum_secs = 0
+			rel_sum_pts = 0
+			for (slide_no, time_spec) in self._slide_no_timespec():
+				if time_spec is not None:
+					if time_spec.spec_type == TimeSpecificationType.Absolute:
+						abs_sum_secs += time_spec.value
+					elif time_spec.spec_type == TimeSpecificationType.Relative:
+						rel_sum_pts += time_spec.value
+					else:
+						raise NotImplementedError(time_spec.spec_type)
+				else:
+					rel_sum_pts += 1
+
+			active_rel_time_secs = self._active_presentation_time_seconds - abs_sum_secs
+			if active_rel_time_secs < 0:
+				raise TimeSpecificationError("Presentation active time is %.0f seconds, but %.0f seconds already allocated for absolute slides." % (self._active_presentation_time_seconds, abs_sum_secs))
+
+			if rel_sum_pts == 0:
+				# If they are in sum 0, it does not matter anyways, all the
+				# numerators will be zero and this way we save two if-elses to
+				# avoid divide-by-zero
+				rel_sum_pts += 1
+
+			timeslices = { }
+			current_slide_ratio = 0
+			for (slide_no, time_spec) in self._slide_no_timespec():
+				if time_spec is not None:
+					if time_spec.spec_type == TimeSpecificationType.Absolute:
+						slide_time_secs = time_spec.value
+					elif time_spec.spec_type == TimeSpecificationType.Relative:
+						slide_time_secs = time_spec.value / rel_sum_pts * active_rel_time_secs
+				else:
+					slide_time_secs = 1 / rel_sum_pts * active_rel_time_secs
+
+				slide_ratio = slide_time_secs / self._active_presentation_time_seconds
+				timeslice = self._TimeSlice(slide_no = slide_no, slide_ratio = slide_ratio, begin_ratio = current_slide_ratio, end_ratio = current_slide_ratio + slide_ratio, time_seconds = slide_time_secs)
+				current_slide_ratio += slide_ratio
+				timeslices[slide_no] = timeslice
+
+			self._timeslices = timeslices
+		return self._timeslices
+
+	def __getitem__(self, slide_no):
+		self.compute()
+		return self._timeslices[slide_no]
+
+	def __iter__(self):
+		self.compute()
+		return iter(self._timeslices.values())

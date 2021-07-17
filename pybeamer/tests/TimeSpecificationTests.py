@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import unittest
-from pybeamer.Schedule import TimeSpecificationType, TimeSpecification, TimeRange, TimeRanges
+from pybeamer.Schedule import TimeSpecificationType, TimeSpecification, TimeRange, TimeRanges, PresentationSchedule
 from pybeamer.Exceptions import TimeSpecificationError
 
 class TimeSpecificationTests(unittest.TestCase):
@@ -110,3 +110,11 @@ class TimeSpecificationTests(unittest.TestCase):
 	def test_timeranges_simple(self):
 		trs = TimeRanges.parse("10:00-10:15 10:20-10:30")
 		self.assertEqual(trs.duration_mins, 15 + 10)
+
+	def test_presentation_schedule_simple(self):
+		ps = PresentationSchedule(active_presentation_time_minutes = 45)
+		ps.set_slide_no(1, TimeSpecification.parse(abs_string = "2 min"))
+		ps.set_slide_no(5, TimeSpecification.parse(rel_string = "2"))
+		ps.have_slide(15)
+#		for x in ps:
+#			print(x)
