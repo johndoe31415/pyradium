@@ -26,10 +26,16 @@ export class FeedbackSender {
 		this._target_uri = target_uri;
 		this._options = options;
 		this._sources = [ ];
+		this._buttons = [ ];
 	}
 
 	add_source(element) {
 		this._sources.push(element);
+	}
+
+	add_button(element) {
+		element.addEventListener("click", (event) => this.submit());
+		this._buttons.push(element);
 	}
 
 	_collect_data() {
@@ -54,11 +60,34 @@ export class FeedbackSender {
 		handler(text);
 	}
 
+	clear_form() {
+	}
+
+	_set_form_elements(disabled) {
+		this._sources.forEach((source) => {
+			source.disabled = disabled;
+		});
+		this._buttons.forEach((button) => {
+			button.disabled = disabled;
+		});
+	}
+
+	disable_form_elements() {
+		this._set_form_elements(true);
+	}
+
+	enable_form_elements() {
+		this._set_form_elements(false);
+	}
+
 	submit() {
+		this.disable_form_elements();
+
 		const collected = this._collect_data();
 		const is_empty = this._data_is_empty(collected);
 		if (is_empty) {
 			this._fire_handler("form_empty", "Form contains no data for submission.");
+			this._enable_form_elements();
 			return;
 		}
 
@@ -81,6 +110,8 @@ export class FeedbackSender {
 			}
 		}).catch((error) => {
 			this._fire_handler("error", "Network error during submission.");
+		}).finally(() => {
+			this.enable_form_elements();
 		});
 	}
 }
