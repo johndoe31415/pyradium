@@ -19,7 +19,6 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import os
 import json
 import mako.lookup
 import pybeamer
