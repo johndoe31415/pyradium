@@ -20,6 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import json
 import contextlib
 from .GenericTOC import GenericTOC
 from .OrderedSet import OrderedSet
@@ -101,6 +102,9 @@ class RenderedPresentation():
 	def add_feature(self, feature):
 		self._features.add(feature)
 
+	def has_feature(self, feature):
+		return feature in self.features
+
 	def append_slide(self, rendered_slide):
 		self._rendered_slides.append(rendered_slide)
 
@@ -140,3 +144,13 @@ class RenderedPresentation():
 				else:
 					self.copy_file(rel_filename["name"], target_directory = "/template/")
 				self.add_css(rel_filename["name"], target_directory = "/template/")
+
+	@property
+	def meta(self):
+		return {
+			"foo": "bar",	# TODO
+		}
+
+	@property
+	def meta_json(self):
+		return json.dumps(self.meta)

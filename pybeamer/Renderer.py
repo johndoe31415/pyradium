@@ -117,6 +117,8 @@ class Renderer():
 	def render(self, deploy_directory):
 		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
 
+		for feature in self.rendering_params.presentation_features:
+			rendered_presentation.add_feature(feature.value)
 		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
 			rendered_presentation.add_feature("interactive")
 

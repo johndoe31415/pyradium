@@ -96,6 +96,13 @@
 					"base/pybeamer_menu.css"
 				]
 			},
+			"timer": {
+				"static": [
+					"base/timer.html",
+					"base/pybeamer_timer.js",
+					"base/pybeamer_timekeeper.js"
+				]
+			},
 			"pygments": {
 				"css": [
 					"base/pygments.css"

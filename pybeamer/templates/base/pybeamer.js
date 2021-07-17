@@ -21,6 +21,8 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
+import {TimeKeeper} from "./pybeamer_timekeeper.js";
+
 export class Presentation {
 	constructor(ui_elements) {
 		this._ui_elements = ui_elements;
@@ -35,6 +37,11 @@ export class Presentation {
 		this._ui_elements.slides.forEach((slide) => {
 			this._intersect_obs.observe(slide);
 		});
+		this._timekeeper = new TimeKeeper();
+		this._presentation_id = Math.random();
+		this._presentation_mode = "stopped";
+		this._bc = new BroadcastChannel("presentation");
+		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
 	}
 
 	get slide_count() {
@@ -45,8 +52,59 @@ export class Presentation {
 		return this._ui_elements.slides[this._internal_slide_index];
 	}
 
-	get presentation_mode() {
+	get fullscreen_mode() {
 		return document.fullscreenElement != null;
+	}
+
+	set presentation_mode(value) {
+		const changed = (this._presentation_mode != value);
+		this._presentation_mode = value;
+		this._timekeeper.mode = value;
+		if (changed) {
+			this._tx_status();
+		}
+	}
+
+	get presentation_mode() {
+		return this._presentation_mode;
+	}
+
+	set timer(value) {
+		if (this._timer == null) {
+			this._timer = value;
+			this._tx_status();
+		}
+	}
+
+	_tx_status() {
+		const msg = {
+			"type":						"status",
+			"presentation_id":			this._presentation_id,
+			"presentation_mode":		this.presentation_mode,
+			"internal_slide_index":		this._internal_slide_index,
+			"timekeeper": {
+				"started":		this._timekeeper.time_spent_in("started"),
+				"paused":		this._timekeeper.time_spent_in("paused"),
+			},
+		};
+		this._bc.postMessage(msg);
+	}
+
+	_tx_presentation_info() {
+		const msg = {
+			"type":						"presentation_info",
+			"slide_count":				123,	// TODO
+		};
+		this._bc.postMessage(msg);
+	}
+
+	_rx_message(msg) {
+		const data = msg.data;
+		if (data["type"] == "query_status") {
+			this._tx_status();
+		} else if (data["type"] == "query_presentation_info") {
+			this._tx_presentation_info();
+		}
 	}
 
 	_enumerate_slides() {
@@ -72,13 +130,14 @@ export class Presentation {
 	}
 
 	start_presentation() {
-		if (this.presentation_mode) {
+		if (this.fullscreen_mode) {
 			return;
 		}
 		console.log("Presentation started.");
 		this._show_cursor = false;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
+		this.presentation_mode = "started";
 	}
 
 	_find_slide(selector) {
@@ -94,7 +153,7 @@ export class Presentation {
 		const sub_slide_index = this.current_slide.getAttribute("sub_slide_index") | 0;
 		const slide_designator = (sub_slide_index == 0) ? slide_no : (slide_no + "." + (sub_slide_index + 1));
 		this._ui_elements.slideno_text.value = slide_designator;
-		if (this.presentation_mode) {
+		if (this.fullscreen_mode) {
 			this._prepare_full_screen_div();
 		}
 	}
@@ -137,7 +196,7 @@ export class Presentation {
 	event_wheel(event) {
 //		console.log("wheel event", event);
 		const scroll_up = event.deltaY > 0;
-		if (this.presentation_mode) {
+		if (this.fullscreen_mode) {
 			if (scroll_up) {
 				this.next_slide();
 			} else {
@@ -157,13 +216,13 @@ export class Presentation {
 	}
 
 	event_fullscreen(event) {
-		if (!this.presentation_mode) {
+		if (!this.fullscreen_mode) {
 			this._hide_full_screen_div();
 		}
 	}
 
 	event_resize(event) {
-		if (this.presentation_mode) {
+		if (this.fullscreen_mode) {
 			const screen_width = screen.width;
 			const screen_height = screen.height;
 
@@ -175,6 +234,15 @@ export class Presentation {
 
 			console.log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
 			this._ui_elements.full_screen_div.style.zoom = zoom;
+
+			if (this._internal_slide_index > 0) {
+				/* If we start a presentation at the very beginning we don't
+				 * actually automatically count it as started until the first
+				 * slide has been advanced. */
+				this.presentation_mode = "started";
+			}
+		} else {
+			this.presentation_mode = "stopped";
 		}
 	}
 
@@ -200,13 +268,16 @@ export class Presentation {
 
 		const internal_slide_index = slide[0].getAttribute("internal_slide_index") | 0;
 		this._goto_slide(internal_slide_index, true);
-
 	}
 
 	_goto_slide(slide_index, scroll_to_slide) {
 		if ((slide_index >= 0) && (slide_index < this.slide_count) && (slide_index != this._internal_slide_index)) {
 			this._internal_slide_index = slide_index;
 			this._update(scroll_to_slide);
+			if (this.fullscreen_mode) {
+				this.presentation_mode = "started";
+				this._tx_status();
+			}
 		}
 	}
 

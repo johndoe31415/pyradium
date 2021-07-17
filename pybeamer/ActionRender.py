@@ -56,7 +56,8 @@ class ActionRender(BaseAction):
 					include_dirs = [ os.path.dirname(self._args.infile) ] + self._args.include_dir,
 					index_filename = self._args.index_filename,
 					geometry = self._args.geometry,
-					image_max_dimension = self._args.image_max_dimension)
+					image_max_dimension = self._args.image_max_dimension,
+					presentation_features = self._args.presentation_feature)
 			presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 			renderer = Renderer(presentation, rendering_parameters)
 			rendered_presentation = renderer.render(deploy_directory = self._args.outdir)

@@ -24,7 +24,7 @@ from .Enums import PresentationMode
 from .FileLookup import FileLookup
 
 class RenderingParameters():
-	def __init__(self, template_style = "default", honor_pauses = True, presentation_mode = PresentationMode.Interactive, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", geometry = (1280, 720), image_max_dimension = 1000):
+	def __init__(self, template_style = "default", honor_pauses = True, presentation_mode = PresentationMode.Interactive, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", geometry = (1280, 720), image_max_dimension = 1000, presentation_features = None):
 		self._template_style = template_style
 		self._honor_pauses = honor_pauses
 		self._presentation_mode = presentation_mode
@@ -39,7 +39,7 @@ class RenderingParameters():
 		self._index_filename = index_filename
 		self._geometry = geometry
 		self._image_max_dimension = image_max_dimension
-
+		self._presentation_features = set(presentation_features) if (presentation_features is not None) else set()
 
 	@property
 	def template_style(self):
@@ -76,3 +76,7 @@ class RenderingParameters():
 	@property
 	def image_max_dimension(self):
 		return self._image_max_dimension
+
+	@property
+	def presentation_features(self):
+		return iter(self._presentation_features)
