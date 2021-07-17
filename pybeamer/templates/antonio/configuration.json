@@ -1,7 +1,7 @@
 {
 	"template": {
 		"author": "Johannes Bauer",
-		"name": "pybeamer default template",
+		"name": "Antonio",
 		"license": "CC-BY 4.0"
 	},
 	"references": [
@@ -30,29 +30,29 @@
 	"files": {
 		"css": [
 			{ "name": "base/pybeamer.css", "render": true },
-			"default/default.css",
-			"default/font_fira.css",
-			"default/font_latinmodernmono.css"
+			"antonio/antonio.css",
+			"antonio/font_fira.css",
+			"antonio/font_latinmodernmono.css"
 		],
 		"static": [
 			"base/pybeamer.js",
-			"default/bar.svg",
-			"default/triangle1.svg",
-			"default/triangle2.svg",
-			"default/font_fira/FiraSans-Regular-latin.woff2",
-			"default/font_fira/FiraSans-Light-latin.woff2",
-			"default/font_fira/FiraSans-Bold-latin.woff2",
-			"default/font_latinmodernmono/lmmono10-regular.otf",
-			"default/font_latinmodernmono/lmmono10-italic.otf"
+			"antonio/bar.svg",
+			"antonio/triangle1.svg",
+			"antonio/triangle2.svg",
+			"antonio/font_fira/FiraSans-Regular-latin.woff2",
+			"antonio/font_fira/FiraSans-Light-latin.woff2",
+			"antonio/font_fira/FiraSans-Bold-latin.woff2",
+			"antonio/font_latinmodernmono/lmmono10-regular.otf",
+			"antonio/font_latinmodernmono/lmmono10-italic.otf"
 		]
 	},
 	"controllers": {
 		"toc": {
-			"file":			"default/controller.py",
+			"file":			"antonio/controller.py",
 			"class":		"TOCController"
 		},
 		"acronyms": {
-			"file":			"default/controller.py",
+			"file":			"antonio/controller.py",
 			"class":		"AcronymController"
 		},
 		"feedback": {
@@ -64,7 +64,7 @@
 		"slidetype": {
 			"quote": {
 				"static": [
-					"default/quote.svg"
+					"antonio/quote.svg"
 				]
 			},
 			"feedback": {
