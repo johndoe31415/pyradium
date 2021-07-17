@@ -130,9 +130,13 @@ class RenderedPresentation():
 		for rel_filename in dependencies.get("static", [ ]):
 			self.copy_file(rel_filename, target_directory = "/template/")
 		for rel_filename in dependencies.get("css", [ ]):
-			self.copy_file(rel_filename, target_directory = "/template/")
-			self.add_css(rel_filename, target_directory = "/template/")
-		for rel_filename in dependencies.get("rendered_css", [ ]):
-			rendered_css = self.renderer.render_file(rel_filename, rendered_presentation = self)
-			self.add_file(rel_filename, rendered_css, target_directory = "/template/")
-			self.add_css(rel_filename, target_directory = "/template/")
+			if isinstance(rel_filename, str):
+				self.copy_file(rel_filename, target_directory = "/template/")
+				self.add_css(rel_filename, target_directory = "/template/")
+			else:
+				if rel_filename.get("render"):
+					rendered_css = self.renderer.render_file(rel_filename["name"], rendered_presentation = self)
+					self.add_file(rel_filename["name"], rendered_css, target_directory = "/template/")
+				else:
+					self.copy_file(rel_filename["name"], target_directory = "/template/")
+				self.add_css(rel_filename["name"], target_directory = "/template/")

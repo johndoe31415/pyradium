@@ -66,6 +66,11 @@
 		</ul>
 	</slide>
 
+	<slide type="quote">
+		Even the best blade will rust and grow dull unless it is cared for.
+		<s:var name="author" value="Klingon Proverb" />
+	</slide>
+
 	<slide type="leftright">
 		<s:var name="heading" value="Left/Right slide" />
 		<s:content name="left">

@@ -29,12 +29,10 @@
 	],
 	"files": {
 		"css": [
+			{ "name": "base/pybeamer.css", "render": true },
 			"default/default.css",
 			"default/font_fira.css",
 			"default/font_latinmodernmono.css"
-		],
-		"rendered_css": [
-			"base/pybeamer.css"
 		],
 		"static": [
 			"base/pybeamer.js",

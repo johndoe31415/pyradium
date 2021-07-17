@@ -188,3 +188,35 @@ div.final_flex div.final_main {
 div.final_flex div.final_sub {
 	color: #677480;
 }
+
+
+div.slide.quote div.flex {
+	position: relative;
+	display: flex;
+	height: 70%;
+	top: 30%;
+	width: 100%;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+div.slide.quote div.flex div.quote_text {
+	width: 80%;
+	color: #34495e;
+	font-style: italic;
+}
+
+div.slide.quote div.flex div.quote_author {
+	width: 80%;
+	text-align: right;
+	color: #677480;
+	margin-top: 25px;
+	font-size: 80%;
+}
+
+div.slide.quote img.quotationmark {
+	position: relative;
+	top: 25%;
+	width: 100%;
+}
