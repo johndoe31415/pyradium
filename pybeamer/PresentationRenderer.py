@@ -217,7 +217,7 @@ class PresentationRenderer():
 		self._render_file("base/pybeamer_forms.css", rendered_presentation, template_args)
 
 		for filename in self._template_config.get("files", { }).get("static", [ ]):
-			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename))
+			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename), destination_relpath = filename)
 		for filename in self._template_config.get("files", { }).get("css", [ ]):
 			rendered_presentation.copy_template_file("%s/%s" % (self._rendering_params.template_style, filename))
 			rendered_presentation.add_css(filename)
