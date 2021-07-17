@@ -5,3 +5,10 @@
   font-display: block;
   src: local('lmmono10-regular.otf') format('otf');
 }
+@font-face {
+  font-family: 'Latin Modern Mono';
+  font-style: italic;
+  font-weight: 300;
+  font-display: block;
+  src: local('lmmono10-italic.otf') format('otf');
+}
