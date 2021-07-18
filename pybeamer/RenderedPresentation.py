@@ -24,7 +24,7 @@ import json
 import contextlib
 from .GenericTOC import GenericTOC
 from .OrderedSet import OrderedSet
-from .Schedule import PresentationSchedule
+from .Schedule import PresentationSchedule, TimeRange
 
 class RenderedPresentation():
 	def __init__(self, renderer, deploy_directory):
@@ -40,7 +40,13 @@ class RenderedPresentation():
 		self._total_slide_count = 0
 		self._uid = 0
 		self._features = set()
-		self._schedule = PresentationSchedule(60)		# TODO
+
+		time_range = self._renderer.presentation.meta.get("schedule", { }).get("total-presentation-time")
+		if time_range is None:
+			presentation_length_mins = None
+		else:
+			presentation_length_mins = TimeRange.parse(time_range).duration_mins
+		self._schedule = PresentationSchedule(presentation_length_mins)
 
 	@property
 	def next_unique_id(self):

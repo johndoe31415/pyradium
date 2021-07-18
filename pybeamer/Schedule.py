@@ -77,7 +77,7 @@ class TimeSpecification():
 		return "TimeSpecification<%s, %.0f>" % (self.spec_type.name, self.value)
 
 class TimeRange():
-	_TIME_RE = re.compile("\s*(?P<begin_hrs>\d+):(?P<begin_mins>\d{2})\s*-\s*(?P<end_hrs>\d+):(?P<end_mins>\d{2})\s*")
+	_TIME_RE = re.compile(r"\s*(?P<begin_hrs>\d+):(?P<begin_mins>\d{2})\s*-\s*(?P<end_hrs>\d+):(?P<end_mins>\d{2})\s*")
 	def __init__(self, range_begin, range_end):
 		self._range_begin = range_begin
 		self._range_end = range_end
@@ -128,7 +128,7 @@ class TimeRange():
 		return "%d:%02d-%d:%02d" % (self.begin_time[0], self.begin_time[1], self.end_time[0], self.end_time[1])
 
 class TimeRanges():
-	_SPLITTER_RE = re.compile("\s+")
+	_SPLITTER_RE = re.compile(r"\s+")
 
 	def __init__(self, time_ranges):
 		assert(all(isinstance(time_range, TimeRange) for time_range in time_ranges))
@@ -152,7 +152,10 @@ class PresentationSchedule():
 	_TimeSlice = collections.namedtuple("TimeSlice", [ "slide_no", "slide_ratio", "begin_ratio", "end_ratio", "time_seconds" ])
 
 	def __init__(self, active_presentation_time_minutes):
-		self._active_presentation_time_seconds = 60 * active_presentation_time_minutes
+		if active_presentation_time_minutes is not None:
+			self._active_presentation_time_seconds = 60 * active_presentation_time_minutes
+		else:
+			self._active_presentation_time_seconds = None
 		self._time_specs = { }
 		self._timeslices = None
 		self._max_slide_no = 0
@@ -187,9 +190,16 @@ class PresentationSchedule():
 				else:
 					rel_sum_pts += 1
 
-			active_rel_time_secs = self._active_presentation_time_seconds - abs_sum_secs
-			if active_rel_time_secs < 0:
-				raise TimeSpecificationError("Presentation active time is %.0f seconds, but %.0f seconds already allocated for absolute slides." % (self._active_presentation_time_seconds, abs_sum_secs))
+			if (abs_sum_secs > 0) and (self._active_presentation_time_seconds is None):
+				raise TimeSpecificationError("You are free to not define a presentation length beforehand, but then absolute time references may not be used.")
+
+			if self._active_presentation_time_seconds is not None:
+				active_rel_time_secs = self._active_presentation_time_seconds - abs_sum_secs
+				if active_rel_time_secs < 0:
+					raise TimeSpecificationError("Presentation active time is %.0f seconds, but %.0f seconds already allocated for absolute slides." % (self._active_presentation_time_seconds, abs_sum_secs))
+			else:
+				# Doesn't matter at all, we're only dealing with relative references
+				active_rel_time_secs = 1
 
 			if rel_sum_pts == 0:
 				# If they are in sum 0, it does not matter anyways, all the
@@ -208,7 +218,10 @@ class PresentationSchedule():
 				else:
 					slide_time_secs = 1 / rel_sum_pts * active_rel_time_secs
 
-				slide_ratio = slide_time_secs / self._active_presentation_time_seconds
+				if self._active_presentation_time_seconds is not None:
+					slide_ratio = slide_time_secs / self._active_presentation_time_seconds
+				else:
+					slide_ratio = slide_time_secs
 				timeslice = self._TimeSlice(slide_no = slide_no, slide_ratio = slide_ratio, begin_ratio = current_slide_ratio, end_ratio = current_slide_ratio + slide_ratio, time_seconds = slide_time_secs)
 				current_slide_ratio += slide_ratio
 				timeslices[slide_no] = timeslice
