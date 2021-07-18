@@ -100,7 +100,8 @@
 				"static": [
 					"base/timer.html",
 					"base/pybeamer_timer.js",
-					"base/pybeamer_timekeeper.js"
+					"base/pybeamer_timekeeper.js",
+					"base/pybeamer_tools.js"
 				]
 			},
 			"pygments": {

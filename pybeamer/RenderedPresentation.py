@@ -155,7 +155,8 @@ class RenderedPresentation():
 	@property
 	def meta(self):
 		return {
-			"foo": "bar",	# TODO
+			"total_presentation_time":	self.renderer.presentation.meta.get("schedule", { }).get("total-presentation-time"),
+			"pause_minutes":			self.renderer.presentation.meta.get("schedule", { }).get("pause-minutes"),
 		}
 
 	@property

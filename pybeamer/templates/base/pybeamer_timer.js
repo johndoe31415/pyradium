@@ -21,6 +21,8 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
+import {TimeTools} from "./pybeamer_tools.js";
+
 export class PresentationTimer {
 	constructor(ui_elements) {
 		this._ui_elements = ui_elements;
@@ -31,15 +33,30 @@ export class PresentationTimer {
 		this._meta = null;
 		this._active_presentation_time_secs = 300.0;
 		this._tx_message({ "type": "query_status" });
+		this._tx_message({ "type": "query_presentation_meta" });
 	}
 
 	_update() {
+		if ((this._status == null) || (this._meta == null)) {
+			return;
+		}
 		console.log(this._status);
-		const current_abs_ratio = this._status["timekeeper"]["started"] / this._active_presentation_time_secs;
-		const current_rel_ratio = (current_abs_ratio - this._status["begin_ratio"]) / (this._status["end_ratio"] - this._status["begin_ratio"]);
-		const slide_time_allocation_secs = (this._status["end_ratio"] - this._status["begin_ratio"]) * this._active_presentation_time_secs;
-		const slide_time_remaining = current_rel_ratio * slide_time_allocation_secs;
+		const current_abs_ratio = this._status.timekeeper.started / this._active_presentation_time_secs;
+		const current_rel_ratio = (current_abs_ratio - this._status.begin_ratio) / (this._status.end_ratio - this._status.begin_ratio);
+		const slide_time_allocation_secs = (this._status.end_ratio - this._status.begin_ratio) * this._active_presentation_time_secs;
+		const slide_time_used_secs = current_rel_ratio * slide_time_allocation_secs;
+		const slide_time_remaining_secs = slide_time_allocation_secs - slide_time_used_secs;
 		console.log(current_abs_ratio, current_rel_ratio, slide_time_allocation_secs, slide_time_remaining);
+
+		this._ui_elements.presentation_mode.innerHTML = this._status.presentation_mode;
+		this._ui_elements.spent_time.innerHTML = this._status.timekeeper.started;
+		this._ui_elements.slide_time_allocation.innerHTML = TimeTools.format_hms(slide_time_allocation_secs);
+		this._ui_elements.slide_time_remaining.innerHTML = TimeTools.format_hms(slide_time_remaining_secs);
+	}
+
+	_update_meta() {
+		this._ui_elements.total_presentation_time.value = this._meta.total_presentation_time;
+		this._ui_elements.pause_minutes.value = this._meta.pause_minutes;
 	}
 
 	_tx_message(msg) {
@@ -48,24 +65,24 @@ export class PresentationTimer {
 
 	_rx_message(msg) {
 		const data = msg.data;
-		if ((this._session != null) && (this._session != data["data"]["presentation_id"])) {
+		if ((this._session != null) && (this._session != data.data.presentation_id)) {
 			/* Other presentation window open, ignore data. */
 			return;
 		}
 
-		if (data["type"] == "status") {
+		if (data.type == "status") {
 			if (this._session == null) {
-				this._session = data["data"]["presentation_id"];
+				this._session = data.data.presentation_id;
 			}
-			this._status = data["data"];
+			this._status = data.data;
 
+			this._update();
+		} else if (data.type == "presentation_meta") {
 			if (this._meta == null) {
-				this._tx_message({ "type": "query_presentation_meta" });
-			} else {
+				this._meta = data.data;
+				this._update_meta();
 				this._update();
 			}
-		} else if (data["type"] == "presentation_meta") {
-			this._meta = data["data"];
 		}
 	}
 }

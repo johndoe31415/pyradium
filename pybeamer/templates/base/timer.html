@@ -7,26 +7,34 @@
 	<body>
 		<div class="menu">
 			Presentation Timeslot:
-			<input type="text" value="14:00-15:00" id="presentation_slot" class="control" />
+			<input type="text" value="" id="total_presentation_time" class="control" />
 			Pause Time:
-			<input type="text" value="10" id="pause_time_mins" class="control" />
+			<input type="text" value="" id="pause_minutes" class="control" />
 		</div>
 
-		<div id="time_display">
-			1:23
-		</div>
+		<div id="presentation_mode"></div>
+		<div id="spent_time"></div>
+		<div id="expected_time"></div>
+		<div id="slide_time_allocation"></div>
+		<div id="slide_time_used"></div>
+		<div id="slide_time_remaining"></div>
+		<div id="remaining_time"></div>
+		<div id="expected_abs_time"></div>
 
 		<script type="module">
 			import {PresentationTimer} from "./pybeamer_timer.js";
 
-
-
-
-
 			const ui_elements = {
-				"presentation_slot":	document.querySelector("#presentation_slot"),
-				"pause_time_mins":		document.querySelector("#pause_time_mins"),
-				"time_display":			document.querySelector("#time_display"),
+				"total_presentation_time":	document.querySelector("#total_presentation_time"),
+				"pause_minutes":			document.querySelector("#pause_minutes"),
+				"presentation_mode":		document.querySelector("#presentation_mode"),
+				"spent_time":				document.querySelector("#spent_time"),
+				"expected_time":			document.querySelector("#expected_time"),
+				"slide_time_allocation":	document.querySelector("#slide_time_allocation"),
+				"slide_time_used":			document.querySelector("#slide_time_used"),
+				"slide_time_remaining":		document.querySelector("#slide_time_remaining"),
+				"remaining_time":			document.querySelector("#remaining_time"),
+				"expected_abs_time":		document.querySelector("#expected_abs_time"),
 			};
 			const pt = new PresentationTimer(ui_elements);
 		</script>
