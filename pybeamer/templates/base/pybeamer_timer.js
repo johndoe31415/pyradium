@@ -40,13 +40,17 @@ export class PresentationTimer {
 		if ((this._status == null) || (this._meta == null)) {
 			return;
 		}
-		console.log(this._status);
-		const current_abs_ratio = this._status.timekeeper.started / this._active_presentation_time_secs;
-		const current_rel_ratio = (current_abs_ratio - this._status.begin_ratio) / (this._status.end_ratio - this._status.begin_ratio);
-		const slide_time_allocation_secs = (this._status.end_ratio - this._status.begin_ratio) * this._active_presentation_time_secs;
+
+		let current_rel_ratio = 0;
+		let slide_time_allocation_secs = 0;
+		if (Math.abs(this._status.begin_ratio - this._status.end_ratio) > 1e-4) {
+			/* Non-zero time slide */
+			const current_abs_ratio = this._status.timekeeper.started / this._active_presentation_time_secs;
+			current_rel_ratio = (current_abs_ratio - this._status.begin_ratio) / (this._status.end_ratio - this._status.begin_ratio);
+			slide_time_allocation_secs = (this._status.end_ratio - this._status.begin_ratio) * this._active_presentation_time_secs;
+		}
 		const slide_time_used_secs = current_rel_ratio * slide_time_allocation_secs;
 		const slide_time_remaining_secs = slide_time_allocation_secs - slide_time_used_secs;
-		console.log(current_abs_ratio, current_rel_ratio, slide_time_allocation_secs, slide_time_remaining);
 
 		this._ui_elements.presentation_mode.innerHTML = this._status.presentation_mode;
 		this._ui_elements.spent_time.innerHTML = this._status.timekeeper.started;
