@@ -34,6 +34,19 @@ export class PresentationTimer {
 		this._active_presentation_time_secs = 300.0;
 		this._tx_message({ "type": "query_status" });
 		this._tx_message({ "type": "query_presentation_meta" });
+		this._timeout_handle = null;
+		this._reset_timeout();
+	}
+
+	_reset_timeout() {
+		if (this._timeout_handle != null) {
+			window.clearTimeout(this._timeout_handle);
+		}
+		this._timeout_handle = window.setTimeout(() => this._connection_lost(), 5000);
+	}
+
+	_connection_lost() {
+		console.log("Connection to presentation lost.");
 	}
 
 	_update() {
@@ -53,7 +66,7 @@ export class PresentationTimer {
 		const slide_time_remaining_secs = slide_time_allocation_secs - slide_time_used_secs;
 
 		this._ui_elements.presentation_mode.innerHTML = this._status.presentation_mode;
-		this._ui_elements.spent_time.innerHTML = this._status.timekeeper.started;
+		this._ui_elements.spent_time.innerHTML = TimeTools.format_hms(this._status.timekeeper.started);
 		this._ui_elements.slide_time_allocation.innerHTML = TimeTools.format_hms(slide_time_allocation_secs);
 		this._ui_elements.slide_time_remaining.innerHTML = TimeTools.format_hms(slide_time_remaining_secs);
 	}
@@ -74,6 +87,7 @@ export class PresentationTimer {
 			return;
 		}
 
+		this._reset_timeout();
 		if (data.type == "status") {
 			if (this._session == null) {
 				this._session = data.data.presentation_id;
