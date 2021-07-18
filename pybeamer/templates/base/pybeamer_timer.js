@@ -31,11 +31,28 @@ export class PresentationTimer {
 		this._session = null;
 		this._status = null;
 		this._meta = null;
-		this._active_presentation_time_secs = 300.0;
+		this._total_presentation_time = null;
+		this._active_presentation_time_secs = null;
+		this._pause_minutes = null;
 		this._tx_message({ "type": "query_status" });
 		this._tx_message({ "type": "query_presentation_meta" });
 		this._timeout_handle = null;
 		this._reset_timeout();
+		this._ui_elements.total_presentation_time.addEventListener("input", (event) => this._ui_change());
+		this._ui_elements.pause_minutes.addEventListener("input", (event) => this._ui_change());
+	}
+
+	_ui_change() {
+		this._total_presentation_time = TimeTools.parse_timerange(this._ui_elements.total_presentation_time.value);
+		this._pause_minutes = this._ui_elements.pause_minutes.value | 0;
+		this._active_presentation_time_secs = null;
+		if (this._total_presentation_time != null) {
+			const active_presentation_time_secs = this._total_presentation_time.duration_seconds - (60 * this._pause_minutes);
+			if (active_presentation_time_secs > 0) {
+				this._active_presentation_time_secs = active_presentation_time_secs;
+			}
+		}
+		this._update();
 	}
 
 	_reset_timeout() {
@@ -50,7 +67,7 @@ export class PresentationTimer {
 	}
 
 	_update() {
-		if ((this._status == null) || (this._meta == null)) {
+		if ((this._status == null) || (this._meta == null) || (this._active_presentation_time_secs == null)) {
 			return;
 		}
 
@@ -74,6 +91,7 @@ export class PresentationTimer {
 	_update_meta() {
 		this._ui_elements.total_presentation_time.value = this._meta.total_presentation_time;
 		this._ui_elements.pause_minutes.value = this._meta.pause_minutes;
+		this._ui_change();
 	}
 
 	_tx_message(msg) {

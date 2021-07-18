@@ -21,7 +21,68 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
+class TimeRange {
+	constructor(begin_hour, begin_minute, end_hour, end_minute) {
+		this._begin_time = (60 * begin_hour) + begin_minute;
+		this._end_time = (60 * end_hour) + end_minute;
+		if (this._end_time < this._begin_time) {
+			this._end_time += 1440;
+		}
+	}
+
+	get duration_seconds() {
+		return this.duration_minutes * 60;
+	}
+
+	get duration_minutes() {
+		return this._end_time - this._begin_time;
+	}
+
+	get begin_hour() {
+		return Math.floor(this._begin_time % 1440 / 60);
+	}
+
+	get begin_minute() {
+		return Math.floor(this._begin_time % 1440 % 60);
+	}
+
+	get end_hour() {
+		return Math.floor(this._end_time % 1440 / 60);
+	}
+
+	get end_minute() {
+		return Math.floor(this._end_time % 1440 % 60);
+	}
+}
+
 export class TimeTools {
+	static parse_timerange(timerange_str) {
+		const match = timerange_str.match(/^\s*(?<begin_hour>\d{1,2}):(?<begin_minute>\d{2})\s*-\s*(?<end_hour>\d{1,2}):(?<end_minute>\d{2})\s*$/);
+		if (match) {
+			const begin_hour = match.groups.begin_hour | 0;
+			const begin_minute = match.groups.begin_minute | 0;
+			const end_hour = match.groups.end_hour | 0;
+			const end_minute = match.groups.end_minute | 0;
+			if ((begin_hour < 0) || (begin_hour > 23)) {
+				return null;
+			}
+			if ((begin_minute < 0) || (begin_minute > 59)) {
+				return null;
+			}
+			if ((end_hour < 0) || (end_hour > 23)) {
+				return null;
+			}
+			if ((end_minute < 0) || (end_minute > 59)) {
+				return null;
+			}
+			if ((begin_hour == end_hour) && (begin_minute == end_minute)) {
+				return null;
+			}
+			return new TimeRange(begin_hour, begin_minute, end_hour, end_minute);
+		}
+		return null;
+	}
+
 	static format_hms(total_seconds) {
 		if (total_seconds <= -0.5) {
 			return "-" + TimeTools.format_hms(-total_seconds);
