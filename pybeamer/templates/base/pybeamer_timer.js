@@ -26,8 +26,20 @@ export class PresentationTimer {
 		this._ui_elements = ui_elements;
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
+		this._session = null;
 		this._status = null;
+		this._meta = null;
+		this._active_presentation_time_secs = 300.0;
 		this._tx_message({ "type": "query_status" });
+	}
+
+	_update() {
+		console.log(this._status);
+		const current_abs_ratio = this._status["timekeeper"]["started"] / this._active_presentation_time_secs;
+		const current_rel_ratio = (current_abs_ratio - this._status["begin_ratio"]) / (this._status["end_ratio"] - this._status["begin_ratio"]);
+		const slide_time_allocation_secs = (this._status["end_ratio"] - this._status["begin_ratio"]) * this._active_presentation_time_secs;
+		const slide_time_remaining = current_rel_ratio * slide_time_allocation_secs;
+		console.log(current_abs_ratio, current_rel_ratio, slide_time_allocation_secs, slide_time_remaining);
 	}
 
 	_tx_message(msg) {
@@ -36,9 +48,24 @@ export class PresentationTimer {
 
 	_rx_message(msg) {
 		const data = msg.data;
+		if ((this._session != null) && (this._session != data["data"]["presentation_id"])) {
+			/* Other presentation window open, ignore data. */
+			return;
+		}
+
 		if (data["type"] == "status") {
-			this._status = data;
-			console.log(data);
+			if (this._session == null) {
+				this._session = data["data"]["presentation_id"];
+			}
+			this._status = data["data"];
+
+			if (this._meta == null) {
+				this._tx_message({ "type": "query_presentation_meta" });
+			} else {
+				this._update();
+			}
+		} else if (data["type"] == "presentation_meta") {
+			this._meta = data["data"];
 		}
 	}
 }

@@ -24,8 +24,9 @@
 import {TimeKeeper} from "./pybeamer_timekeeper.js";
 
 export class Presentation {
-	constructor(ui_elements) {
+	constructor(ui_elements, presentation_meta) {
 		this._ui_elements = ui_elements;
+		this._presentation_meta = presentation_meta;
 		this._show_cursor = false;
 		this._enumerate_slides();
 		this._internal_slide_index = 0;
@@ -42,6 +43,11 @@ export class Presentation {
 		this._presentation_mode = "stopped";
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
+		setInterval(() => this._tx_status(), 1000);
+	}
+
+	get presentation_meta() {
+		return this._presentation_meta;
 	}
 
 	get slide_count() {
@@ -69,22 +75,19 @@ export class Presentation {
 		return this._presentation_mode;
 	}
 
-	set timer(value) {
-		if (this._timer == null) {
-			this._timer = value;
-			this._tx_status();
-		}
-	}
-
 	_tx_status() {
+
 		const msg = {
 			"type":						"status",
 			"presentation_id":			this._presentation_id,
-			"presentation_mode":		this.presentation_mode,
-			"internal_slide_index":		this._internal_slide_index,
-			"timekeeper": {
-				"started":		this._timekeeper.time_spent_in("started"),
-				"paused":		this._timekeeper.time_spent_in("paused"),
+			"data": {
+				"presentation_mode":		this.presentation_mode,
+				"begin_ratio":				this.current_slide.getAttribute("begin_ratio") * 1,
+				"end_ratio":				this.current_slide.getAttribute("end_ratio") * 1,
+				"timekeeper": {
+					"started":		this._timekeeper.time_spent_in("started"),
+					"paused":		this._timekeeper.time_spent_in("paused"),
+				},
 			},
 		};
 		this._bc.postMessage(msg);
@@ -92,8 +95,9 @@ export class Presentation {
 
 	_tx_presentation_info() {
 		const msg = {
-			"type":						"presentation_info",
-			"slide_count":				123,	// TODO
+			"type":						"presentation_meta",
+			"presentation_id":			this._presentation_id,
+			"data":						this.presentation_meta,
 		};
 		this._bc.postMessage(msg);
 	}
@@ -102,7 +106,7 @@ export class Presentation {
 		const data = msg.data;
 		if (data["type"] == "query_status") {
 			this._tx_status();
-		} else if (data["type"] == "query_presentation_info") {
+		} else if (data["type"] == "query_presentation_meta") {
 			this._tx_presentation_info();
 		}
 	}
