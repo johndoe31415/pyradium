@@ -24,6 +24,7 @@ import json
 import contextlib
 from .GenericTOC import GenericTOC
 from .OrderedSet import OrderedSet
+from .Schedule import PresentationSchedule
 
 class RenderedPresentation():
 	def __init__(self, renderer, deploy_directory):
@@ -39,6 +40,7 @@ class RenderedPresentation():
 		self._total_slide_count = 0
 		self._uid = 0
 		self._features = set()
+		self._schedule = PresentationSchedule(60)		# TODO
 
 	@property
 	def next_unique_id(self):
@@ -57,6 +59,7 @@ class RenderedPresentation():
 		self._current_slide_number += 1
 		self._total_slide_count = max(self._total_slide_count, self._current_slide_number)
 		self._toc.at_page(self.current_slide_number)
+		self.schedule.have_slide(self.current_slide_number)
 
 	def finalize_toc(self):
 		self._frozen_toc = self._toc.finalize()
@@ -78,6 +81,10 @@ class RenderedPresentation():
 	@property
 	def css(self):
 		return iter(self._css)
+
+	@property
+	def schedule(self):
+		return self._schedule
 
 	def add_css(self, filename, target_directory = "/"):
 		assert(target_directory.startswith("/"))

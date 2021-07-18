@@ -65,6 +65,7 @@ class RenderSlideDirective(BaseDirective):
 			"toc":					rendered_presentation.frozen_toc,
 			"sub_slide_index":		sub_slide_index,
 			"generate_uid":			lambda: rendered_presentation.next_unique_id,
+			"timeslice":			rendered_presentation.schedule[rendered_presentation.current_slide_number],
 		})
 		return slide_vars
 

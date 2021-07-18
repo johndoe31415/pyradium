@@ -217,9 +217,10 @@ class PresentationSchedule():
 		return self._timeslices
 
 	def __getitem__(self, slide_no):
-		self.compute()
-		return self._timeslices[slide_no]
+		if self._timeslices is None:
+			return self._TimeSlice(slide_no = slide_no, slide_ratio = 1, begin_ratio = 0, end_ratio = 1, time_seconds = 1)
+		else:
+			return self._timeslices[slide_no]
 
 	def __iter__(self):
-		self.compute()
 		return iter(self._timeslices.values())

@@ -125,6 +125,7 @@ class Renderer():
 		# Run it first to build the initial TOC and determine feature set
 		self._compute_renderable_slides(rendered_presentation)
 
+
 		# Then copy the dependencies
 		rendered_presentation.handle_dependencies(self._template_config.get("files"))
 		for slide_type in self._determine_slide_types():
@@ -137,6 +138,9 @@ class Renderer():
 		rendered_presentation.finalize_toc()
 		self._compute_renderable_slides(rendered_presentation)
 		rendered_presentation.finalize_toc()
+
+		# Compute the schedule
+		rendered_presentation.schedule.compute()
 
 		for renderable_slide in self._compute_renderable_slides(rendered_presentation):
 			additional_template_args = {
