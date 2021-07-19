@@ -64,6 +64,7 @@ export class PresentationTimer {
 
 	_connection_lost() {
 		console.log("Connection to presentation lost.");
+		this._ui_elements.presentation_mode.innerHTML = "Error: Could not connect to presentation.";
 	}
 
 	_update() {
@@ -81,11 +82,62 @@ export class PresentationTimer {
 		}
 		const slide_time_used_secs = current_rel_ratio * slide_time_allocation_secs;
 		const slide_time_remaining_secs = slide_time_allocation_secs - slide_time_used_secs;
+		const remaining_presentation_time_secs = this._active_presentation_time_secs - this._status.timekeeper.started;
 
-		this._ui_elements.presentation_mode.innerHTML = this._status.presentation_mode;
+		/* This is the presentation time the slide should begin and end. The
+		 * speed error is 0 as long as we're in the time window for that slide.
+		 */
+		const begin_time_secs = this._status.begin_ratio * this._active_presentation_time_secs;
+		const end_time_secs = this._status.end_ratio * this._active_presentation_time_secs;
+		let speed_error_secs = 0;
+		if (this._status.timekeeper.started < begin_time_secs) {
+			/* We're too fast. Speed error is positive. */
+			speed_error_secs = begin_time_secs - this._status.timekeeper.started;
+		} else if (this._status.timekeeper.started > end_time_secs) {
+			/* We're too slow. Speed error is negative. */
+			speed_error_secs = end_time_secs - this._status.timekeeper.started;
+		}
+
+		this._ui_elements.presentation_mode.className = this._status.presentation_mode;
+		switch (this._status.presentation_mode) {
+			case "started":
+				this._ui_elements.presentation_mode.innerHTML = "<img src=\"media_play.svg\" class=\"media\">";
+				break;
+
+			case "stopped":
+				this._ui_elements.presentation_mode.innerHTML = "<img src=\"media_stop.svg\" class=\"media\">";
+				break;
+
+			case "pause":
+				this._ui_elements.presentation_mode.innerHTML = "<img src=\"media_pause.svg\" class=\"media\">";
+				break;
+
+			default:
+				console.log("Error, unknown presentation mode:", this._status.presentation_mode);
+				this._ui_elements.presentation_mode.innerHTML = "Error: Unknown presentation mode.";
+		}
 		this._ui_elements.spent_time.innerHTML = TimeTools.format_hms(this._status.timekeeper.started);
+		this._ui_elements.expected_time.innerHTML;
 		this._ui_elements.slide_time_allocation.innerHTML = TimeTools.format_hms(slide_time_allocation_secs);
+		this._ui_elements.slide_time_used.innerHTML = TimeTools.format_hms(slide_time_used_secs);
 		this._ui_elements.slide_time_remaining.innerHTML = TimeTools.format_hms(slide_time_remaining_secs);
+		this._ui_elements.remaining_time.innerHTML = TimeTools.format_hms(remaining_presentation_time_secs);
+		this._ui_elements.expected_abs_time.innerHTML;
+
+		this._ui_elements.main_indicator.className = "main_indicator";
+		const delay_large_cutoff_secs = 300;
+		const delay_small_cutoff_secs = 30;
+		if (speed_error_secs < -delay_large_cutoff_secs) {
+			this._ui_elements.main_indicator.classList.add("largely_behind");
+		} else if (speed_error_secs < -delay_small_cutoff_secs) {
+			this._ui_elements.main_indicator.classList.add("slightly_behind");
+		} else if (speed_error_secs < delay_small_cutoff_secs) {
+			this._ui_elements.main_indicator.classList.add("caught_up");
+		} else if (speed_error_secs < delay_large_cutoff_secs) {
+			this._ui_elements.main_indicator.classList.add("slightly_ahead");
+		} else {
+			this._ui_elements.main_indicator.classList.add("largely_ahead");
+		}
 	}
 
 	_update_meta() {

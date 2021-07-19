@@ -101,7 +101,13 @@
 					"base/timer.html",
 					"base/pybeamer_timer.js",
 					"base/pybeamer_timekeeper.js",
-					"base/pybeamer_tools.js"
+					"base/pybeamer_tools.js",
+					"base/media_stop.svg",
+					"base/media_pause.svg",
+					"base/media_play.svg"
+				],
+				"css": [
+					"base/pybeamer_timer.css"
 				]
 			},
 			"pygments": {

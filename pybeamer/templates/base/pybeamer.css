@@ -1,3 +1,7 @@
+body {
+	font-family: "Arial";
+}
+
 div.size_container {
 	width: ${renderer.rendering_params.geometry_x}px;
 	height: ${renderer.rendering_params.geometry_y}px;
@@ -21,7 +25,6 @@ div.slide {
 	position: relative;
 	height: 100%;
 	width: 100%;
-	font-family: "Arial";
 	font-size: 48px;
 	background: #fff;
 }
