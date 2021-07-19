@@ -1,0 +1,47 @@
+/* Menu bar on top */
+div.menu {
+	z-index: 1;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	background: white;
+	padding: 20px 10px 20px 10px;
+	margin-bottom: 30px;
+	border-bottom: 1px solid black;
+}
+
+/* Slides below */
+div.belowmenu {
+	padding-top: 100px;
+}
+
+/* General scaling of menu items */
+div.menu .control {
+	border-radius: 5px;
+	font-size: 120%;
+	border: 1px solid #aaa;
+	margin-right: 15px;
+}
+
+/* Do not draw border around menu controls when they're selected */
+div.menu .control:focus {
+	outline: none;
+}
+
+div.menu button {
+	border-radius: 5px;
+	padding: 10px 30px;
+	font-size: 120%;
+	transition-duration: 0.1s;
+	background-color: #eee;
+	padding: 10px 30px;
+}
+
+div.menu button:hover {
+	background-color: #ccc;
+}
+
+div.menu input {
+	width: 75px;
+	padding: 10px 10px;
+}

@@ -1,0 +1,40 @@
+.tooltip {
+    position: relative;
+	background-image: linear-gradient(to right, #97abbc 50%, transparent 50%);
+	background-position: 0 1.04em;
+	background-repeat: repeat-x;
+	background-size: 5px 2px;
+}
+
+.tooltip .text {
+	text-indent: 0px;
+	text-align: center;
+    min-width: 300px;
+    top: -15px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    padding: 10px;
+    color: #222222;
+	background-color: #fce5cd;
+	font-size: 20pt;
+    border-radius: 8px;
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid #97abbc;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+	display: none;
+}
+
+.tooltip:hover .text {
+    display: block;
+}
+
+/* In presentation mode, we don't want the underlines */
+.fullscreen .tooltip {
+	background-image: none;
+}
+
+/* Nor do we want the tooltips to show up */
+.fullscreen .tooltip .text {
+	display: none;
+}

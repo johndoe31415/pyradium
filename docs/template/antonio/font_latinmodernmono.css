@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "Latin Modern Mono";
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+  src: local("Latin Modern Mono") url("font_latinmodernmono/lmmono10-regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Latin Modern Mono";
+  font-style: italic;
+  font-weight: 300;
+  font-display: block;
+  src: local("Latin Modern Mono") url("font_latinmodernmono/lmmono10-italic.otf") format("opentype");
+}

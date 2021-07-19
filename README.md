@@ -18,6 +18,10 @@ started in 2015. It is incorporating features of LaTeX-Beamer which I like into 
     document so I know exactly if I've already fixed an issue or not if it gets
     reported multiple times.
 
+## Example
+You can view an example of a presentation [here](https://johndoe31415.github.io/pybeamer/).
+The source for that presentation can be found [here](https://github.com/johndoe31415/pybeamer/tree/master/examples).
+
 ## Usage
 All features that have been mentioned above are implemented by pybeamer. You
 can see an example file in the [examples/ subdirectory](https://github.com/johndoe31415/pybeamer/tree/master/examples).

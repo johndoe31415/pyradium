@@ -1,0 +1,222 @@
+a {
+	color: #2185c5;
+
+	background-image: linear-gradient(#9fc5e8, #9fc5e8);
+	background-position: 0 1.04em;
+	background-repeat: repeat-x;
+	background-size: 5px 3px;
+	text-decoration: none;
+}
+
+.fullscreen a {
+	color: inherit;
+	background-image: none;
+}
+
+div.slide {
+	font-family: "Fira Sans";
+}
+
+pre {
+	font-family: "Latin Modern Mono";
+}
+
+div.title img.bar {
+	position: absolute;
+	top: 58%;
+	left: 2%;
+	width: 84%;
+}
+
+div.slide.title div.title {
+	font-weight: bold;
+	font-size: 150%;
+	position: absolute;
+	bottom: 45%;
+	left: 5%;
+	color: #2185c5;
+}
+
+div.slide.title div.author {
+	font-size: 90%;
+	position: absolute;
+	top: 63%;
+	left: 5%;
+	color: #677480;
+}
+
+div.slide.title div.date {
+	font-size: 89%;
+	font-weight: 100;
+	position: absolute;
+	top: 69%;
+	left: 5%;
+	color: #97abbc;
+}
+
+div.slide div.body {
+	position: relative;
+	height: 100%;
+}
+
+div.slide.headerfooter div.header {
+	position: relative;
+	height: 10%;
+	/*background-color: #eee;*/
+}
+
+div.header div.heading {
+	font-weight: bold;
+	margin-left: 15px;
+	padding: 10px;
+}
+
+div.slide.headerfooter div.body {
+	position: relative;
+	height: 82%;
+}
+
+div.body div.content {
+	color: #34495e;
+	padding: 25px;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+div.slide.headerfooter div.footer {
+	position: relative;
+	height: 8%;
+	/*background-color: #eee;*/
+	color: #97abbc;
+	font-size: 75%;
+	font-weight: 100;
+	overflow: hidden;
+}
+
+div.footer div.flex {
+	display: flex;
+	flex-wrap: nowrap;
+	width: 95%;
+	margin: 0 auto;
+}
+
+div.flex div.flexchild {
+	flex: 1;
+	display: flex;
+}
+
+div.flexchild.left {
+	justify-content: flex-start;
+}
+
+div.flexchild.center {
+	justify-content: center;
+}
+
+div.flexchild.right {
+	justify-content: flex-end;
+}
+
+div.footer img.bar {
+	position: absolute;
+	width: 100%;
+	bottom: 0px;
+}
+
+div.slidetype-leftright div.content-left {
+	position: relative;
+	float: left;
+	width: 50%;
+}
+
+div.slidetype-leftright div.content-right {
+	position: relative;
+	float: right;
+	width: 50%;
+}
+
+div.leftright {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+}
+
+div.leftright div.left, div.leftright div.right {
+	width: 45%;
+}
+
+ul {
+	text-indent: -38px;
+	margin-left: 38px;
+}
+
+ul li {
+	list-style: none;
+}
+
+ul li:before {
+	content: url("triangle1.svg");
+	margin-right: 8px;
+}
+
+ul li li:before {
+	content: url("triangle2.svg");
+}
+
+ul.bare li {
+	background-image: none;
+	padding-left: 0px;
+}
+
+div.final_flex {
+	position: relative;
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+div.final_flex div.final_main {
+	font-size: 200%;
+	font-weight: bold;
+	color: #2185c5;
+}
+
+div.final_flex div.final_sub {
+	color: #677480;
+}
+
+
+div.slide.quote div.flex {
+	position: relative;
+	display: flex;
+	height: 70%;
+	top: 30%;
+	width: 100%;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+div.slide.quote div.flex div.quote_text {
+	width: 80%;
+	color: #34495e;
+	font-style: italic;
+}
+
+div.slide.quote div.flex div.quote_author {
+	width: 80%;
+	text-align: right;
+	color: #677480;
+	margin-top: 25px;
+	font-size: 80%;
+}
+
+div.slide.quote img.quotationmark {
+	position: relative;
+	top: 25%;
+	width: 100%;
+}
