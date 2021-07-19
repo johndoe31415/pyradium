@@ -135,13 +135,14 @@ export class Presentation {
 
 	start_presentation() {
 		if (this.fullscreen_mode) {
+			/* Second press on fullscreen starts the presentation automatically */
+			this.presentation_mode = "started";
 			return;
 		}
 		console.log("Presentation started.");
 		this._show_cursor = false;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
-		this.presentation_mode = "started";
 	}
 
 	_find_slide(selector) {
@@ -177,6 +178,8 @@ export class Presentation {
 			this.start_presentation();
 		} else if (event.key == "c") {
 			this.toggle_cursor();
+		} else if (event.key == "s") {
+			this.toggle_presentation_mode();
 		} else {
 //			console.log("keypress event", event);
 		}
@@ -245,14 +248,20 @@ export class Presentation {
 				 * slide has been advanced. */
 				this.presentation_mode = "started";
 			}
-		} else {
-			this.presentation_mode = "stopped";
 		}
 	}
 
 	toggle_cursor() {
 		this._show_cursor = !this._show_cursor;
 		this._set_cursor_style();
+	}
+
+	toggle_presentation_mode() {
+		if (this.presentation_mode == "started") {
+			this.presentation_mode = "stopped";
+		} else if (this.presentation_mode == "stopped") {
+			this.presentation_mode = "started";
+		}
 	}
 
 	goto_slide() {
