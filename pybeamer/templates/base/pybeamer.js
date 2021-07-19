@@ -39,7 +39,7 @@ export class Presentation {
 			this._intersect_obs.observe(slide);
 		});
 		this._timekeeper = new TimeKeeper();
-		this._presentation_id = Math.random();
+		this._session_id = Math.random();
 		this._presentation_mode = "stopped";
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
@@ -79,14 +79,14 @@ export class Presentation {
 
 		const msg = {
 			"type":						"status",
-			"presentation_id":			this._presentation_id,
+			"session_id":				this._session_id,
 			"data": {
-				"presentation_mode":		this.presentation_mode,
-				"begin_ratio":				this.current_slide.getAttribute("begin_ratio") * 1,
-				"end_ratio":				this.current_slide.getAttribute("end_ratio") * 1,
+				"presentation_mode":	this.presentation_mode,
+				"begin_ratio":			this.current_slide.getAttribute("begin_ratio") * 1,
+				"end_ratio":			this.current_slide.getAttribute("end_ratio") * 1,
 				"timekeeper": {
-					"started":		this._timekeeper.time_spent_in("started"),
-					"paused":		this._timekeeper.time_spent_in("paused"),
+					"started":			this._timekeeper.time_spent_in("started"),
+					"paused":			this._timekeeper.time_spent_in("paused"),
 				},
 			},
 		};
@@ -95,9 +95,9 @@ export class Presentation {
 
 	_tx_presentation_info() {
 		const msg = {
-			"type":						"presentation_meta",
-			"presentation_id":			this._presentation_id,
-			"data":						this.presentation_meta,
+			"type":					"presentation_meta",
+			"session_id":			this._session_id,
+			"data":					this.presentation_meta,
 		};
 		this._bc.postMessage(msg);
 	}

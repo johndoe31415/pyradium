@@ -28,7 +28,7 @@ export class PresentationTimer {
 		this._ui_elements = ui_elements;
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
-		this._session = null;
+		this._session_id = null;
 		this._status = null;
 		this._meta = null;
 		this._total_presentation_time = null;
@@ -143,15 +143,15 @@ export class PresentationTimer {
 
 	_rx_message(msg) {
 		const data = msg.data;
-		if ((this._session != null) && (this._session != data.data.presentation_id)) {
+		if ((this._session_id != null) && (this._session_id != data.session_id)) {
 			/* Other presentation window open, ignore data. */
 			return;
 		}
 
 		this._reset_timeout();
 		if (data.type == "status") {
-			if (this._session == null) {
-				this._session = data.data.presentation_id;
+			if (this._session_id == null) {
+				this._session_id = data.session_id;
 			}
 			this._status = data.data;
 
