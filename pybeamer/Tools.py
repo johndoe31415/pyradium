@@ -95,10 +95,10 @@ class XMLTools():
 		return cls.findall_recurse_predicate(root_node, predicate = lambda node: (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name))
 
 	@classmethod
-	def findall(cls, root_node, name):
+	def findall(cls, root_node, name, namespace_uri = None):
 		result = [ ]
 		for node in root_node.childNodes:
-			if (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name):
+			if (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name) and (node.namespaceURI == namespace_uri):
 				result.append(node)
 		return result
 
