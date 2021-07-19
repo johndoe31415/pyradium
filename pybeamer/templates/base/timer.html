@@ -31,13 +31,6 @@
 				</div>
 
 				<div class="top">
-					Expected Time
-				</div>
-				<div class="bottom">
-					<div id="expected_time"></div>
-				</div>
-
-				<div class="top">
 					Time for Slide
 				</div>
 				<div class="bottom">
@@ -57,13 +50,6 @@
 				<div class="bottom">
 					<div id="remaining_time"></div>
 				</div>
-
-				<div class="top">
-					Expected Real Time
-				</div>
-				<div class="bottom">
-					<div id="expected_abs_time"></div>
-				</div>
 			</div>
 		</div>
 
@@ -80,12 +66,10 @@
 				"pause_minutes":			document.querySelector("#pause_minutes"),
 				"presentation_mode":		document.querySelector("#presentation_mode"),
 				"spent_time":				document.querySelector("#spent_time"),
-				"expected_time":			document.querySelector("#expected_time"),
 				"slide_time_allocation":	document.querySelector("#slide_time_allocation"),
 				"slide_time_used":			document.querySelector("#slide_time_used"),
 				"slide_time_remaining":		document.querySelector("#slide_time_remaining"),
 				"remaining_time":			document.querySelector("#remaining_time"),
-				"expected_abs_time":		document.querySelector("#expected_abs_time"),
 			};
 			const pt = new PresentationTimer(ui_elements);
 		</script>

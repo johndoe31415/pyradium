@@ -205,9 +205,12 @@
 	<slide type="final">
 		<s:time rel="0" />
 	</slide>
-	<slide type="acronyms" />
+	<slide type="acronyms">
+		<s:time rel="0" />
+	</slide>
 
 	<slide type="feedback">
+		<s:time rel="0" />
 		<s:var name="endpoint" value="https://myserver.com/feedback-api" />
 	</slide>
 </presentation>

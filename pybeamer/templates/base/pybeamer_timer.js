@@ -72,23 +72,16 @@ export class PresentationTimer {
 			return;
 		}
 
-		let current_rel_ratio = 0;
-		let slide_time_allocation_secs = 0;
-		if (Math.abs(this._status.begin_ratio - this._status.end_ratio) > 1e-4) {
-			/* Non-zero time slide */
-			const current_abs_ratio = this._status.timekeeper.started / this._active_presentation_time_secs;
-			current_rel_ratio = (current_abs_ratio - this._status.begin_ratio) / (this._status.end_ratio - this._status.begin_ratio);
-			slide_time_allocation_secs = (this._status.end_ratio - this._status.begin_ratio) * this._active_presentation_time_secs;
-		}
-		const slide_time_used_secs = current_rel_ratio * slide_time_allocation_secs;
-		const slide_time_remaining_secs = slide_time_allocation_secs - slide_time_used_secs;
-		const remaining_presentation_time_secs = this._active_presentation_time_secs - this._status.timekeeper.started;
-
-		/* This is the presentation time the slide should begin and end. The
-		 * speed error is 0 as long as we're in the time window for that slide.
-		 */
 		const begin_time_secs = this._status.begin_ratio * this._active_presentation_time_secs;
 		const end_time_secs = this._status.end_ratio * this._active_presentation_time_secs;
+		const slide_time_allocation_secs = end_time_secs - begin_time_secs;
+		const slide_time_remaining_secs = end_time_secs - this._status.timekeeper.started;
+		const slide_time_used_secs = slide_time_allocation_secs - slide_time_remaining_secs;
+		const remaining_presentation_time_secs = this._active_presentation_time_secs - this._status.timekeeper.started;
+
+		/* The speed error is 0 as long as we're in the time window for that
+		 * slide.
+		 */
 		let speed_error_secs = 0;
 		if (this._status.timekeeper.started < begin_time_secs) {
 			/* We're too fast. Speed error is positive. */
@@ -117,12 +110,10 @@ export class PresentationTimer {
 				this._ui_elements.presentation_mode.innerHTML = "Error: Unknown presentation mode.";
 		}
 		this._ui_elements.spent_time.innerHTML = TimeTools.format_hms(this._status.timekeeper.started);
-		this._ui_elements.expected_time.innerHTML;
 		this._ui_elements.slide_time_allocation.innerHTML = TimeTools.format_hms(slide_time_allocation_secs);
 		this._ui_elements.slide_time_used.innerHTML = TimeTools.format_hms(slide_time_used_secs);
 		this._ui_elements.slide_time_remaining.innerHTML = TimeTools.format_hms(slide_time_remaining_secs);
 		this._ui_elements.remaining_time.innerHTML = TimeTools.format_hms(remaining_presentation_time_secs);
-		this._ui_elements.expected_abs_time.innerHTML;
 
 		this._ui_elements.main_indicator.className = "main_indicator";
 		const delay_large_cutoff_secs = 300;
