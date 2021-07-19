@@ -1,5 +1,5 @@
 # pybeamer
-[![Build Status](https://travis-ci.com/johndoe31415/pybeamer.svg?branch=master)](https://travis-ci.org/johndoe31415/pybeamer)
+[![Build Status](https://travis-ci.com/johndoe31415/pybeamer.svg?branch=master)](https://travis-ci.com/johndoe31415/pybeamer)
 
 This is a complete rewrite of a presentation rendering tool I've originally
 started in 2015. It is incorporating features of LaTeX-Beamer which I like into a renderer that outputs HTML. In particular, the design goals were:
