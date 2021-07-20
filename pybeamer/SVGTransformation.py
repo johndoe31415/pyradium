@@ -126,9 +126,24 @@ class SVGTransformation():
 	def get_layer(self, layer_id):
 		return self._layers_by_id[layer_id]
 
-	def write(self, filename):
+	def apply(self, transformation_dict):
+		if transformation_dict["cmd"] == "show_layer":
+			self.get_layer(transformation_dict["layer_id"]).show()
+		elif transformation_dict["cmd"] == "hide_layer":
+			self.get_layer(transformation_dict["layer_id"]).hide()
+		else:
+			raise NotImplementedError(transformation_dict["cmd"])
+
+	def apply_all(self, transformation_dicts):
+		for transformation_dict in transformation_dicts:
+			self.apply(transformation_dict)
+
+	def write(self, f):
+		self._xml.writexml(f)
+
+	def write_file(self, filename):
 		with open(filename, "w") as f:
-			self._xml.writexml(f)
+			self.write(f)
 
 if __name__ == "__main__":
 	svg = SVGTransformation("animation_l2hid.svg")
@@ -138,4 +153,4 @@ if __name__ == "__main__":
 	for layer_id in layer_ids:
 		svg.get_layer(layer_id).hide()
 	svg.get_layer(layer_ids[0]).show()
-	svg.write("/tmp/x.svg")
+	svg.write_file("/tmp/x.svg")

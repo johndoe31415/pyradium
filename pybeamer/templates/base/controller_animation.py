@@ -36,18 +36,27 @@ class AnimationController(BaseController):
 		# Determine the number of layers the SVG has first
 		svg = SVGTransformation(full_filename)
 		considered_layers = list(svg.visible_layer_ids)
+		svg_transforms = [ ]
 
-		# Hide them all first
+		# Store commands to hide all layers first
 		for layer_id in considered_layers:
-			svg.get_layer(layer_id).hide()
+			svg_transforms.append({
+				"cmd":			"hide_layer",
+				"layer_id":		layer_id,
+			})
 
 		# Then show them one-by-one and render each
 		renderer = self.rendered_presentation.renderer.get_custom_renderer("img")
 		for layer_id in considered_layers:
-			svg.get_layer(layer_id).show()
-
-
-			print("EMIT")
-
-		yield from [ ]
-#		yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, { "acronyms": page_content })
+			svg_transforms.append({
+				"cmd":			"show_layer",
+				"layer_id":		layer_id,
+			})
+			rendered_image = renderer.render({
+				"src":				full_filename,
+				"max_dimension":	self.rendered_presentation.renderer.rendering_params.image_max_dimension,
+				"svg_transform":	svg_transforms,
+			})
+			local_filename = "imgs/anim/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
+			self.rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
+			yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, { "image": local_filename })
