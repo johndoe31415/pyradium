@@ -25,6 +25,7 @@ class SlideException(PyBeamerException): pass
 class UndefinedContentException(SlideException): pass
 class TemplateErrorException(SlideException): pass
 class TimeSpecificationError(SlideException): pass
+class UsageException(SlideException): pass
 
 class XMLHookRegistryException(PyBeamerException): pass
 

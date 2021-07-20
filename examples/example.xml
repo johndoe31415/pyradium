@@ -194,6 +194,11 @@
 		<s:img src="3dbox.svg" />
 	</slide>
 
+	<slide type="animation">
+		<s:var name="heading" value="Image Animation" />
+		<s:var name="filename" value="animation.svg" />
+	</slide>
+
 	<subsection>Esc&lt;&gt;ping</subsection>
 	<slide>
 		<s:var name="heading" value="Escaped &lt;&gt; Characters" />

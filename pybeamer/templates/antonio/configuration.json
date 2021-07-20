@@ -64,6 +64,10 @@
 		"feedback": {
 			"file":			"base/controller_feedback.py",
 			"class":		"FeedbackController"
+		},
+		"animation": {
+			"file":			"base/controller_animation.py",
+			"class":		"AnimationController"
 		}
 	},
 	"dependencies": {
