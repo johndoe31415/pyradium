@@ -63,4 +63,8 @@ class AnimationController(BaseController):
 			additional_slide_var_list.append({
 				"image": local_filename,
 			})
-		yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_var_list)
+
+		if not self.rendered_presentation.renderer.rendering_params.collapse_animation:
+			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_var_list)
+		else:
+			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_var_list[-1])

@@ -43,6 +43,7 @@ def main():
 		parser.add_argument("-t", "--template-style", metavar = "name", default = "default", help = "Template style to use. Defaults to %(default)s.")
 		parser.add_argument("-g", "--geometry", metavar = "width x height", type = _geometry, default = "1280x720", help = "Slide geometry, in pixels. Defaults to %(default)s.")
 		parser.add_argument("-r", "--remove-pauses", action = "store_true", help = "Ignore all pause directives and just render the final slides.")
+		parser.add_argument("--collapse-animation", action = "store_true", help = "Do not render animations as multiple slides, just show one complete slide.")
 		parser.add_argument("-i", "--index-filename", metavar = "filename", default = "index.html", help = "Gives the name of the presentation index file. Defaults to %(default)s. Useful if you want to render multiple presentations in one subdirectory.")
 		parser.add_argument("-m", "--presentation-mode", metavar = "{%s}" % (",".join(enumitem.value for enumitem in PresentationMode)), type = PresentationMode, default = "interactive", help = "Generate this type of presentation. Can be one of %(choices)s, defaults to %(default)s.")
 		parser.add_argument("-F", "--presentation-feature", metavar = "{%s}" % (",".join(enumitem.value for enumitem in PresentationFeature)), type = PresentationFeature, default = [ ], action = "append", help = "Enable a specific presentation feature. Can be one of %(choices)s and can be given multiple times.")
