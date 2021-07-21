@@ -37,7 +37,7 @@ def main():
 	mc = MultiCommand()
 
 	def genparser(parser):
-		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1000, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")
+		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1920, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")
 		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
 		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
 		parser.add_argument("-t", "--template-style", metavar = "name", default = "default", help = "Template style to use. Defaults to %(default)s.")

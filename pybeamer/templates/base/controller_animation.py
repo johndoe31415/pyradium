@@ -46,6 +46,7 @@ class AnimationController(BaseController):
 			})
 
 		# Then show them one-by-one and render each
+		additional_slide_var_list = [ ]
 		renderer = self.rendered_presentation.renderer.get_custom_renderer("img")
 		for layer_id in considered_layers:
 			svg_transforms.append({
@@ -59,4 +60,7 @@ class AnimationController(BaseController):
 			})
 			local_filename = "imgs/anim/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
 			self.rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
-			yield from self.slide.emit_slide(self.rendered_presentation, self.content_containers, { "image": local_filename })
+			additional_slide_var_list.append({
+				"image": local_filename,
+			})
+		yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_var_list)

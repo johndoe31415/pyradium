@@ -32,4 +32,4 @@ class FeedbackController(BaseController):
 		additional_slide_vars = {
 			"json_slide_info": json.dumps(slide_info),
 		}
-		yield from self._slide.emit_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)
+		yield from self._slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_vars)

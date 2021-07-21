@@ -69,7 +69,19 @@ class RenderSlideDirective(BaseDirective):
 		})
 		return slide_vars
 
-	def emit_slide(self, rendered_presentation, content_containers, additional_slide_vars = None):
+	def emit_nocontent_slide(self, rendered_presentation, additional_slide_var_list = None):
+		if additional_slide_var_list is None:
+			additional_slide_var_list = [ { } ]
+		elif not isinstance(additional_slide_var_list, list):
+			additional_slide_var_list = [ additional_slide_var_list ]
+
+		rendered_presentation.advance_slide()
+		for (sub_slide_index, additional_slide_vars) in enumerate(additional_slide_var_list):
+			slide_vars = self.compute_slide_vars(rendered_presentation, sub_slide_index)
+			slide_vars.update(additional_slide_vars)
+			yield RenderableSlide(slide_type = self.slide_type, content_containers = None, slide_vars = slide_vars)
+
+	def emit_content_slide(self, rendered_presentation, content_containers, additional_slide_vars = None):
 		rendered_presentation.advance_slide()
 		paused_containers = PauseRenderer(content_containers, honor_pauses = rendered_presentation.renderer.rendering_params.honor_pauses).render()
 
@@ -85,7 +97,7 @@ class RenderSlideDirective(BaseDirective):
 	def render(self, rendered_presentation):
 		controller = rendered_presentation.renderer.controllers.get_controller(self, self._content_containers, rendered_presentation)
 		if controller is None:
-			yield from self.emit_slide(rendered_presentation, self._content_containers)
+			yield from self.emit_content_slide(rendered_presentation, self._content_containers)
 		else:
 			yield from controller.render()
 

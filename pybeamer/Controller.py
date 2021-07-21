@@ -41,7 +41,7 @@ class BaseController():
 		return self._rendered_presentation
 
 	def render(self):
-		return self._slide.emit_slide(self._rendered_presentation, self._content_containers)
+		return self._slide.emit_content_slide(self._rendered_presentation, self._content_containers)
 
 class ControllerManager():
 	def __init__(self, renderer):
