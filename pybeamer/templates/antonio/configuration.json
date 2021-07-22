@@ -30,6 +30,7 @@
 	"files": {
 		"css": [
 			{ "name": "base/pybeamer.css", "render": true },
+			{ "name": "base/pybeamer_print.css", "order": 1000 },
 			"antonio/antonio.css",
 			"antonio/font_fira.css",
 			"antonio/font_latinmodernmono.css"

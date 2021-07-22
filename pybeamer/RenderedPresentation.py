@@ -31,7 +31,7 @@ class RenderedPresentation():
 		self._renderer = renderer
 		self._deploy_directory = deploy_directory
 		self._rendered_slides = [ ]
-		self._css = OrderedSet()
+		self._css = { }
 		self._js = OrderedSet()
 		self._toc = GenericTOC()
 		self._frozen_toc = None
@@ -86,16 +86,21 @@ class RenderedPresentation():
 
 	@property
 	def css(self):
-		return iter(self._css)
+		for (filename, order) in sorted(self._css.items(), key = lambda x: (x[1], x[0])):
+			yield filename
 
 	@property
 	def schedule(self):
 		return self._schedule
 
-	def add_css(self, filename, target_directory = "/"):
+	def add_css(self, filename, order = None, target_directory = "/"):
 		assert(target_directory.startswith("/"))
 		assert(target_directory.endswith("/"))
-		return self._css.add(target_directory[1:] + filename)
+		if order is None:
+			order = len(self._css)
+		key = target_directory[1:] + filename
+		if key not in self._css:
+			self._css[key] = order
 
 	def add_js(self, filename):
 		return self._js.add(filename)
@@ -156,7 +161,7 @@ class RenderedPresentation():
 					self.add_file(rel_filename["name"], rendered_css, target_directory = "/template/")
 				else:
 					self.copy_file(rel_filename["name"], target_directory = "/template/")
-				self.add_css(rel_filename["name"], target_directory = "/template/")
+				self.add_css(rel_filename["name"], target_directory = "/template/", order = rel_filename.get("order"))
 
 	@property
 	def meta(self):
