@@ -26,6 +26,7 @@ from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
+from .Exceptions import MalformedXMLInputException
 
 class Presentation():
 	_NAMESPACES = {
@@ -56,7 +57,10 @@ class Presentation():
 		meta = None
 		content = [ ]
 		sources = [ filename ]
-		for child in XMLTools.child_tagname(dom, "presentation").childNodes:
+		presentation = XMLTools.child_tagname(dom, "presentation")
+		if presentation is None:
+			raise MalformedXMLInputException("No 'presentation' node is present as top node of the XML input document.")
+		for child in presentation.childNodes:
 			if child.nodeType != child.ELEMENT_NODE:
 				continue
 

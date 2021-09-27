@@ -21,6 +21,8 @@
 
 class PyBeamerException(Exception): pass
 
+class MalformedXMLInputException(PyBeamerException): pass
+
 class SlideException(PyBeamerException): pass
 class UndefinedContentException(SlideException): pass
 class TemplateErrorException(SlideException): pass
