@@ -72,7 +72,7 @@ class ImageRenderer(BaseRenderer):
 
 	def _render_raster_bitmap(self, src, max_dimension):
 		# Resize using ImageMagick
-		if src.lower().endswith(".jpg") or src.loewr().endswith(".jpeg"):
+		if src.lower().endswith(".jpg") or src.lower().endswith(".jpeg"):
 			extension = "jpg"
 		else:
 			extension = "png"
