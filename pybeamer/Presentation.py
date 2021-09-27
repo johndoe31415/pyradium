@@ -37,6 +37,7 @@ class Presentation():
 		self._meta = meta
 		self._content = content
 		self._sources = sources
+		self._validate_metadata()
 
 	@property
 	def meta(self):
@@ -83,6 +84,10 @@ class Presentation():
 			else:
 				print("Warning: Ignored unknown tag '%s'." % (child.tagName))
 		return cls(meta, content, sources)
+
+	def _validate_metadata(self):
+		if not isinstance(self.meta.get("schedule", { }), dict):
+			raise MalformedXMLInputException("The 'meta' child node 'schedule' must not contain text, but two child nodes (<total-presentation-time> and <pause-minutes>).")
 
 	def _determine_sha256(self, filename):
 		with open(filename, "rb") as f:
