@@ -25,6 +25,7 @@ from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
 from .Renderer import Renderer
+from .Exceptions import CallingProcessException
 
 class ActionRender(BaseAction):
 	def _wait_for_change(self, renderer):
@@ -40,7 +41,9 @@ class ActionRender(BaseAction):
 		sources += self._args.re_render_watch
 		sources = [ source for source in sources if os.path.exists(source) ]
 		cmd += sources
-		subprocess.check_call(cmd)
+		proc = subprocess.run(cmd)
+		if proc.returncode not in [ 0, 1 ]:
+			raise CallingProcessException("inotifywait returned with returncode %d." % (proc.returncode))
 
 	def run(self):
 		if (not self._args.force) and os.path.exists(self._args.outdir):
