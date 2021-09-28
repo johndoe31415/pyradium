@@ -53,7 +53,10 @@ class Presentation():
 
 	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
-		dom = xml.dom.minidom.parse(filename)
+		try:
+			dom = xml.dom.minidom.parse(filename)
+		except xml.parsers.expat.ExpatError as e:
+			raise MalformedXMLInputException("Cannot parse %s: %s" % (filename, str(e)))
 		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))
 		meta = None
 		content = [ ]

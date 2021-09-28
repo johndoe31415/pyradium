@@ -20,12 +20,14 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import sys
+import time
 import subprocess
 from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
 from .Renderer import Renderer
-from .Exceptions import CallingProcessException
+from .Exceptions import CallingProcessException, PyBeamerException
 
 class ActionRender(BaseAction):
 	def _wait_for_change(self, renderer):
@@ -50,22 +52,33 @@ class ActionRender(BaseAction):
 			print("Refusing to overwrite: %s" % (self._args.outdir))
 			return 1
 
+		renderer = None
+		render_success = True
 		while True:
-			rendering_parameters = RenderingParameters(
-					template_style = self._args.template_style,
-					honor_pauses = not self._args.remove_pauses,
-					collapse_animation = self._args.collapse_animation,
-					presentation_mode = self._args.presentation_mode,
-					extra_template_dirs = self._args.template_dir,
-					include_dirs = [ os.path.dirname(self._args.infile) ] + self._args.include_dir,
-					index_filename = self._args.index_filename,
-					geometry = self._args.geometry,
-					image_max_dimension = self._args.image_max_dimension,
-					presentation_features = self._args.presentation_feature)
-			presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
-			renderer = Renderer(presentation, rendering_parameters)
-			rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
+			try:
+				rendering_parameters = RenderingParameters(
+						template_style = self._args.template_style,
+						honor_pauses = not self._args.remove_pauses,
+						collapse_animation = self._args.collapse_animation,
+						presentation_mode = self._args.presentation_mode,
+						extra_template_dirs = self._args.template_dir,
+						include_dirs = [ os.path.dirname(self._args.infile) ] + self._args.include_dir,
+						index_filename = self._args.index_filename,
+						geometry = self._args.geometry,
+						image_max_dimension = self._args.image_max_dimension,
+						presentation_features = self._args.presentation_feature)
+				presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
+				renderer = Renderer(presentation, rendering_parameters)
+				rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
+			except PyBeamerException as e:
+				render_success = False
+				print("Rendering failed: [%s] %s" % (e.__class__.__name__, str(e)), file = sys.stderr)
 			if not self._args.re_render_loop:
 				break
-			self._wait_for_change(renderer)
-		return 0
+			if renderer is None:
+				sleep_duration_secs = 5
+				print("Unable to watch files for change since parsing the source was impossible; sleeping for %d seconds instead." % (sleep_duration_secs), file = sys.stderr)
+				time.sleep(sleep_duration_secs)
+			else:
+				self._wait_for_change(renderer)
+		return 0 if render_success else 1
