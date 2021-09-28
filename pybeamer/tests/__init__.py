@@ -20,3 +20,4 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from .TimeSpecificationTests import TimeSpecificationTests
+from .CmdlineParserTests import CmdlineParserTests
