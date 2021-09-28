@@ -207,6 +207,16 @@
 		</ul>
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Execution of scripts 1" />
+		<s:exec cmd="my_script foo" />
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="Execution of scripts 2" />
+		<s:exec cmd="my_script bar" />
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0" />
 	</slide>

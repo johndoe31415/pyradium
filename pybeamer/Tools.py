@@ -20,6 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import json
+import hashlib
 import subprocess
 from pybeamer.Exceptions import InvalidBooleanValueException
 
@@ -196,3 +197,9 @@ class ImageTools():
 	def get_image_info(cls, filename):
 		image_info = json.loads(subprocess.check_output([ "convert", filename, "json:-" ]))[0]
 		return image_info
+
+class HashTools():
+	@classmethod
+	def hash_file(cls, filename):
+		with open(filename, "rb") as f:
+			return hashlib.md5(f.read()).hexdigest()
