@@ -90,13 +90,16 @@ class RendererCache():
 			"object_properties":		property_dict,
 			"additional_key":			self._renderer.rendering_key(property_dict),
 		}
+		attempt_cache = property_dict.get("cache", True)
+
 		keyhash = self._hash_key(key)
 		cached_object = self._retrieve(keyhash)
-		if cached_object is not None:
+		if attempt_cache and (cached_object is not None):
 			return cached_object
 		else:
 			object_data = self._renderer.render(property_dict)
-			self._store(key, keyhash, object_data)
+			if attempt_cache:
+				self._store(key, keyhash, object_data)
 			return RenderedResult(key = key, keyhash = keyhash, from_cache = False, data = object_data)
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ import pybeamer
 from pybeamer.Controller import ControllerManager
 from pybeamer.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pybeamer.renderer.ImageRenderer import ImageRenderer
+from pybeamer.renderer.ExecRenderer import ExecRenderer
 from .Acronyms import Acronyms
 from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
@@ -40,6 +41,7 @@ class Renderer():
 		self._custom_renderers = {
 			"latex":	RendererCache(LatexFormulaRenderer()),
 			"img":		RendererCache(ImageRenderer()),
+			"exec":		RendererCache(ExecRenderer()),
 			"acronym":	Acronyms(),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])

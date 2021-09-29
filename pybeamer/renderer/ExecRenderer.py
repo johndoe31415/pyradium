@@ -22,6 +22,7 @@
 import subprocess
 from pybeamer.Tools import HashTools
 from pybeamer.RendererCache import BaseRenderer
+from pybeamer.Exceptions import FailedToExecuteSubprocessException
 
 class ExecRenderer(BaseRenderer):
 	def __init__(self):
@@ -45,10 +46,16 @@ class ExecRenderer(BaseRenderer):
 
 	def render(self, property_dict):
 		cmd = property_dict["cmd"]
-		proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		try:
+			proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+		except PermissionError as e:
+			raise FailedToExecuteSubprocessException("Could not execute '%s' (%s)." % (str(cmd), str(e)))
+
+		if proc.returncode != 0:
+			raise FailedToExecuteSubprocessException("Could not execute '%s': returncode %d." % (str(cmd), proc.returncode))
+
 		result = {
 			"cmd":			cmd,
-			"returncode":	proc.returncode,
 			"stdout":		proc.stdout,
 			"stderr":		proc.stderr,
 		}

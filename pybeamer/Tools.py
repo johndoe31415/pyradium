@@ -47,7 +47,15 @@ class XMLTools():
 
 	@classmethod
 	def replace_node(cls, node, replacement):
-		node.parentNode.replaceChild(replacement, node)
+		parent = node.parentNode
+		if not isinstance(replacement, list):
+			parent.replaceChild(replacement, node)
+		else:
+			result = node.parentNode.replaceChild(replacement[-1], node)
+			last_node = replacement[-1]
+			for sibling_node in reversed(replacement[ : -1]):
+				parent.insertBefore(sibling_node, last_node)
+				last_node = sibling_node
 
 	@classmethod
 	def remove_siblings_after(cls, node):

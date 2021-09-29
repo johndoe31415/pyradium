@@ -36,3 +36,5 @@ class XMLHookRegistryException(PyBeamerException): pass
 class DuplicateOrderException(PyBeamerException): pass
 class InvalidBooleanValueException(PyBeamerException): pass
 class FailedToLookupFileException(PyBeamerException): pass
+
+class FailedToExecuteSubprocessException(PyBeamerException): pass
