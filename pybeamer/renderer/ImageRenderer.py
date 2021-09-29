@@ -20,9 +20,8 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import tempfile
-import hashlib
 import subprocess
-from pybeamer.Tools import ImageTools
+from pybeamer.Tools import ImageTools, HashTools
 from pybeamer.RendererCache import BaseRenderer
 from pybeamer.Exceptions import UsageException
 from pybeamer.SVGTransformation import SVGTransformation
@@ -40,10 +39,6 @@ class ImageRenderer(BaseRenderer):
 		return {
 			"version":			1,
 		}
-
-	def _filehash(self, filename):
-		with open(filename, "rb") as f:
-			return hashlib.md5(f.read()).hexdigest()
 
 	def _render_raw_svg(self, src, max_dimension, svg_transform = None):
 		with tempfile.NamedTemporaryFile(prefix = "pybeamer_img_", suffix = ".png") as output_file:
@@ -83,9 +78,14 @@ class ImageRenderer(BaseRenderer):
 			img_data = output_file.read()
 		return (extension, img_data)
 
+	def rendering_key(self, property_dict):
+		src = property_dict["src"]
+		return {
+			"srchash":		HashTools.hash_file(src),
+		}
+
 	def render(self, property_dict):
 		src = property_dict["src"]
-		srchash = self._filehash(src)
 		max_dimension = property_dict["max_dimension"]
 
 		if src.lower().endswith(".svg"):
@@ -96,7 +96,6 @@ class ImageRenderer(BaseRenderer):
 			(extension, img_data) = self._render_raster_bitmap(src, max_dimension)
 
 		image = {
-			"srchash":		srchash,
 			"extension":	extension,
 			"img_data":		img_data,
 		}
@@ -106,5 +105,6 @@ if __name__ == "__main__":
 	from pybeamer.RendererCache import RendererCache
 	renderer = RendererCache(ImageRenderer())
 	print(renderer.render({
-		"src":	"examples/3dbox.svg",
+		"max_dimension": 100,
+		"src":	"test.svg",
 	}))

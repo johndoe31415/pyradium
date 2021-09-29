@@ -30,6 +30,8 @@ from .ExtendedJSONEncoder import ExtendedJSONEncoder
 RenderedResult = collections.namedtuple("RenderedResult", [ "key", "keyhash", "from_cache", "data" ])
 
 class BaseRenderer():
+	RendererResult = collections.namedtuple("RendererResult", [ "key", "data" ])
+
 	@property
 	def name(self):
 		raise NotImplementedError(__class__.__name__)
@@ -37,6 +39,9 @@ class BaseRenderer():
 	@property
 	def properties(self):
 		return { "version": 0 }
+
+	def rendering_key(self, property_dict):
+		return None
 
 	def render(self, property_dict):
 		raise NotImplementedError(__class__.__name__)
@@ -83,6 +88,7 @@ class RendererCache():
 			"name":						self._renderer.name,
 			"renderer_properties":		self._renderer.properties,
 			"object_properties":		property_dict,
+			"additional_key":			self._renderer.rendering_key(property_dict),
 		}
 		keyhash = self._hash_key(key)
 		cached_object = self._retrieve(keyhash)

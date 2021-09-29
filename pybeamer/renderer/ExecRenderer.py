@@ -19,12 +19,9 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import hashlib
 import subprocess
 from pybeamer.Tools import HashTools
 from pybeamer.RendererCache import BaseRenderer
-from pybeamer.Exceptions import UsageException
-from pybeamer.CmdlineParser import CmdlineParser, CmdlineParserException
 
 class ExecRenderer(BaseRenderer):
 	def __init__(self):
@@ -40,18 +37,20 @@ class ExecRenderer(BaseRenderer):
 			"version":			1,
 		}
 
+	def rendering_key(self, property_dict):
+		cmd = property_dict["cmd"]
+		return {
+			"srchash":		HashTools.hash_file(cmd[0]),
+		}
+
 	def render(self, property_dict):
-		cmdline = property_dict["cmdline"]
-		cmd = CmdlineParser().parse(cmdline)
-
-		srchash = HashTools.hash_file(cmd[0])
-
-		stdout = b"foo bar"
-
+		cmd = property_dict["cmd"]
+		proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 		result = {
-			"cmdline":		cmdline,
-			"srchash":		srchash,
-			"stdout":		stdout,
+			"cmd":			cmd,
+			"returncode":	proc.returncode,
+			"stdout":		proc.stdout,
+			"stderr":		proc.stderr,
 		}
 		return result
 
@@ -59,5 +58,5 @@ if __name__ == "__main__":
 	from pybeamer.RendererCache import RendererCache
 	renderer = RendererCache(ExecRenderer())
 	print(renderer.render({
-		"cmdline":	"/bin/ls -l /",
+		"cmd":	[ "/bin/ls", "-l", "/" ],
 	}))
