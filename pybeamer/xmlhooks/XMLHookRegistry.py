@@ -37,6 +37,12 @@ class XMLHookRegistry():
 		return hook_class
 
 	@classmethod
+	def _replace_text(self, text):
+		text = text.replace("---", "—")
+		text = text.replace("--", "–")
+		return text
+
+	@classmethod
 	def mangle(cls, rendered_presentation, root_node):
 		def callback(node):
 			if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName.startswith("s:")):
@@ -52,6 +58,11 @@ class XMLHookRegistry():
 							XMLTools.replace_node(node, replace_by)
 					else:
 						print("Warning: Unknown hook '%s' used in source document." % (hook_name))
+			elif node.nodeType == node.TEXT_NODE:
+				text = node.wholeText
+				new_text = cls._replace_text(text)
+				if text != new_text:
+					node.replaceWholeText(new_text)
 		XMLTools.walk(root_node, callback)
 
 class BaseHook():
