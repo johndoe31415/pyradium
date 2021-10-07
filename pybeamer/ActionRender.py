@@ -62,7 +62,7 @@ class ActionRender(BaseAction):
 						collapse_animation = self._args.collapse_animation,
 						presentation_mode = self._args.presentation_mode,
 						extra_template_dirs = self._args.template_dir,
-						include_dirs = [ os.path.dirname(self._args.infile) ] + self._args.include_dir,
+						include_dirs = [ os.path.dirname(self._args.infile) or "." ] + self._args.include_dir,
 						index_filename = self._args.index_filename,
 						geometry = self._args.geometry,
 						image_max_dimension = self._args.image_max_dimension,
