@@ -80,12 +80,16 @@ There are of course more options to choose from. Read the help pages to learn mo
 
 ```
 $ ./pybeamer.py render --help
-usage: ./pybeamer.py render [--image-max-dimension pixels] [-I path]
-                            [--template-dir path] [-t name]
-                            [-g width x height] [-r] [-i filename]
-                            [-m {interactive,static}] [-l]
-                            [--re-render-watch path] [-f] [-v] [--help]
-                            infile outdir
+usage: ./pybeamer.py render [--image-max-dimension pixels]
+                                            [-I path] [--template-dir path]
+                                            [-t name] [-g width x height] [-r]
+                                            [--collapse-animation]
+                                            [-i filename]
+                                            [-m {interactive,static}]
+                                            [-F {timer}] [-l]
+                                            [--re-render-watch path] [-f] [-v]
+                                            [--help]
+                                            infile outdir
 
 Render a slide show
 
@@ -98,7 +102,7 @@ optional arguments:
                         When rendering imaages, specifies the maximum
                         dimension they're downsized to. The lower this value,
                         the smaller the output files and the lower the
-                        quality. Defaults to 1000 pixels.
+                        quality. Defaults to 1920 pixels.
   -I path, --include-dir path
                         Specifies an additional include directory in which,
                         for example, images are located which are referenced
@@ -112,6 +116,8 @@ optional arguments:
                         Slide geometry, in pixels. Defaults to 1280x720.
   -r, --remove-pauses   Ignore all pause directives and just render the final
                         slides.
+  --collapse-animation  Do not render animations as multiple slides, just show
+                        one complete slide.
   -i filename, --index-filename filename
                         Gives the name of the presentation index file.
                         Defaults to index.html. Useful if you want to render
@@ -119,6 +125,9 @@ optional arguments:
   -m {interactive,static}, --presentation-mode {interactive,static}
                         Generate this type of presentation. Can be one of
                         None, defaults to interactive.
+  -F {timer}, --presentation-feature {timer}
+                        Enable a specific presentation feature. Can be one of
+                        None and can be given multiple times.
   -l, --re-render-loop  Stay in a continuous loop, re-rendering the
                         presentation if anything changes.
   --re-render-watch path
