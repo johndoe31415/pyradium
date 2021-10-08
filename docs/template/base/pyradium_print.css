@@ -1,0 +1,30 @@
+@media print {
+	div.menu {
+		display: none;
+	}
+
+	div.belowmenu {
+		padding-top: 0px;
+	}
+
+	div.size_container {
+		page-break-after: always;
+	}
+
+	div.size_container.noprint {
+		display: none;
+	}
+
+	a {
+        color: inherit;
+        background-image: none;
+	}
+
+	.tooltip {
+		background-image: none;
+	}
+
+	.tooltip .text {
+		display: none;
+	}
+}
