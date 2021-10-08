@@ -1,5 +1,5 @@
-# pybeamer
-[![Build Status](https://travis-ci.com/johndoe31415/pybeamer.svg?branch=master)](https://travis-ci.com/johndoe31415/pybeamer)
+# pyradium
+[![Build Status](https://travis-ci.com/johndoe31415/pyradium.svg?branch=master)](https://travis-ci.com/johndoe31415/pyradium)
 
 This is a complete rewrite of a presentation rendering tool I've originally
 started in 2015. It is incorporating features of LaTeX-Beamer which I like into a renderer that outputs HTML. In particular, the design goals were:
@@ -18,13 +18,17 @@ started in 2015. It is incorporating features of LaTeX-Beamer which I like into 
     document so I know exactly if I've already fixed an issue or not if it gets
     reported multiple times.
 
+## Name
+pyradium has been previously known as pybeamer, but has been renamed because a
+different project under that name exists on PyPi.
+
 ## Example
-You can view an example of a presentation [here](https://johndoe31415.github.io/pybeamer/).
-The source for that presentation can be found [here](https://github.com/johndoe31415/pybeamer/tree/master/examples).
+You can view an example of a presentation [here](https://johndoe31415.github.io/pyradium/).
+The source for that presentation can be found [here](https://github.com/johndoe31415/pyradium/tree/master/examples).
 
 ## Usage
-All features that have been mentioned above are implemented by pybeamer. You
-can see an example file in the [examples/ subdirectory](https://github.com/johndoe31415/pybeamer/tree/master/examples).
+All features that have been mentioned above are implemented by pyradium. You
+can see an example file in the [examples/ subdirectory](https://github.com/johndoe31415/pyradium/tree/master/examples).
 XML namespaces are used to distinguish tags which are renderer commands, i.e.,
 which have some special interpretation.  All other content is essentially pure
 HTML.
@@ -39,7 +43,7 @@ a more than a decade old Firefox [issue for this](https://bugzilla.mozilla.org/s
 but it appears that this is deliberately not implemented.
 
 ## Third-Party Components
-There are three external components that pybeamer uses:
+There are three external components that pyradium uses:
 
   * The default template "Antonio" is adapted from
     [Jimena Catalina at SlideCarnival](https://www.slidescarnival.com/antonio-free-presentation-template/84).
@@ -49,10 +53,10 @@ There are three external components that pybeamer uses:
   * The font Latin Modern Mono is included, from [GUST](http://www.gust.org.pl/projects/e-foundry/latin-modern).
     It is licensed under the GUST font license.
 
-All third party licenses can be found in the [licenses/ subdirectory](https://github.com/johndoe31415/pybeamer/tree/master/licenses)
+All third party licenses can be found in the [licenses/ subdirectory](https://github.com/johndoe31415/pyradium/tree/master/licenses)
 subdirectory. Additionally, detailed attribution information is also provided
 as part of the template itself in the `configuration.json` file of the
-respective template. For example, [this](https://github.com/johndoe31415/pybeamer/blob/master/pybeamer/templates/antonio/configuration.json)
+respective template. For example, [this](https://github.com/johndoe31415/pyradium/blob/master/pyradium/templates/antonio/configuration.json)
 is the configuration file of the "antonio" template.
 
 ## Simple Usage
@@ -60,16 +64,16 @@ First, you have to create a presentation. For this example, we'll use the
 `example.xml` that is provided. Firstly, it needs to be rendered:
 
 ```
-$ ./pybeamer.py render -I examples/sub/ examples/example.xml rendered/
+$ ./pyradium.py render -I examples/sub/ examples/example.xml rendered/
 ```
 
 You'll notice that the `-I` parameter defines a subdirectory that is searched
-for files. This is a feature of pybeamer as well (it allows you to distribute
+for files. This is a feature of pyradium as well (it allows you to distribute
 and organize large presentation into multiple files you can then combine into
 one). Once it's rendered, you can create a web server to serve it:
 
 ```
-$ ./pybeamer.py serve rendered/
+$ ./pyradium.py serve rendered/
 Serving: http://127.0.0.1:8123
 ```
 
@@ -79,8 +83,8 @@ Now simply redirect your browser there and enjoy the view.
 There are of course more options to choose from. Read the help pages to learn more, for example:
 
 ```
-$ ./pybeamer.py render --help
-usage: ./pybeamer.py render [--image-max-dimension pixels]
+$ ./pyradium.py render --help
+usage: ./pyradium.py render [--image-max-dimension pixels]
                                             [-I path] [--template-dir path]
                                             [-t name] [-g width x height] [-r]
                                             [--collapse-animation]
@@ -143,4 +147,4 @@ optional arguments:
 
 
 ## License
-pybeamer is licensed under the GNU GPL-3.
+pyradium is licensed under the GNU GPL-3.

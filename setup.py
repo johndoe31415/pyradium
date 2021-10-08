@@ -4,7 +4,7 @@ with open("README.md") as f:
 	long_description = f.read()
 
 setuptools.setup(
-	name = "pybeamer",
+	name = "pyradium",
 	packages = setuptools.find_packages(),
 	version = "0.0.1",
 	license = "gpl-3.0",
@@ -13,15 +13,15 @@ setuptools.setup(
 	long_description_content_type = "text/markdown",
 	author = "Johannes Bauer",
 	author_email = "joe@johannes-bauer.com",
-	url = "https://github.com/johndoe31415/pybeamer",
-	download_url = "https://github.com/johndoe31415/pybeamer/archive/0.0.1.tar.gz",
+	url = "https://github.com/johndoe31415/pyradium",
+	download_url = "https://github.com/johndoe31415/pyradium/archive/0.0.1.tar.gz",
 	keywords = [ "latex", "presentation", "template", "html" ],
 	install_requires = [
 		"mako",
 	],
 	entry_points = {
 		"console_scripts": [
-			"pybeamer = pybeamer.__main__:main"
+			"pyradium = pyradium.__main__:main"
 		]
 	},
 	include_package_data = True,

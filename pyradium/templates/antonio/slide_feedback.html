@@ -1,0 +1,76 @@
+<%inherit file="base/slide.html" />
+<%block name="container_classes">noprint</%block>
+<%block name="slide_classes">feedback</%block>
+<% uid = slide.var("generate_uid")() %>
+<div class="body" id="${uid}">
+
+	<div class="modal">
+		<div class="content">
+			<span class="close">&times;</span>
+			<div class="msg"></div>
+		</div>
+	</div>
+
+	<div class="form-grid">
+		<div class="form-span feedback-header">
+			Feedback
+		</div>
+
+		<div class="form-label">Rating:</div>
+		<div class="form-input button-checkbox-group" name="rating" lid="rating">
+%for (rating, emoji) in zip([ "puke-0", "bad-1", "good-2", "great-3" ], "🤮🙁🙂😁"):
+			<label class="button-checkbox">
+				<input type="checkbox" value="${rating}">
+				<span>${emoji}</span>
+			</label>
+%endfor
+		</div>
+
+		<div class="form-label">Your name:</div>
+		<div class="form-input"><input type="text" name="name" placeholder="optional" class="collect" /></div>
+
+		<div class="form-label">Email:</div>
+		<div class="form-input"><input type="text" name="email" placeholder="optional" class="collect" /></div>
+
+		<div class="form-label">Comments:</div>
+		<div class="form-input">
+			<textarea placeholder="Typos, recommendations, criticizm. Anything you like." cols="80" rows="10" name="comments" class="collect"></textarea>
+		</div>
+
+		<div class="form-span">
+			<button lid="submit"><span class="loader">◌</span> Submit</button>
+		</div>
+
+	</div>
+</div>
+<div class="footer">
+	<img src="template/antonio/bar.svg" class="bar" />
+</div>
+
+<script type="module">
+	import {ButtonCheckbox} from "./template/base/pyradium_forms.js";
+	import {FeedbackSender} from "./template/base/pyradium_feedback.js";
+	import {ModalWindow} from "./template/base/pyradium_modal.js";
+
+	const slide_info = ${slide.var("json_slide_info") | n};
+	const parent_div = document.querySelector("#${uid}");
+	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
+	const button_checkbox = new ButtonCheckbox(checkbox_group);
+
+	const modal_div = parent_div.querySelector(".modal");
+	const modal = new ModalWindow(modal_div);
+	const submit_button = parent_div.querySelector("[lid=\"submit\"]");
+
+	const feedback_sender = new FeedbackSender("${slide.var("endpoint")}", {
+		"static_info":		slide_info,
+		"on_success":		() => { modal.show("success", "Thank you for submitting your feedback!"); feedback_sender.clear_form(); },
+		"on_error":			() => modal.show("error", "<b>Error</b>: There was an error during network transmission. Your data has not been submitted. Please try again later."),
+		"on_form_empty":	() => modal.show("error", "<b>Error</b>: You need to enter at least some feedback. The form may not be completely empty."),
+	});
+
+	feedback_sender.add_source(button_checkbox);
+	parent_div.querySelectorAll(".collect").forEach((element) => {
+		feedback_sender.add_source(element);
+	});
+	feedback_sender.add_button(submit_button);
+</script>

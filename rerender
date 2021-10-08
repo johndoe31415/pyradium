@@ -9,11 +9,11 @@ if [ "$?" != "0" ]; then
 fi
 
 if [ "$1" == "" ]; then
-	echo "$0 [pybeamer options]"
+	echo "$0 [pyradium options]"
 	exit 1
 fi
 
 while true; do
-	./pybeamer "$@"
-	inotifywait -e close_write examples/*.xml templates/base/* templates/default/* *.py pybeamer
+	./pyradium "$@"
+	inotifywait -e close_write examples/*.xml templates/base/* templates/default/* *.py pyradium
 done

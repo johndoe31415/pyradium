@@ -1,0 +1,125 @@
+{
+	"template": {
+		"author": "Johannes Bauer",
+		"name": "Antonio",
+		"license": "CC-BY 4.0"
+	},
+	"references": [
+		{
+			"author": "Jimena Catalina, SlideCarnival",
+			"contribution": "Design elements and layout ideas",
+			"uri": "https://www.slidescarnival.com/antonio-free-presentation-template/84",
+			"license": "CC-BY 4.0",
+			"license_uri": "https://creativecommons.org/licenses/by/4.0/"
+		},
+		{
+			"author": "Carrois Apostrophe, Google Fonts",
+			"contribution": "Font: Fira Sans",
+			"uri": "https://fonts.google.com/specimen/Fira+Sans",
+			"license": "SIL Open Font License (OFL)",
+			"license_uri": "https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL"
+		},
+		{
+			"author": "Grupa Użytkowników Systemu TeX (GUST)",
+			"contribution": "Font: Latin Modern",
+			"uri": "http://www.gust.org.pl/projects/e-foundry/latin-modern",
+			"license": "GUST Font License (GFL); LaTeX Project Public License (LPPL) v1.3c or later",
+			"license_uri": "http://www.gust.org.pl/projects/e-foundry/licenses/GUST-FONT-SOURCE-LICENSE.txt/view"
+		}
+	],
+	"files": {
+		"css": [
+			{ "name": "base/pyradium.css", "render": true },
+			{ "name": "base/pyradium_print.css", "order": 1000 },
+			"antonio/antonio.css",
+			"antonio/font_fira.css",
+			"antonio/font_latinmodernmono.css"
+		],
+		"static": [
+			"base/pyradium.js",
+			"antonio/bar.svg",
+			"antonio/triangle1.svg",
+			"antonio/triangle2.svg",
+			"antonio/font_fira/FiraSans-Regular-latin.woff2",
+			"antonio/font_fira/FiraSans-Light-latin.woff2",
+			"antonio/font_fira/FiraSans-Bold-latin.woff2",
+			"antonio/font_latinmodernmono/lmmono10-regular.otf",
+			"antonio/font_latinmodernmono/lmmono10-italic.otf"
+		]
+	},
+	"controllers": {
+		"toc": {
+			"file":			"base/controller_toc.py",
+			"class":		"TOCController",
+			"options": {
+				"toc_items_per_slide":	8
+			}
+		},
+		"acronyms": {
+			"file":			"base/controller_acronym.py",
+			"class":		"AcronymController",
+			"options": {
+				"acronyms_per_slide":	8
+			}
+		},
+		"feedback": {
+			"file":			"base/controller_feedback.py",
+			"class":		"FeedbackController"
+		},
+		"animation": {
+			"file":			"base/controller_animation.py",
+			"class":		"AnimationController"
+		}
+	},
+	"dependencies": {
+		"slidetype": {
+			"quote": {
+				"static": [
+					"antonio/quote.svg"
+				]
+			},
+			"feedback": {
+				"css": [
+					"base/pyradium_forms.css",
+					"base/pyradium_modal.css"
+				],
+				"static": [
+					"base/pyradium_forms.js",
+					"base/pyradium_modal.js",
+					"base/pyradium_feedback.js"
+				]
+			}
+		},
+		"feature": {
+			"acronym": {
+				"css": [
+					"base/pyradium_tooltip.css"
+				]
+			},
+			"interactive": {
+				"css": [
+					"base/pyradium_menu.css"
+				]
+			},
+			"timer": {
+				"static": [
+					"base/timer.html",
+					"base/pyradium_timer.js",
+					"base/pyradium_timekeeper.js",
+					"base/pyradium_tools.js",
+					"base/media_stop.svg",
+					"base/media_pause.svg",
+					"base/media_play.svg"
+				],
+				"css": [
+					"base/pyradium_timer.css"
+				]
+			},
+			"pygments": {
+				"css": [
+					"base/pygments.css"
+				]
+			}
+		}
+	}
+}
