@@ -55,6 +55,7 @@
 		<s:var name="heading" value="After include" />
 		<ul>
 			<li>This is the slide which directly follows an include.</li>
+			<li>Hex: <s:tt>001122abcdef</s:tt></li>
 		</ul>
 	</slide>
 

@@ -21,6 +21,10 @@ pre {
 	font-family: "Latin Modern Mono";
 }
 
+span.tt {
+	font-family: "Latin Modern Mono";
+}
+
 div.title img.bar {
 	position: absolute;
 	top: 58%;

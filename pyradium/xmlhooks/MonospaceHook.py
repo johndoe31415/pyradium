@@ -19,16 +19,16 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .AcronymHook import AcronymHook
-from .TimeHook import TimeHook
-from .ExecHook import ExecHook
-from .MonospaceHook import MonospaceHook
-from .DebugHook import DebugHook
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+
+@XMLHookRegistry.register_hook
+class MonospaceHook(BaseHook):
+	_TAG_NAME = "tt"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		replacement_node = node.ownerDocument.createElement("span")
+		replacement_node.setAttribute("class", "tt")
+		for child in node.childNodes:
+			replacement_node.appendChild(child)
+		return replacement_node
