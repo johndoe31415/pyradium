@@ -37,6 +37,7 @@
 		],
 		"static": [
 			"base/pyradium.js",
+			"base/cursor.svg",
 			"antonio/bar.svg",
 			"antonio/triangle1.svg",
 			"antonio/triangle2.svg",
