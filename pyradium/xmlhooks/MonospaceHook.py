@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import sys
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 
 @XMLHookRegistry.register_hook
@@ -29,6 +30,10 @@ class MonospaceHook(BaseHook):
 	def handle(cls, rendered_presentation, node):
 		replacement_node = node.ownerDocument.createElement("span")
 		replacement_node.setAttribute("class", "tt")
-		for child in node.childNodes:
+
+		# Need the copy of the child dictionary here otherwise we'll miss
+		# children
+		for child in list(node.childNodes):
 			replacement_node.appendChild(child)
+
 		return replacement_node

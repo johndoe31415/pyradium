@@ -56,6 +56,11 @@ class XMLHookRegistry():
 							XMLTools.remove_node(node)
 						else:
 							XMLTools.replace_node(node, replace_by)
+							if not isinstance(replace_by, list):
+								XMLTools.walk(replace_by, callback)
+							else:
+								for new_child in replace_by:
+									XMLTools.walk(new_child, callback)
 					else:
 						print("Warning: Unknown hook '%s' used in source document." % (hook_name))
 			elif node.nodeType == node.TEXT_NODE:

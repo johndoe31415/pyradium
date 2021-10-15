@@ -218,6 +218,16 @@
 		<s:exec cmd="my_script bar" />
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Execution of scripts 3" />
+		<s:tt><s:exec cmd="my_script tt" /></s:tt>
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="Nested Tags" />
+		<s:tt>first <b>bold <i>bolditalics</i></b> last</s:tt>
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0" />
 	</slide>
