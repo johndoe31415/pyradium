@@ -48,11 +48,11 @@ class LatexFormulaRenderer(BaseRenderer):
 	@property
 	def properties(self):
 		return {
-			"version":			1,
+			"version":			2,
 			"rendering_dpi":	self._rendering_dpi,
 		}
 
-	def _get_image_info(self, png_filename, xoffset):
+	def _get_baseline_info(self, png_filename, xoffset):
 		# Need 2 pixel wide sample so that ImageMagick does not return an empty image
 		crop_info = json.loads(subprocess.check_output([ "convert", "%s[2x+%d+0]" % (png_filename, xoffset), "-trim", "json:-" ]))
 
@@ -62,11 +62,15 @@ class LatexFormulaRenderer(BaseRenderer):
 		lower_baseline_y_from_top = upper_baseline_y_from_top + crop_info[0]["image"]["geometry"]["height"]
 		baseline_y_from_top = round((upper_baseline_y_from_top + lower_baseline_y_from_top) / 2)
 		baseline_y_from_bottom = image_height - baseline_y_from_top
+		return baseline_y_from_bottom
 
+	def _get_image_info(self, png_data):
+		crop_info = json.loads(subprocess.check_output([ "convert", "-", "json:-" ], input = png_data))
+		image_width = crop_info[0]["image"]["pageGeometry"]["width"]
+		image_height = crop_info[0]["image"]["pageGeometry"]["height"]
 		image_info = {
 			"width":		image_width,
 			"height":		image_height,
-			"baseline":		baseline_y_from_bottom,
 		}
 		return image_info
 
@@ -95,12 +99,16 @@ class LatexFormulaRenderer(BaseRenderer):
 			subprocess.check_call([ "convert", "-define", "profile:skip=ICC", "-density", str(self._rendering_dpi), "-trim", "+repage", pdf_filename, png_filename ])
 
 #			print("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s" % (left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename))
-			image_info = self._get_image_info(png_filename, eval_baseline_at_x)
+			baseline_y_from_bottom = self._get_baseline_info(png_filename, eval_baseline_at_x)
 
 #			print("Determined baseline y-offset at %d pixels (measured from bottom)" % (image_info["baseline"]))
 
 			# Then crop the image finally
 			png_data = subprocess.check_output([ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", png_filename, "png:-" ])
+
+			# And determine resulting information
+			image_info = self._get_image_info(png_data)
+			image_info["baseline"] = baseline_y_from_bottom
 
 			# Return an image object
 			image = {
@@ -112,4 +120,7 @@ class LatexFormulaRenderer(BaseRenderer):
 if __name__ == "__main__":
 	from pyradium.RendererCache import RendererCache
 	renderer = RendererCache(LatexFormulaRenderer())
-	print(renderer.render({ "formula": "y^2 = x^3 + ax + b" }))
+	#print(renderer.render({ "formula": "y^2 = x^3 + ax + b" }))
+	result = renderer.render({ "formula": "\Gamma" })
+	with open("out.png", "wb") as f:
+		f.write(result.data["png_data"])

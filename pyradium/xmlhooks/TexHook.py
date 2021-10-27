@@ -39,6 +39,7 @@ class TexHook(BaseHook):
 		scale_factor = 0.5
 		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
 		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
+		#print(properties["formula"], rendered_formula.data["info"], width_px)
 
 		replacement_node = node.ownerDocument.createElement("img")
 		replacement_node.setAttribute("src", local_filename)
