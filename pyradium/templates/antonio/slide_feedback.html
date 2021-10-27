@@ -52,7 +52,8 @@
 	import {FeedbackSender} from "./template/base/pyradium_feedback.js";
 	import {ModalWindow} from "./template/base/pyradium_modal.js";
 
-	const slide_info = ${slide.var("json_slide_info") | n};
+	let slide_info = ${slide.var("json_slide_info") | n};
+	slide_info["uri"] = location.href;
 	const parent_div = document.querySelector("#${uid}");
 	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
 	const button_checkbox = new ButtonCheckbox(checkbox_group);
