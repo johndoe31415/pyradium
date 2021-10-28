@@ -32,11 +32,15 @@ class TexHook(BaseHook):
 			"formula":	XMLTools.inner_text(node),
 			"long":		XMLTools.get_bool_attr(node, "long"),
 		}
+		if node.hasAttribute("scale"):
+			user_scale = float(node.getAttribute("scale"))
+		else:
+			user_scale = 1
 		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
 		rendered_formula = tex_renderer.render(properties)
 		local_filename = "imgs/latex/%s.png" % (rendered_formula.keyhash)
 
-		scale_factor = 0.5
+		scale_factor = 0.625 * user_scale
 		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
 		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
 		#print(properties["formula"], rendered_formula.data["info"], width_px)
@@ -46,7 +50,7 @@ class TexHook(BaseHook):
 		if properties["long"]:
 			replacement_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
 		else:
-			replacement_node.setAttribute("style", "width: %dpx; margin-bottom: -%dpx; margin-top: 5px" % (width_px, baseline_px))
+			replacement_node.setAttribute("style", "width: %dpx; margin-bottom: %dpx; margin-top: 5px" % (width_px, -baseline_px + 1))
 		replacement_node.setAttribute("alt", properties["formula"])
 
 		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])
