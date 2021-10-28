@@ -33,12 +33,20 @@ div.title img.bar {
 }
 
 div.slide.title div.title {
-	font-weight: bold;
-	font-size: 150%;
 	position: absolute;
 	bottom: 45%;
 	left: 5%;
+	width: 87%;
+}
+
+div.slide.title div.title div.main {
+	font-weight: bold;
+	font-size: 150%;
 	color: #2185c5;
+}
+
+div.slide.title div.title div.sub {
+	color: #677480;
 }
 
 div.slide.title div.author {
