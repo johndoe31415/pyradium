@@ -3,6 +3,6 @@
 #
 
 while true; do
-	./pyradium.py render -f -F timer -I examples/sub examples/example.xml rendered
+	./pyradium.py render -f -F timer -I examples/sub examples/example.xml rendered -v
 	inotifywait -q --exclude '\..*\.sw[a-z]' -e modify -e close_write -e create -r pyradium.py pyradium examples 
 done

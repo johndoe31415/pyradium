@@ -19,9 +19,12 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import logging
 import textwrap
 from pyradium.Exceptions import XMLHookRegistryException
 from pyradium.Tools import XMLTools
+
+_log = logging.getLogger(__spec__.name)
 
 class XMLHookRegistry():
 	_HOOKS = { }
@@ -62,7 +65,7 @@ class XMLHookRegistry():
 								for new_child in replace_by:
 									XMLTools.walk(new_child, callback)
 					else:
-						print("Warning: Unknown hook '%s' used in source document." % (hook_name))
+						_log.warning("Unknown hook '%s' used in source document.", hook_name)
 			elif node.nodeType == node.TEXT_NODE:
 				text = node.wholeText
 				new_text = cls._replace_text(text)
@@ -85,7 +88,7 @@ class ReplacementHook(BaseHook):
 	def handle(cls, rendered_presentation, node):
 		text = XMLTools.inner_text(node).strip()
 		if text not in cls._REPLACEMENTS:
-			print("Warning: %s(%s) not available. Ignored the sequence." % (cls._TAG_NAME, text))
+			_log.warning("%s(%s) not available. Ignored the sequence.", cls._TAG_NAME, text)
 			return None
 		else:
 			replacement_text = cls._REPLACEMENTS[text]

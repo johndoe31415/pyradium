@@ -23,11 +23,14 @@ import os
 import sys
 import time
 import subprocess
+import logging
 from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
 from .Renderer import Renderer
 from .Exceptions import CallingProcessException, PyRadiumException
+
+_log = logging.getLogger(__spec__.name)
 
 class ActionRender(BaseAction):
 	def _wait_for_change(self, renderer):
@@ -49,13 +52,14 @@ class ActionRender(BaseAction):
 
 	def run(self):
 		if (not self._args.force) and os.path.exists(self._args.outdir):
-			print("Refusing to overwrite: %s" % (self._args.outdir))
+			print("Refusing to overwrite: %s" % (self._args.outdir), file = sys.stderr)
 			return 1
 
 		renderer = None
 		render_success = True
 		while True:
 			try:
+				t0 = time.time()
 				rendering_parameters = RenderingParameters(
 						template_style = self._args.template_style,
 						honor_pauses = not self._args.remove_pauses,
@@ -70,14 +74,16 @@ class ActionRender(BaseAction):
 				presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 				renderer = Renderer(presentation, rendering_parameters)
 				rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
+				t1 = time.time()
+				_log.info("Successfully rendered presentation into directory \"%s\", took %.1f seconds", self._args.outdir, t1 - t0)
 			except PyRadiumException as e:
 				render_success = False
-				print("Rendering failed: [%s] %s" % (e.__class__.__name__, str(e)), file = sys.stderr)
+				_log.error("Rendering failed: [%s] %s" % (e.__class__.__name__, str(e)))
 			if not self._args.re_render_loop:
 				break
 			if renderer is None:
 				sleep_duration_secs = 5
-				print("Unable to watch files for change since parsing the source was impossible; sleeping for %d seconds instead." % (sleep_duration_secs), file = sys.stderr)
+				_log.warning("Unable to watch files for change since parsing the source was impossible; sleeping for %d seconds instead." % (sleep_duration_secs))
 				time.sleep(sleep_duration_secs)
 			else:
 				self._wait_for_change(renderer)

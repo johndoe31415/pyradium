@@ -42,12 +42,12 @@ _TEX_TEMPLATE = r"""
 """
 
 class LatexFormulaRenderer(BaseRenderer):
-	_DEBUG = False
 	_Baseline = collections.namedtuple("Baseline", [ "image_width", "image_height", "upper", "lower", "mid" ])
 
 	def __init__(self, rendering_dpi = 600):
 		super().__init__()
 		self._rendering_dpi = rendering_dpi
+		self._debug_draw_baselines = False
 
 	@property
 	def name(self):
@@ -94,32 +94,32 @@ class LatexFormulaRenderer(BaseRenderer):
 			with open(tex_filename, "w") as tex_file:
 				tex_file.write(_TEX_TEMPLATE % { "content": content })
 			_log.debug("Rendering LaTeX formula: %s in directory %s", content, tex_dir)
-			subprocess.check_call([ "pdflatex", "-output-directory=%s" % (tex_dir), tex_filename ], stdout = subprocess.DEVNULL)
+			subprocess.check_call([ "pdflatex", "-output-directory=%s" % (tex_dir), tex_filename ], stdout = _log.subproc_target, stderr = _log.subproc_target)
 
 			# Then render the PDF to PNG
 			cmd = [ "convert", "-define", "profile:skip=ICC", "-density", str(self._rendering_dpi), "-trim", "+repage", pdf_filename, png_filename ]
-			_log.debug("Converting PDF to PNG in %d dpi: %s", self._rendering_dpi, CmdlineEscape().cmdline(cmd))
-			subprocess.check_call(cmd, stdout = subprocess.DEVNULL)
+			_log.trace("Converting PDF to PNG in %d dpi: %s", self._rendering_dpi, CmdlineEscape().cmdline(cmd))
+			subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 
-			_log.debug("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s", left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename)
+			_log.trace("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s", left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename)
 			baseline = self._get_baseline_info(png_filename, eval_baseline_at_x)
-			_log.debug("Baseline Y from top %d px upper, %d px lower, %d px mid (equals %d px mid from bottom)", baseline.upper, baseline.lower, baseline.mid, baseline.image_height - baseline.mid)
+			_log.trace("Baseline Y from top %d px upper, %d px lower, %d px mid (equals %d px mid from bottom)", baseline.upper, baseline.lower, baseline.mid, baseline.image_height - baseline.mid)
 
 			# Then crop the image finally and capture cropping metadata along the way
 			crop_meta = json.loads(subprocess.check_output([ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", png_filename, "json:-" ]))[0]
 			cmd = [ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", png_filename, "png:-" ]
 			png_data = subprocess.check_output(cmd)
-			_log.debug("Final crop to output size: %s", CmdlineEscape().cmdline(cmd))
-			if self._DEBUG:
+			_log.trace("Final crop to output size: %s", CmdlineEscape().cmdline(cmd))
+			if _log.isEnabledFor(logging.SINGLESTEP):
 				with open(tex_dir + "/processed_01_crop_meta.json", "w") as f:
 					json.dump(crop_meta, f, indent = 4, sort_keys = True)
 				with open(tex_dir + "/processed_01_cropped.png", "wb") as f:
 					f.write(png_data)
 
-			_log.debug("Crop upper left corner is at %d, %d and cropped size is %d x %d px", crop_meta["image"]["pageGeometry"]["x"], crop_meta["image"]["pageGeometry"]["y"], crop_meta["image"]["geometry"]["width"], crop_meta["image"]["geometry"]["height"])
+			_log.trace("Crop upper left corner is at %d, %d and cropped size is %d x %d px", crop_meta["image"]["pageGeometry"]["x"], crop_meta["image"]["pageGeometry"]["y"], crop_meta["image"]["geometry"]["width"], crop_meta["image"]["geometry"]["height"])
 
 			# For debugging purposes, draw the baseline on the image
-			if self._DEBUG:
+			if self._debug_draw_baselines:
 				cmd = [ "convert", "-stroke", "red", "-draw", "line 0,%d %d,%d" % (baseline.mid, crop_meta["image"]["geometry"]["width"], baseline.mid) ]
 				cmd += [ "-", "png:-" ]
 				png_data = subprocess.check_output(cmd, input = png_data)
@@ -129,7 +129,7 @@ class LatexFormulaRenderer(BaseRenderer):
 			# Compute the shifted baseline in the cropped image
 			baseline_from_top_cropped = baseline.mid - crop_meta["image"]["pageGeometry"]["y"]
 			baseline_from_bottom_cropped = crop_meta["image"]["geometry"]["height"] - baseline_from_top_cropped
-			_log.debug("Adapted baseline offsets for cropped image: %d px from top (equals %d px from bottom).", baseline_from_top_cropped, baseline_from_bottom_cropped)
+			_log.trace("Adapted baseline offsets for cropped image: %d px from top (equals %d px from bottom).", baseline_from_top_cropped, baseline_from_bottom_cropped)
 
 			# Return an image object
 			image = {
@@ -140,8 +140,9 @@ class LatexFormulaRenderer(BaseRenderer):
 					"baseline": baseline_from_bottom_cropped,
 				},
 			}
-			if self._DEBUG:
-				input("Press RETURN to exit...")
+			if _log.isEnabledFor(logging.SINGLESTEP):
+				_log.singlestep("Interrupting execution.")
+				input("Press RETURN to continue...")
 			return image
 
 if __name__ == "__main__":

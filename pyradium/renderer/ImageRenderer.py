@@ -19,12 +19,16 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import logging
 import tempfile
 import subprocess
+from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
 from pyradium.RendererCache import BaseRenderer
 from pyradium.Exceptions import UsageException
 from pyradium.SVGTransformation import SVGTransformation
+
+_log = logging.getLogger(__spec__.name)
 
 class ImageRenderer(BaseRenderer):
 	def __init__(self):
@@ -48,7 +52,8 @@ class ImageRenderer(BaseRenderer):
 			else:
 				scale_param = "-h"
 			cmd = [ "inkscape", "-o", output_file.name, scale_param, str(max_dimension), src ]
-			subprocess.check_call(cmd)
+			_log.debug("Rendering SVG: %s", CmdlineEscape().cmdline(cmd))
+			subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 			extension = "png"
 			img_data = output_file.read()
 		return (extension, img_data)
@@ -74,7 +79,8 @@ class ImageRenderer(BaseRenderer):
 
 		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = "." + extension) as output_file:
 			cmd = [ "convert", "-geometry", ">%dx%d" % (max_dimension, max_dimension), src, output_file.name ]
-			subprocess.check_call(cmd)
+			_log.debug("Rendering raster image: %s", CmdlineEscape().cmdline(cmd))
+			subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 			img_data = output_file.read()
 		return (extension, img_data)
 

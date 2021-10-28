@@ -19,7 +19,10 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import logging
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+
+_log = logging.getLogger(__spec__.name)
 
 @XMLHookRegistry.register_hook
 class DebugHook(BaseHook):
@@ -27,4 +30,4 @@ class DebugHook(BaseHook):
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		print("Debug hook:", node)
+		_log.debug("Debug hook: %s", str(node))

@@ -19,4 +19,6 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import pyradium.Logging
+
 VERSION = "0.0.4rc0"

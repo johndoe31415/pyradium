@@ -20,24 +20,27 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import logging
+import subprocess
 
-class BaseAction():
-	def __init__(self, action, args):
-		self._action = action
-		self._args = args
+logging.TRACE = logging.DEBUG - 1
+logging.SINGLESTEP = logging.DEBUG - 2
+logging.addLevelName(logging.TRACE, "TRACE")
+logging.addLevelName(logging.SINGLESTEP, "SINGLESTEP")
 
-		if self._args.verbose == 0:
-			loglevel = logging.WARN
-		elif self._args.verbose == 1:
-			loglevel = logging.INFO
-		elif self._args.verbose == 2:
-			loglevel = logging.DEBUG
-		elif self._args.verbose == 3:
-			loglevel = logging.TRACE
-		elif self._args.verbose == 4:
-			loglevel = logging.SINGLESTEP
-		logging.basicConfig(format = " {name:>20s} [{levelname:.1s}]: {message}", style = "{", level = loglevel)
-		self.run()
+class CustomLogger(logging.Logger):
+	@property
+	def subproc_target(self):
+		if self.isEnabledFor(logging.TRACE):
+			return None
+		else:
+			return subprocess.DEVNULL
 
-	def run(self):
-		raise NotImplementedError("%s.run" % (self.__class__.__name__))
+	def trace(self, msg, *args, **kwargs):
+		if self.isEnabledFor(logging.TRACE):
+			self._log(logging.TRACE, msg, args, **kwargs)
+
+	def singlestep(self, msg, *args, **kwargs):
+		if self.isEnabledFor(logging.SINGLESTEP):
+			self._log(logging.SINGLESTEP, msg, args, **kwargs)
+
+logging.setLoggerClass(CustomLogger)
