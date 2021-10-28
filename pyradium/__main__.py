@@ -26,6 +26,7 @@ from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
 from .ActionServe import ActionServe
 from .ActionAcroSort import ActionAcroSort
+from .ActionPurge import ActionPurge
 from .Enums import PresentationMode, PresentationFeature
 
 def _geometry(text):
@@ -68,6 +69,9 @@ def main():
 		parser.add_argument("acrofile", help = "Acronym database JSON file.")
 	mc.register("acrosort", "Sort an acryonym database", genparser, action = ActionAcroSort)
 
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+	mc.register("purge", "Purge the document cache", genparser, action = ActionPurge)
 	return mc.run(sys.argv[1:])
 
 if __name__ == "__main__":
