@@ -50,3 +50,5 @@ class TOCDirective(BaseDirective):
 	def render(self, rendered_presentation):
 		level = self._TOC_LEVEL[self.toc_element]
 		rendered_presentation.toc.new_heading(level, self.value)
+		if rendered_presentation.frozen_toc is not None:
+			rendered_presentation.frozen_toc.advance()

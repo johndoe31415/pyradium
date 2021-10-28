@@ -14,8 +14,16 @@
 	<div class="footer">
 		<%block name="footer">
 			<div class="flex">
-				<div class="flexchild left">${slide.var("section", "")}</div>
-				<div class="flexchild center">${slide.var("subsection", "")}</div>
+				<div class="flexchild left">
+					%if (slide.var("toc_entry") is not None) and (len(slide.var("toc_entry").full_text) >= 1):
+						${slide.var("toc_entry").full_text[0]}
+					%endif
+				</div>
+				<div class="flexchild center">
+					%if (slide.var("toc_entry") is not None) and (len(slide.var("toc_entry").full_text) >= 2):
+						${slide.var("toc_entry").full_text[1]}
+					%endif
+				</div>
 				<div class="flexchild right">${slide.var("current_slide_number")} / ${slide.var("total_slide_count")}</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />

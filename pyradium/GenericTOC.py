@@ -53,6 +53,7 @@ class FrozenTOC():
 		self._instructions = self._normalize_instructions(toc)
 		self._entries = [ ]
 		self._index_by_full_number = { }
+		self._current_index = -1
 
 		self._text = collections.defaultdict(str)
 		self._counter = collections.defaultdict(int)
@@ -75,6 +76,19 @@ class FrozenTOC():
 	@property
 	def toc(self):
 		return self._toc
+
+	@property
+	def current_item(self):
+		if self._current_index < 0:
+			return None
+		else:
+			return self._entries[self._current_index]
+
+	def advance(self):
+		self._current_index += 1
+
+	def reset_index(self):
+		self._current_index = -1
 
 	def _seperator(self, depth):
 		return self._separators.get(depth, ".")
@@ -228,11 +242,7 @@ class GenericTOC():
 	"""
 	def __init__(self):
 		self._instructions = [ ]
-		self._text = { }
 		self._last_toc_item = { }
-
-	def current_text(self, level):
-		return self._text.get(level)
 
 	@property
 	def instructions(self):
@@ -249,7 +259,6 @@ class GenericTOC():
 		self._instructions.append(_TOCInstruction(opcode = _TOCInstructionOpcode.CounterAdd, data = { level: value }))
 
 	def new_heading(self, level, text, at_page = None):
-		self._text[level] = text
 		toc_item = _TOCItem(level = level, text = text, pages = set())
 		self._instructions.append(_TOCInstruction(opcode = _TOCInstructionOpcode.TOCItem, data = toc_item))
 		self._last_toc_item[level] = toc_item

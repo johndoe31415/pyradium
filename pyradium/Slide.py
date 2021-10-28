@@ -59,14 +59,13 @@ class RenderSlideDirective(BaseDirective):
 		slide_vars.update({
 			"current_slide_number":	rendered_presentation.current_slide_number,
 			"total_slide_count":	rendered_presentation.total_slide_count,
-			"chapter":				rendered_presentation.toc.current_text(0),
-			"section":				rendered_presentation.toc.current_text(1),
-			"subsection":			rendered_presentation.toc.current_text(2),
 			"toc":					rendered_presentation.frozen_toc,
 			"sub_slide_index":		sub_slide_index,
 			"generate_uid":			lambda: rendered_presentation.next_unique_id,
 			"timeslice":			rendered_presentation.schedule[rendered_presentation.current_slide_number],
 		})
+		if rendered_presentation.frozen_toc is not None:
+			slide_vars["toc_entry"] = rendered_presentation.frozen_toc.current_item
 		return slide_vars
 
 	def emit_nocontent_slide(self, rendered_presentation, additional_slide_var_list = None):

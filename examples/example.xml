@@ -20,6 +20,33 @@
 
 	<slide type="title" />
 
+	<slide>
+		<s:time rel="1.5" />
+		<s:var name="heading" value="Before we have sect/subsect" />
+		<ul>
+			<li>This should not show "None" below.</li>
+		</ul>
+	</slide>
+
+	<section>Foo</section>
+	<subsection>Bar</subsection>
+	<slide>
+		<s:time rel="1.5" />
+		<s:var name="heading" value="Now we do have them" />
+		<ul>
+			<li>This should show "Foo" / "Bar" below.</li>
+		</ul>
+	</slide>
+
+	<section>Moo</section>
+	<slide>
+		<s:time rel="1.5" />
+		<s:var name="heading" value="Resetting subsection" />
+		<ul>
+			<li>This should show ONLY "Moo" below.</li>
+		</ul>
+	</slide>
+
 	<section>Introduction</section>
 	<subsection>Nomenclature</subsection>
 	<slide type="toc" />
