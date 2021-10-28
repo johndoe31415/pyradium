@@ -80,20 +80,36 @@ Serving: http://127.0.0.1:8123
 Now simply redirect your browser there and enjoy the view.
 
 ## Complex Usage
-There are of course more options to choose from. Read the help pages to learn more, for example:
+There are of course more options to choose from. Read the help pages to learn
+more. To get an overview over the available facilities:
+
+```
+$ ./pyradium.py
+Syntax: ./pyradium.py [command] [options]
+
+Available commands:
+
+version: pyradium v0.0.4
+
+Options vary from command to command. To receive further info, type
+    ./pyradium.py [command] --help
+    render             Render a slide show
+    serve              Serve a slide show as HTTP
+    acrosort           Sort an acryonym database
+    purge              Purge the document cache
+```
+
+Each facility has its own help page. The `render` facility, for example:
 
 ```
 $ ./pyradium.py render --help
-usage: ./pyradium.py render [--image-max-dimension pixels]
-                                            [-I path] [--template-dir path]
-                                            [-t name] [-g width x height] [-r]
-                                            [--collapse-animation]
-                                            [-i filename]
-                                            [-m {interactive,static}]
-                                            [-F {timer}] [-l]
-                                            [--re-render-watch path] [-f] [-v]
-                                            [--help]
-                                            infile outdir
+usage: ./pyradium.py render [--image-max-dimension pixels] [-I path]
+                            [--template-dir path] [-t name]
+                            [-g width x height] [-r] [--collapse-animation]
+                            [-i filename] [-m {interactive,static}]
+                            [-F {timer}] [-l] [--re-render-watch path] [-f]
+                            [-v] [--help]
+                            infile outdir
 
 Render a slide show
 
@@ -115,7 +131,7 @@ optional arguments:
                         template style files are located. Can be issued
                         multiple times.
   -t name, --template-style name
-                        Template style to use. Defaults to default.
+                        Template style to use. Defaults to antonio.
   -g width x height, --geometry width x height
                         Slide geometry, in pixels. Defaults to 1280x720.
   -r, --remove-pauses   Ignore all pause directives and just render the final
