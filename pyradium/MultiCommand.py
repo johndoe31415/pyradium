@@ -71,7 +71,7 @@ class MultiCommand():
 				continue
 			commandname_line = command.name
 			for description_line in textwrap.wrap(command.description, width = 56):
-				print("    %-15s    %s" % (commandname_line, description_line))
+				print("    %-15s    %s" % (commandname_line, description_line), file = sys.stderr)
 				commandname_line = ""
 		print(file = sys.stderr)
 		if self._trailing_text is not None:
