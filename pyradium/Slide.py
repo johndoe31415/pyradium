@@ -39,6 +39,10 @@ class RenderSlideDirective(BaseDirective):
 			self._content_containers["default"] = self._dom
 
 	@property
+	def xmlnode(self):
+		return self._dom
+
+	@property
 	def slide_type(self):
 		return self._dom.getAttribute("type")
 

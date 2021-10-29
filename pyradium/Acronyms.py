@@ -28,6 +28,10 @@ class AcronymDirective():
 	def __init__(self, node):
 		self._src = node.getAttribute("src")
 
+	@property
+	def src(self):
+		return self._src
+
 	def render(self, rendered_presentation):
 		filename = rendered_presentation.renderer.lookup_include(self._src)
 		acronyms = rendered_presentation.renderer.get_custom_renderer("acronym")

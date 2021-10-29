@@ -27,6 +27,7 @@ from .ActionRender import ActionRender
 from .ActionServe import ActionServe
 from .ActionAcroSort import ActionAcroSort
 from .ActionPurge import ActionPurge
+from .ActionHashPresentation import ActionHashPresentation
 from .Enums import PresentationMode, PresentationFeature
 
 def _geometry(text):
@@ -72,6 +73,13 @@ def main():
 	def genparser(parser):
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 	mc.register("purge", "Purge the document cache", genparser, action = ActionPurge)
+
+	def genparser(parser):
+		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("infile", help = "Input XML file of the slide show.")
+	mc.register("hash", "Create a hash of a presentation and all dependencies to detect modifications", genparser, action = ActionHashPresentation)
+
 	return mc.run(sys.argv[1:])
 
 if __name__ == "__main__":

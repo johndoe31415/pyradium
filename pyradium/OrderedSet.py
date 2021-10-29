@@ -30,5 +30,13 @@ class OrderedSet():
 		self._set.add(item)
 		self._list.append(item)
 
+	def __or__(self, itemlist):
+		for item in itemlist:
+			self.add(item)
+		return self
+
+	def __repr__(self):
+		return "OrderedSet" + str(self._list)
+
 	def __iter__(self):
 		return iter(self._list)

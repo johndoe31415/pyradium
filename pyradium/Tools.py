@@ -208,6 +208,21 @@ class ImageTools():
 
 class HashTools():
 	@classmethod
+	def _update_file(cls, hashfnc, f):
+		while True:
+			chunk = f.read(1024 * 1024)
+			if len(chunk) == 0:
+				break
+			hashfnc.update(chunk)
+
+	@classmethod
+	def hash_files(cls, filenames):
+		hashfnc = hashlib.md5()
+		for filename in filenames:
+			with open(filename, "rb") as f:
+				cls._update_file(hashfnc, f)
+		return hashfnc.hexdigest()
+
+	@classmethod
 	def hash_file(cls, filename):
-		with open(filename, "rb") as f:
-			return hashlib.md5(f.read()).hexdigest()
+		return cls.hash_files([ filename ])
