@@ -19,7 +19,6 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import sys
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 
 @XMLHookRegistry.register_hook

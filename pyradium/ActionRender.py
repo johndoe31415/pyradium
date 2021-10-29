@@ -78,12 +78,12 @@ class ActionRender(BaseAction):
 				_log.info("Successfully rendered presentation into directory \"%s\", took %.1f seconds", self._args.outdir, t1 - t0)
 			except PyRadiumException as e:
 				render_success = False
-				_log.error("Rendering failed: [%s] %s" % (e.__class__.__name__, str(e)))
+				_log.error("Rendering failed: [%s] %s", e.__class__.__name__, str(e))
 			if not self._args.re_render_loop:
 				break
 			if renderer is None:
 				sleep_duration_secs = 5
-				_log.warning("Unable to watch files for change since parsing the source was impossible; sleeping for %d seconds instead." % (sleep_duration_secs))
+				_log.warning("Unable to watch files for change since parsing the source was impossible; sleeping for %d seconds instead.", sleep_duration_secs)
 				time.sleep(sleep_duration_secs)
 			else:
 				self._wait_for_change(renderer)

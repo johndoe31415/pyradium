@@ -49,7 +49,7 @@ class ExecRenderer(BaseRenderer):
 		try:
 			proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 		except PermissionError as e:
-			raise FailedToExecuteSubprocessException("Could not execute '%s' (%s)." % (str(cmd), str(e)))
+			raise FailedToExecuteSubprocessException("Could not execute '%s' (%s)." % (str(cmd), str(e))) from e
 
 		if proc.returncode != 0:
 			raise FailedToExecuteSubprocessException("Could not execute '%s': returncode %d." % (str(cmd), proc.returncode))

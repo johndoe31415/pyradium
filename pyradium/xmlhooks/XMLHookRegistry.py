@@ -40,7 +40,7 @@ class XMLHookRegistry():
 		return hook_class
 
 	@classmethod
-	def _replace_text(self, text):
+	def _replace_text(cls, text):
 		text = text.replace("---", "—")
 		text = text.replace("--", "–")
 		return text

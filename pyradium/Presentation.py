@@ -56,7 +56,7 @@ class Presentation():
 		try:
 			dom = xml.dom.minidom.parse(filename)
 		except xml.parsers.expat.ExpatError as e:
-			raise MalformedXMLInputException("Cannot parse %s: %s" % (filename, str(e)))
+			raise MalformedXMLInputException("Cannot parse %s: %s" % (filename, str(e))) from e
 		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))
 		meta = None
 		content = [ ]

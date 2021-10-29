@@ -107,7 +107,7 @@ class XMLTools():
 	def findall(cls, root_node, name, namespace_uri = "*"):
 		result = [ ]
 		for node in root_node.childNodes:
-			if (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name) and ((namespace_uri == "*") or (node.namespaceURI == namespace_uri)):
+			if (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name) and (namespace_uri in ("*", node.namespaceURI)):
 				result.append(node)
 		return result
 

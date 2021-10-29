@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	CmdlineEscape - Escape a command line so that it can be safely put in a bash script
-#	Copyright (C) 2020-2020 Johannes Bauer
+#	Copyright (C) 2020-2021 Johannes Bauer
 #
 #	This file is part of pycommon.
 #
@@ -22,6 +22,8 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 #
 #	File UUID df05d56b-c766-41a7-a240-0a8bef0a6064
+
+import os
 
 class CmdlineEscape():
 	_ESCAPE_CHARS = set(" \\\"';&*()|")
