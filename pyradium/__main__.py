@@ -28,6 +28,7 @@ from .ActionServe import ActionServe
 from .ActionAcroSort import ActionAcroSort
 from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
+from .ActionDumpMetadata import ActionDumpMetadata
 from .Enums import PresentationMode, PresentationFeature
 
 def _geometry(text):
@@ -80,6 +81,14 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the slide show.")
 	mc.register("hash", "Create a hash of a presentation and all dependencies to detect modifications", genparser, action = ActionHashPresentation)
+
+	def genparser(parser):
+		parser.add_argument("-p", "--pretty-print", action = "store_true", help = "Pretty print the output JSON data.")
+		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
+		parser.add_argument("-j", "--inject-metadata", metavar = "filename", help = "Gives the option to inject metadata into the presentation. Must point to a JSON filename and will override the respective metadata fields of the presentation. Useful for changing things like the presentation date on the command line.")
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("infile", help = "Input XML file of the slide show.")
+	mc.register("dumpmeta", "Dump the metadata dictionary in JSON format", genparser, action = ActionDumpMetadata)
 
 	return mc.run(sys.argv[1:])
 

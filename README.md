@@ -88,15 +88,18 @@ $ ./pyradium.py
 Syntax: ./pyradium.py [command] [options]
 
 Available commands:
-
-version: pyradium v0.0.4
-
-Options vary from command to command. To receive further info, type
-    ./pyradium.py [command] --help
     render             Render a slide show
     serve              Serve a slide show as HTTP
     acrosort           Sort an acryonym database
     purge              Purge the document cache
+    hash               Create a hash of a presentation and all dependencies to
+                       detect modifications
+    dumpmeta           Dump the metadata dictionary in JSON format
+
+version: pyradium v0.0.5rc0
+
+Options vary from command to command. To receive further info, type
+    ./pyradium.py [command] --help
 ```
 
 Each facility has its own help page. The `render` facility, for example:
