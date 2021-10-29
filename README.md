@@ -106,9 +106,9 @@ $ ./pyradium.py render --help
 usage: ./pyradium.py render [--image-max-dimension pixels] [-I path]
                             [--template-dir path] [-t name]
                             [-g width x height] [-r] [--collapse-animation]
-                            [-i filename] [-m {interactive,static}]
-                            [-F {timer}] [-l] [--re-render-watch path] [-f]
-                            [-v] [--help]
+                            [-i filename] [-j filename]
+                            [-m {interactive,static}] [-F {timer}] [-l]
+                            [--re-render-watch path] [-f] [-v] [--help]
                             infile outdir
 
 Render a slide show
@@ -142,6 +142,12 @@ optional arguments:
                         Gives the name of the presentation index file.
                         Defaults to index.html. Useful if you want to render
                         multiple presentations in one subdirectory.
+  -j filename, --inject-metadata filename
+                        Gives the option to inject metadata into the
+                        presentation. Must point to a JSON filename and will
+                        override the respective metadata fields of the
+                        presentation. Useful for changing things like the
+                        presentation date on the command line.
   -m {interactive,static}, --presentation-mode {interactive,static}
                         Generate this type of presentation. Can be one of
                         None, defaults to interactive.

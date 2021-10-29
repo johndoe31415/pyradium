@@ -23,6 +23,7 @@ import os
 import sys
 import time
 import subprocess
+import json
 import logging
 from .BaseAction import BaseAction
 from .Presentation import Presentation
@@ -55,6 +56,13 @@ class ActionRender(BaseAction):
 			print("Refusing to overwrite: %s" % (self._args.outdir), file = sys.stderr)
 			return 1
 
+		if self._args.inject_metadata is None:
+			injected_metadata = None
+		else:
+			with open(self._args.inject_metadata) as f:
+				injected_metadata = json.load(f)
+				_log.debug("Injected metadata: %s", str(injected_metadata))
+
 		renderer = None
 		render_success = True
 		while True:
@@ -70,7 +78,8 @@ class ActionRender(BaseAction):
 						index_filename = self._args.index_filename,
 						geometry = self._args.geometry,
 						image_max_dimension = self._args.image_max_dimension,
-						presentation_features = self._args.presentation_feature)
+						presentation_features = self._args.presentation_feature,
+						injected_metadata = injected_metadata)
 				presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 				renderer = Renderer(presentation, rendering_parameters)
 				rendered_presentation = renderer.render(deploy_directory = self._args.outdir)

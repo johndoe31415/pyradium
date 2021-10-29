@@ -21,12 +21,15 @@
 
 import hashlib
 import subprocess
+import logging
 import xml.dom.minidom
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
 from .Exceptions import MalformedXMLInputException
+
+_log = logging.getLogger(__spec__.name)
 
 class Presentation():
 	_NAMESPACES = {
@@ -50,6 +53,14 @@ class Presentation():
 	@property
 	def sources(self):
 		return self._sources
+
+	@classmethod
+	def _merge_metadata(cls, meta_dict, injected_dict):
+		if not isinstance(injected_dict, dict):
+			self._error("Could not inject metadata (not a dictionary): %s", str(injected_dict))
+			return meta_dict
+		meta_dict.update(injected_dict)
+		return meta_dict
 
 	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
@@ -85,7 +96,9 @@ class Presentation():
 			elif child.tagName == "acronyms":
 				content.append(AcronymDirective(child))
 			else:
-				print("Warning: Ignored unknown tag '%s'." % (child.tagName))
+				_log.warning("Ignored unknown tag '%s'.", child.tagName)
+		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
+			meta = cls._merge_metadata(meta, rendering_parameters.injected_metadata)
 		return cls(meta, content, sources)
 
 	def _validate_metadata(self):
