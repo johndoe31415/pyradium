@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
-import hashlib
 import logging
 from .BaseAction import BaseAction
 from .RenderingParameters import RenderingParameters
