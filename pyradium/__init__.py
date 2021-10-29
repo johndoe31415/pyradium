@@ -21,4 +21,4 @@
 
 import pyradium.Logging
 
-VERSION = "0.0.4"
+VERSION = "0.0.5rc0"
