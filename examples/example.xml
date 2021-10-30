@@ -21,29 +21,31 @@
 	<slide type="title" />
 
 	<slide>
-		<s:time rel="1.5" />
-		<s:var name="heading" value="Before we have sect/subsect" />
+		<s:var name="heading" value="No section at all" />
 		<ul>
-			<li>This should not show "None" below.</li>
+			<li>There is no section or no subsection set for this slide.</li>
+			<li>In the status line, there should be nothing.</li>
 		</ul>
 	</slide>
 
 	<section>Foo</section>
 	<subsection>Bar</subsection>
 	<slide>
-		<s:time rel="1.5" />
 		<s:var name="heading" value="Now we do have them" />
 		<ul>
+			<li>Now it's section <s:enq>Foo</s:enq></li>
+			<li>And subsection <s:enq>Bar</s:enq></li>
 			<li>This should show "Foo" / "Bar" below.</li>
 		</ul>
 	</slide>
 
 	<section>Moo</section>
 	<slide>
-		<s:time rel="1.5" />
 		<s:var name="heading" value="Resetting subsection" />
 		<ul>
-			<li>This should show ONLY "Moo" below.</li>
+			<li>Now it's section <s:enq>Moo</s:enq></li>
+			<li>But no subsection</li>
+			<li>This should show <i>only</i> show <s:enq>Moo</s:enq> below.</li>
 		</ul>
 	</slide>
 
@@ -55,11 +57,11 @@
 		<s:time rel="1.5" />
 		<s:var name="heading" value="Pausing Slides" />
 		<ul>
-			<li>This is a test! Pause1 <s:ac>WEP</s:ac></li>
+			<li>Pausing slides is easy! Acronyms too: <s:ac>WEP</s:ac></li>
 			<s:pause />
-			<li>After the first pause! <s:ac>DES</s:ac></li>
+			<li>After the first pause! Another acronym: <s:ac>DES</s:ac></li>
 			<s:pause />
-			<li>After the second pause! Explaining <s:ac>AES</s:ac>-<s:ac>CBC</s:ac></li>
+			<li>This is after the second pause! Explaining <s:ac>AES</s:ac>-<s:ac>CBC</s:ac></li>
 		</ul>
 	</slide>
 
@@ -81,8 +83,9 @@
 	<slide>
 		<s:var name="heading" value="After include" />
 		<ul>
+			<li>We just included a sub-document</li>
 			<li>This is the slide which directly follows an include.</li>
-			<li>Hex: <s:tt>001122abcdef</s:tt></li>
+			<li>Fixed-width text is possible: <s:tt>001122abcdef</s:tt></li>
 		</ul>
 	</slide>
 

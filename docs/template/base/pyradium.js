@@ -23,11 +23,18 @@
 
 import {TimeKeeper} from "./pyradium_timekeeper.js";
 
+const CursorStyle = {
+	CURSOR_OFF: 0,
+	CURSOR_DEFAULT: 1,
+	CURSOR_HIGHLIGHT: 2,
+	INVALID: 3,
+}
+
 export class Presentation {
 	constructor(ui_elements, presentation_meta) {
 		this._ui_elements = ui_elements;
 		this._presentation_meta = presentation_meta;
-		this._show_cursor = false;
+		this._cursor_style = CursorStyle.CURSOR_OFF;
 		this._enumerate_slides();
 		this._internal_slide_index = 0;
 		this._resize_obs = new ResizeObserver((event) => this.event_resize(event));
@@ -122,7 +129,19 @@ export class Presentation {
 	}
 
 	_set_cursor_style() {
-		this._ui_elements.full_screen_div.style.cursor = this._show_cursor ? "inherit" : "none";
+		switch (this._cursor_style) {
+			case CursorStyle.CURSOR_OFF:
+				this._ui_elements.full_screen_div.style.cursor = "none";
+				break;
+
+			case CursorStyle.CURSOR_DEFAULT:
+				this._ui_elements.full_screen_div.style.cursor = "inherit";
+				break;
+
+			case CursorStyle.CURSOR_HIGHLIGHT:
+				this._ui_elements.full_screen_div.style.cursor = "url('template/base/cursor.svg'), auto";
+				break;
+		}
 	}
 
 	_prepare_full_screen_div() {
@@ -140,7 +159,7 @@ export class Presentation {
 			return;
 		}
 		console.log("Presentation started.");
-		this._show_cursor = false;
+		this._cursor_style = 0;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
 	}
@@ -252,7 +271,10 @@ export class Presentation {
 	}
 
 	toggle_cursor() {
-		this._show_cursor = !this._show_cursor;
+		this._cursor_style += 1;
+		if (this._cursor_style == CursorStyle.INVALID) {
+			this._cursor_style = 0;
+		}
 		this._set_cursor_style();
 	}
 
