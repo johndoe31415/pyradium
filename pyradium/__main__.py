@@ -38,7 +38,7 @@ def _geometry(text):
 	return (int(text[0]), int(text[1]))
 
 def main():
-	mc = MultiCommand(trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
+	mc = MultiCommand(description = "HTML presentation/slide show generator", trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
 
 	def genparser(parser):
 		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1920, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")

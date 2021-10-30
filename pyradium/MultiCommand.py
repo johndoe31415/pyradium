@@ -34,11 +34,12 @@ class MultiCommand():
 	RegisteredCommand = collections.namedtuple("RegisteredCommand", [ "name", "description", "parsergenerator", "action", "aliases", "visible" ])
 	ParseResult = collections.namedtuple("ParseResults", [ "cmd", "args" ])
 
-	def __init__(self, trailing_text = None):
+	def __init__(self, description = None, trailing_text = None):
+		self._description = description
+		self._trailing_text = trailing_text
 		self._commands = { }
 		self._aliases = { }
 		self._cmdorder = [ ]
-		self._trailing_text = trailing_text
 
 	def register(self, commandname, description, parsergenerator, **kwargs):
 		supported_kwargs = set(("aliases", "action", "visible"))
@@ -60,26 +61,34 @@ class MultiCommand():
 		self._cmdorder.append(commandname)
 
 	def _show_syntax(self, msg = None):
+		output_file = sys.stderr if (msg is not None) else sys.stdout
 		if msg is not None:
-			print("Error: %s" % (msg), file = sys.stderr)
-		print("Syntax: %s [command] [options]" % (sys.argv[0]), file = sys.stderr)
-		print(file = sys.stderr)
-		print("Available commands:", file = sys.stderr)
+			print("Error: %s" % (msg), file = output_file)
+		print("usage: %s [command] [options]" % (sys.argv[0]), file = output_file)
+		print(file = output_file)
+		if self._description is not None:
+			print(self._description, file = output_file)
+			print(file = output_file)
+		print("Available commands:", file = output_file)
 		for commandname in self._cmdorder:
 			command = self._commands[commandname]
 			if not command.visible:
 				continue
 			commandname_line = command.name
 			for description_line in textwrap.wrap(command.description, width = 56):
-				print("    %-15s    %s" % (commandname_line, description_line), file = sys.stderr)
+				print("    %-15s    %s" % (commandname_line, description_line), file = output_file)
 				commandname_line = ""
-		print(file = sys.stderr)
+		print(file = output_file)
 		if self._trailing_text is not None:
 			for line in textwrap.wrap(self._trailing_text, width = 80):
-				print(line, file = sys.stderr)
-			print(file = sys.stderr)
-		print("Options vary from command to command. To receive further info, type", file = sys.stderr)
-		print("    %s [command] --help" % (sys.argv[0]), file = sys.stderr)
+				print(line, file = output_file)
+			print(file = output_file)
+		print("Options vary from command to command. To receive further info, type", file = output_file)
+		print("    %s [command] --help" % (sys.argv[0]), file = output_file)
+
+	def _show_syntax_cmd(self, cmdname, *args):
+		self._show_syntax()
+		return 0
 
 	def _raise_error(self, msg, silent = False):
 		if silent:
@@ -96,13 +105,15 @@ class MultiCommand():
 			self._raise_error("No command supplied.")
 
 		# Check if we can match the command portion
-		pm = PrefixMatcher(self._getcmdnames())
+		pm = PrefixMatcher(self._getcmdnames() | set([ "-h", "--help" ]))
 		try:
 			supplied_cmd = pm.matchunique(cmdline[0])
 		except Exception as e:
 			self._raise_error("Invalid command supplied: %s" % (str(e)))
 
-		if supplied_cmd in self._aliases:
+		if supplied_cmd in [ "-h", "--help" ]:
+			return self.ParseResult(cmd = self.RegisteredCommand(name = "--help", description = None, parsergenerator = None, action = self._show_syntax_cmd, aliases = None, visible = False), args = None)
+		elif supplied_cmd in self._aliases:
 			supplied_cmd = self._aliases[supplied_cmd]
 
 		command = self._commands[supplied_cmd]
@@ -120,7 +131,7 @@ class MultiCommand():
 		parseresult.cmd.action(parseresult.cmd.name, parseresult.args)
 
 if __name__ == "__main__":
-	mc = MultiCommand()
+	mc = MultiCommand(description = "Run multiple export- and importthings")
 
 	def importaction(cmd, args):
 		print("Import:", cmd, args)
@@ -131,14 +142,15 @@ if __name__ == "__main__":
 
 	def genparser(parser):
 		parser.add_argument("-i", "--infile", metavar = "filename", type = str, required = True, help = "Specifies the input text file that is to be imported. Mandatory argument.")
-		parser.add_argument("--verbose", action = "store_true", help = "Increase verbosity during the importing process.")
 		parser.add_argument("-n", "--world", metavar = "name", type = str, choices = [ "world", "foo", "bar" ], default = "overworld", help = "Specifies the world name. Possible options are %(choices)s. Default is %(default)s.")
+		parser.add_argument("-h", "--hello", action = "store_true", help = "Print 'hello world'")
+		parser.add_argument("--verbose", action = "count", default = 0, help = "Increase verbosity. Can be given multiple times.")
 	mc.register("import", "Import some file from somewhere", genparser, action = importaction, aliases = [ "ymport" ])
 
 
 	def genparser(parser):
 		parser.add_argument("-o", "--outfile", metavar = "filename", type = str, required = True, help = "Specifies the input text file that is to be imported. Mandatory argument.")
-		parser.add_argument("--verbose", action = "store_true", help = "Increase verbosity during the importing process.")
+		parser.add_argument("--verbose", action = "count", default = 0, help = "Increase verbosity. Can be given multiple times.")
 	mc.register("export", "Export some file to somewhere", genparser, action = ExportAction)
 
 	mc.run(sys.argv[1:])
