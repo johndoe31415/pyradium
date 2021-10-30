@@ -1,34 +1,51 @@
 # pyradium
 [![Build Status](https://travis-ci.com/johndoe31415/pyradium.svg?branch=master)](https://travis-ci.com/johndoe31415/pyradium)
 
-This is a complete rewrite of a presentation rendering tool I've originally
-started in 2015. It is incorporating features of LaTeX-Beamer which I like into a renderer that outputs HTML. In particular, the design goals were:
+This is a tool which takes XML input that describes a presentation and renders
+it into a presentation HTML. It borrows ideas from LaTeX-beamer but also
+combines the flexible way of creating visually appealing documents using
+HTML/CSS. it In particular, the features are:
 
   * Input the slide content in machine-readable form, no WYSIWYG. This is like
-    latex-beamer, but I'm using XML as input files.
-  * Have functionality like acronyms, automatic table of contents,
-    cross-references, equations. This is also like LaTeX.
-  * Output to a format that anyone can style: HTML and CSS. New slide templates
-    should be easy to create (e.g., a three-column design or a "quote" slide
-    template).
-  * Use the advantages of HTML to provide new features, like instant feedback:
-    I want people to tell me typos and general feedback about my presentation
-    and want to make submission of that info as easy as possible (low entry
-    barrier). Also it should record which git revsion was used to typeset the
-    document so I know exactly if I've already fixed an issue or not if it gets
-    reported multiple times.
+    LaTeX-beamer, but pyradium uses XML as input format. This allows for
+    version controlled presentation input data as well.
+  * Acronyms, automatic table of contents, cross-references, LaTeX equations
+    are all supported.
+  * Delegation of scripts that generate content for inclusion. For example, a
+    'crypto helper' can be programmed as an external script that allows writing
+    slides that only specify input data, cipher and key. Then the ciphertext is
+    automatically computed and errors on the slides are avoided.
+  * Syntax highlighting of code or terminal output (using pygments).
+  * Output is easily customizable: HTML and CSS are used as the underlying
+    technologies. Creation of new slide templates is simple (e.g., a
+    three-column design or a "quote" slide template).
+  * Use the advantages of HTML and ECMAScript to provide features like
+    presentation feedback: Make it easy for people to report typos and general
+    feedback about the presentation.  Make submission of that info as easy as
+    possible (low entry barrier). Also it records which git revsion was used to
+    typeset the document so I know exactly if I've already fixed an issue or not if
+    it gets reported multiple times.
 
-## Name
-pyradium has been previously known as pybeamer, but has been renamed because a
-different project under that name exists on PyPi.
+## Installation
+pyradium is available on PyPi, so installation is as easy as
+
+```
+$ pip3 install pyradium
+```
+
+## History
+pyradium has been previously known as pybeamer (in reference to LaTeX-beamer),
+but has been renamed because a different project under that name exists on
+PyPi. It started out as pybeamer in 2015 as a pet project of mine that I've
+never published, but it has since been completely rewritten.
 
 ## Example
 You can view an example of a presentation [here](https://johndoe31415.github.io/pyradium/).
 The source for that presentation can be found [here](https://github.com/johndoe31415/pyradium/tree/master/examples).
 
-## Usage
-All features that have been mentioned above are implemented by pyradium. You
-can see an example file in the [examples/ subdirectory](https://github.com/johndoe31415/pyradium/tree/master/examples).
+## Input Documents
+You can see an example XML file in the [examples/
+subdirectory](https://github.com/johndoe31415/pyradium/tree/master/examples).
 XML namespaces are used to distinguish tags which are renderer commands, i.e.,
 which have some special interpretation.  All other content is essentially pure
 HTML.
@@ -84,8 +101,10 @@ There are of course more options to choose from. Read the help pages to learn
 more. To get an overview over the available facilities:
 
 ```
-$ ./pyradium.py
-Syntax: ./pyradium.py [command] [options]
+$ ./pyradium.py --help
+usage: ./pyradium.py [command] [options]
+
+HTML presentation/slide show generator
 
 Available commands:
     render             Render a slide show
@@ -96,7 +115,7 @@ Available commands:
                        detect modifications
     dumpmeta           Dump the metadata dictionary in JSON format
 
-version: pyradium v0.0.5rc0
+version: pyradium v0.0.5
 
 Options vary from command to command. To receive further info, type
     ./pyradium.py [command] --help

@@ -19,6 +19,7 @@ setuptools.setup(
 	keywords = [ "latex", "presentation", "template", "html" ],
 	install_requires = [
 		"mako",
+		"pygments",
 	],
 	entry_points = {
 		"console_scripts": [
