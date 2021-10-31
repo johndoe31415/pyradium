@@ -31,7 +31,9 @@ class FileLookup():
 
 	def lookup(self, filename):
 		for dirname in self._paths:
-			path = dirname + "/" + filename
+			if not dirname.endswith("/"):
+				dirname += "/"
+			path = dirname + filename
 			if os.path.isfile(path):
 				return path
 		if len(self._paths) == 0:
