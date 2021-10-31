@@ -44,14 +44,23 @@ export class Presentation {
 			this._intersect_obs.observe(slide);
 		});
 		this._session_id = Math.random();
-		this._presentation_mode = "stopped";
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
+		this._debugging = false;
 		setInterval(() => this._tx_status(), 1000);
 	}
 
+	_log(...args) {
+		if (this._debugging) {
+			console.log(...args);
+		}
+	}
+
 	get presentation_meta() {
-		return this._presentation_meta;
+		return {
+			"xml_meta": this._presentation_meta,
+			"slide_count": this.slide_count,
+		}
 	}
 
 	get slide_count() {
@@ -66,24 +75,11 @@ export class Presentation {
 		return document.fullscreenElement != null;
 	}
 
-	set presentation_mode(value) {
-		const changed = (this._presentation_mode != value);
-		this._presentation_mode = value;
-		if (changed) {
-			this._tx_status();
-		}
-	}
-
-	get presentation_mode() {
-		return this._presentation_mode;
-	}
-
 	_tx_status() {
 		const msg = {
 			"type":						"status",
 			"session_id":				this._session_id,
 			"data": {
-				"presentation_mode":	this.presentation_mode,
 				"begin_ratio":			this.current_slide.getAttribute("begin_ratio") * 1,
 				"end_ratio":			this.current_slide.getAttribute("end_ratio") * 1,
 			},
@@ -144,12 +140,7 @@ export class Presentation {
 	}
 
 	start_presentation() {
-		if (this.fullscreen_mode) {
-			/* Second press on fullscreen starts the presentation automatically */
-			this.presentation_mode = "started";
-			return;
-		}
-		console.log("Presentation started.");
+		this._log("Presentation started.");
 		this._cursor_style = 0;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
@@ -183,19 +174,19 @@ export class Presentation {
 			return;
 		}
 		if (event.key == "g") {
-			console.log("Keypress: 'g' -> goto");
+			this._log("Keypress: 'g' -> goto");
 			this.goto_slide();
 		} else if (event.key == "f") {
-			console.log("Keypress: 'f' -> full screen presentation");
+			this._log("Keypress: 'f' -> full screen presentation");
 			this.start_presentation();
 		} else if (event.key == "c") {
-			console.log("Keypress: 'c' -> toggle cursor");
+			this._log("Keypress: 'c' -> toggle cursor");
 			this.toggle_cursor();
-		} else if (event.key == "s") {
-			console.log("Keypress: 's' -> toggle presentation mode");
-			this.toggle_presentation_mode();
+		} else if ((event.key == "X") && (event.ctrlKey) && (event.shiftKey)) {
+			this._debugging = true;
+			this._log("Debugging mode enabled.");
 		} else {
-			console.log("Keypress other: ", event);
+			this._log("Keypress other: ", event);
 		}
 	}
 
@@ -204,23 +195,23 @@ export class Presentation {
 			return;
 		}
 		if (event.key == "PageDown") {
-			console.log("Keydown: 'PageDown' -> next slide");
+			this._log("Keydown: 'PageDown' -> next slide");
 			this.goto_next_slide();
 			event.preventDefault();
 		} else if (event.key == "PageUp") {
-			console.log("Keydown: 'PageUp' -> previous slide");
+			this._log("Keydown: 'PageUp' -> previous slide");
 			this.goto_prev_slide();
 			event.preventDefault();
 		} else if (event.key == "Home") {
-			console.log("Keydown: 'Home' -> first slide");
+			this._log("Keydown: 'Home' -> first slide");
 			this.goto_first_slide();
 			event.preventDefault();
 		} else if (event.key == "End") {
-			console.log("Keydown: 'End' -> last slide");
+			this._log("Keydown: 'End' -> last slide");
 			this.goto_last_slide();
 			event.preventDefault();
 		} else {
-			console.log("Keydown other: ", event);
+			this._log("Keydown other: ", event);
 		}
 	}
 
@@ -228,10 +219,10 @@ export class Presentation {
 		const scroll_up = event.deltaY < 0;
 		if (this.fullscreen_mode) {
 			if (scroll_up) {
-				console.log("Wheel: 'ScrollUp' -> previous slide");
+				this._log("Wheel: 'ScrollUp' -> previous slide");
 				this.goto_prev_slide();
 			} else {
-				console.log("Wheel: 'ScrollDown' -> next slide");
+				this._log("Wheel: 'ScrollDown' -> next slide");
 				this.goto_next_slide();
 			}
 		}
@@ -242,11 +233,10 @@ export class Presentation {
 			return;
 		}
 		events.forEach((event) => {
-			console.log(event);
 			if (event.isIntersecting) {
 				const slide = event.target;
 				const internal_slide_index = slide.getAttribute("internal_slide_index") | 0;
-				console.log("Viewport event goto index " + internal_slide_index);
+				this._log("Viewport event -> goto index " + internal_slide_index);
 				this._goto_slide(internal_slide_index, false);
 			}
 		});
@@ -269,15 +259,8 @@ export class Presentation {
 			const zoom_y = screen_height / slide_height;
 			const zoom = (zoom_x < zoom_y) ? zoom_x : zoom_y;
 
-			console.log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
+			this._log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
 			this._ui_elements.full_screen_div.style.zoom = zoom;
-
-			if (this._internal_slide_index > 0) {
-				/* If we start a presentation at the very beginning we don't
-				 * actually automatically count it as started until the first
-				 * slide has been advanced. */
-				this.presentation_mode = "started";
-			}
 		}
 	}
 
@@ -287,14 +270,6 @@ export class Presentation {
 			this._cursor_style = 0;
 		}
 		this._set_cursor_style();
-	}
-
-	toggle_presentation_mode() {
-		if (this.presentation_mode == "started") {
-			this.presentation_mode = "stopped";
-		} else if (this.presentation_mode == "stopped") {
-			this.presentation_mode = "started";
-		}
 	}
 
 	goto_slide() {
@@ -321,7 +296,6 @@ export class Presentation {
 			this._internal_slide_index = slide_index;
 			this._update(scroll_to_slide);
 			if (this.fullscreen_mode) {
-				this.presentation_mode = "started";
 				this._tx_status();
 			}
 		}

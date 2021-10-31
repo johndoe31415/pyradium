@@ -21,65 +21,107 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-class TimeRange {
-	constructor(begin_hour, begin_minute, end_hour, end_minute) {
-		this._begin_time = (60 * begin_hour) + begin_minute;
-		this._end_time = (60 * end_hour) + end_minute;
-		if (this._end_time < this._begin_time) {
-			this._end_time += 1440;
+const TimestampMode = {
+	ABSOLUTE: 0,
+	RELATIVE_NOW: 1,
+	RELATIVE_PRESENTATION_LENGTH: 2,
+};
+
+class Timestamp {
+	constructor(ts_type, ts_value) {
+		this._ts_type = ts_type;
+		this._ts_value = ts_value;
+		this._timestamp = null;
+	}
+
+	compute(presentation_duration_seconds) {
+		if (this._ts_type == TimestampMode.ABSOLUTE) {
+			this._timestamp = this._ts_value;
+		} else if (this._ts_type == TimestampMode.RELATIVE_NOW) {
+			const now = new Date();
+			this._timestamp = new Date(now.getTime() + (this._ts_value * 1000));
+		} else if (this._ts_type == TimestampMode.RELATIVE_NOW) {
+			const now = new Date();
+			this._timestamp = new Date(now.getTime() + (this._ts_value * presentation_duration_seconds * 1000));
+		} else {
+			console.log("Invalid TS type:", this._ts_type);
 		}
 	}
 
-	get duration_seconds() {
-		return this.duration_minutes * 60;
-	}
-
-	get duration_minutes() {
-		return this._end_time - this._begin_time;
-	}
-
-	get begin_hour() {
-		return Math.floor(this._begin_time % 1440 / 60);
-	}
-
-	get begin_minute() {
-		return Math.floor(this._begin_time % 1440 % 60);
-	}
-
-	get end_hour() {
-		return Math.floor(this._end_time % 1440 / 60);
-	}
-
-	get end_minute() {
-		return Math.floor(this._end_time % 1440 % 60);
+	get timestamp() {
+		return this._timestamp;
 	}
 }
 
 export class TimeTools {
-	static parse_timerange(timerange_str) {
-		const match = timerange_str.match(/^\s*(?<begin_hour>\d{1,2}):(?<begin_minute>\d{2})\s*-\s*(?<end_hour>\d{1,2}):(?<end_minute>\d{2})\s*$/);
+	static parse_hh_mm(hh_mm_str) {
+		const match = timestamp_str.match(/^\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
 		if (match) {
-			const begin_hour = match.groups.begin_hour | 0;
-			const begin_minute = match.groups.begin_minute | 0;
-			const end_hour = match.groups.end_hour | 0;
-			const end_minute = match.groups.end_minute | 0;
-			if ((begin_hour < 0) || (begin_hour > 23)) {
+			const timestamp_hour = match.groups.timestamp_hour | 0;
+			const timestamp_minute = match.groups.timestamp_minute | 0;
+			if ((timestamp_hour < 0) || (timestamp_hour > 23)) {
 				return null;
 			}
-			if ((begin_minute < 0) || (begin_minute > 59)) {
+			if ((timestamp_minute < 0) || (timestamp_minute > 59)) {
 				return null;
 			}
-			if ((end_hour < 0) || (end_hour > 23)) {
-				return null;
-			}
-			if ((end_minute < 0) || (end_minute > 59)) {
-				return null;
-			}
-			if ((begin_hour == end_hour) && (begin_minute == end_minute)) {
-				return null;
-			}
-			return new TimeRange(begin_hour, begin_minute, end_hour, end_minute);
+			return timestamp_hour * 60 + timestamp_minute;
 		}
+		return null;
+	}
+
+	static parse_timestamp(timestamp_str) {
+		/* Easiest first: absolute timestamp given day, hour, minute */
+		{
+			const now = new Date();
+			const match = timestamp_str.match(/^\s*((?<timestamp_day>\d{1,2})-)?\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
+			if (match) {
+				const timestamp_hour = match.groups.timestamp_hour | 0;
+				const timestamp_minute = match.groups.timestamp_minute | 0;
+				const timestamp_day = (match.groups.timestamp_day == null) ? now.getDate() : (match.groups.timestamp_day | 0);
+				if ((timestamp_hour < 0) || (timestamp_hour > 23)) {
+					return null;
+				}
+				if ((timestamp_minute < 0) || (timestamp_minute > 59)) {
+					return null;
+				}
+				if ((timestamp_day != null) && ((timestamp_day < 1) || (timestamp_day > 31))) {
+					return null;
+				}
+
+				const option1 = new Date(now.getYear(), now.getMonth(), timestamp_day, timestamp_hour, timestamp_minute, 0);
+				const option2 = new Date(now.getYear(), now.getMonth() + 1, timestamp_day, timestamp_hour, timestamp_minute, 0);
+				const diff1 = Math.abs(option1.getTime() - now.getTime());
+				const diff2 = Math.abs(option2.getTime() - now.getTime());
+				const timestamp = (diff1 < diff2) ? option1 : option2;
+				return new Timestamp(TimestampMode.ABSOLUTE, timestamp);
+			}
+		}
+
+		/* Second easiest then: relative timestamp relative to current time */
+		{
+			const match = timestamp_str.match(/^\s*\+\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
+			if (match) {
+				const timestamp_hour = match.groups.timestamp_hour | 0;
+				const timestamp_minute = match.groups.timestamp_minute | 0;
+				const relative_seconds = (timestamp_hour * 3600) + (timestamp_minute * 60);
+				return new Timestamp(TimestampMode.RELATIVE_NOW, relative_seconds);
+			}
+		}
+
+		/* Last is a fracton of the presentation duration */
+		{
+			const match = timestamp_str.match(/^\s*(?<numerator>\d+)\s*\/\s*(?<denominator>\d+)\s*$/);
+			if (match) {
+				const numerator = match.groups.numerator | 0;
+				const denominator = match.groups.denominator | 0;
+				if (denominator == 0) {
+					return 0;
+				}
+				return new Timestamp(TimestampMode.RELATIVE_PRESENTATION_LENGTH, numerator / denominator);
+			}
+		}
+
 		return null;
 	}
 

@@ -1,3 +1,13 @@
+div.menugrid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	width: 1200px;
+}
+
+div.menucell {
+	padding: 8px;
+}
+
 div.topgrid {
 	display: grid;
 	grid-template-columns: repeat(7, minmax(0, 1fr));

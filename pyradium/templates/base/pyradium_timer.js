@@ -23,6 +23,33 @@
 
 import {TimeTools} from "./pyradium_tools.js";
 
+class SlideSubset {
+	constructor(begin_slide, end_slide) {
+		this._begin_slide = begin_slide;
+		this._end_slide = end_slide;
+	}
+
+	get begin_slide() {
+		return this._begin_slide;
+	}
+
+	get end_slide() {
+		return this._end_slide;
+	}
+
+	static parse(selector, total_slide_count) {
+		if ((selector.toLowerCase() == "all") || (selection == "*")) {
+			if (total_slide_count != null) {
+				return new SlideSubset(1, total_slide_count);
+			} else {
+				return null;
+			}
+		}
+		return null;
+	}
+}
+
+
 export class PresentationTimer {
 	constructor(ui_elements) {
 		this._ui_elements = ui_elements;
@@ -31,26 +58,38 @@ export class PresentationTimer {
 		this._session_id = null;
 		this._status = null;
 		this._meta = null;
-		this._total_presentation_time = null;
-		this._active_presentation_time_secs = null;
-		this._pause_minutes = null;
 		this._tx_message({ "type": "query_status" });
 		this._tx_message({ "type": "query_presentation_meta" });
 		this._timeout_handle = null;
 		this._reset_timeout();
-		this._ui_elements.total_presentation_time.addEventListener("input", (event) => this._ui_change());
-		this._ui_elements.pause_minutes.addEventListener("input", (event) => this._ui_change());
+		this._ui_elements.slide_subset.value = "all";
+		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._ui_change());
+		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_change());
 	}
 
 	_ui_change() {
-		this._total_presentation_time = TimeTools.parse_timerange(this._ui_elements.total_presentation_time.value);
-		this._pause_minutes = this._ui_elements.pause_minutes.value | 0;
-		this._active_presentation_time_secs = null;
-		if (this._total_presentation_time != null) {
-			const active_presentation_time_secs = this._total_presentation_time.duration_seconds - (60 * this._pause_minutes);
-			if (active_presentation_time_secs > 0) {
-				this._active_presentation_time_secs = active_presentation_time_secs;
-			}
+		this._presentation_end_time = TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value);
+		if (this._presentation_end_time == null) {
+			this._ui_elements.presentation_end_time.classList.add("parse-error");
+		} else {
+			this._ui_elements.presentation_end_time.classList.remove("parse-error");
+		}
+		this._slide_subset = SlideSubset.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count);
+		if (this._slide_subset == null) {
+			this._ui_elements.slide_subset.classList.add("parse-error");
+		} else {
+			this._ui_elements.slide_subset.classList.remove("parse-error");
+		}
+
+		if (this._presentation_end_time != null) {
+			this._ui_elements.presentation_end_time_display.innerText = "foo";
+		} else {
+			this._ui_elements.presentation_end_time_display.innerText = "-";
+		}
+		if (this._slide_subset != null) {
+			this._ui_elements.slide_subset_display.innerText = this._slide_subset.begin_slide + " - " + this._slide_subset.end_slide;
+		} else {
+			this._ui_elements.slide_subset_display.innerText = "-";
 		}
 		this._update();
 	}
@@ -132,8 +171,9 @@ export class PresentationTimer {
 	}
 
 	_update_meta() {
-		this._ui_elements.total_presentation_time.value = this._meta.total_presentation_time;
-		this._ui_elements.pause_minutes.value = this._meta.pause_minutes;
+		if (this._meta.xml_meta.presentation_time != null) {
+			this._ui_elements.presentation_end_time.value = "+" + this._meta.xml_meta.presentation_time;
+		}
 		this._ui_change();
 	}
 
