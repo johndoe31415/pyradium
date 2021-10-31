@@ -192,15 +192,19 @@ export class Presentation {
 			return;
 		}
 		if (event.key == "g") {
+			console.log("Keypress: 'g' -> goto");
 			this.goto_slide();
 		} else if (event.key == "f") {
+			console.log("Keypress: 'f' -> full screen presentation");
 			this.start_presentation();
 		} else if (event.key == "c") {
+			console.log("Keypress: 'c' -> toggle cursor");
 			this.toggle_cursor();
 		} else if (event.key == "s") {
+			console.log("Keypress: 's' -> toggle presentation mode");
 			this.toggle_presentation_mode();
 		} else {
-//			console.log("keypress event", event);
+			console.log("Keypress other: ", event);
 		}
 	}
 
@@ -209,13 +213,15 @@ export class Presentation {
 			return;
 		}
 		if (event.key == "PageDown") {
+			console.log("Keydown: 'PageDown' -> next slide");
 			this.next_slide();
 			event.preventDefault();
 		} else if (event.key == "PageUp") {
+			console.log("Keydown: 'PageUp' -> previous slide");
 			this.prev_slide();
 			event.preventDefault();
 		} else {
-//			console.log("keydown event", event);
+			console.log("Keydown other: ", event);
 		}
 	}
 
