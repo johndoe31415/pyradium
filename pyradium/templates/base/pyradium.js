@@ -226,22 +226,28 @@ export class Presentation {
 	}
 
 	event_wheel(event) {
-//		console.log("wheel event", event);
-		const scroll_up = event.deltaY > 0;
+		const scroll_up = event.deltaY < 0;
 		if (this.fullscreen_mode) {
 			if (scroll_up) {
-				this.next_slide();
-			} else {
+				console.log("Wheel: 'ScrollUp' -> previous slide");
 				this.prev_slide();
+			} else {
+				console.log("Wheel: 'ScrollDown' -> next slide");
+				this.next_slide();
 			}
 		}
 	}
 
 	event_scroll_in_viewport(events) {
+		if (this.fullscreen_mode) {
+			return;
+		}
 		events.forEach((event) => {
+			console.log(event);
 			if (event.isIntersecting) {
 				const slide = event.target;
 				const internal_slide_index = slide.getAttribute("internal_slide_index") | 0;
+				console.log("Viewport event goto index " + internal_slide_index);
 				this._goto_slide(internal_slide_index, false);
 			}
 		});
