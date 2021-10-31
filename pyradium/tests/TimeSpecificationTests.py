@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import unittest
-from pyradium.Schedule import TimeSpecificationType, TimeSpecification, TimeRange, TimeRanges, PresentationSchedule
+from pyradium.Schedule import TimeSpecificationType, TimeSpecification, PresentationSchedule
 from pyradium.Exceptions import TimeSpecificationError
 
 class TimeSpecificationTests(unittest.TestCase):
@@ -35,7 +35,7 @@ class TimeSpecificationTests(unittest.TestCase):
 	def test_rel_value(self):
 		tspec = TimeSpecification.parse(rel_string = "1.234")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Relative)
-		self.assertAlmostEqual(tspec.value, 1.234)
+		self.assertAlmostEqual(tspec.relvalue, 1.234)
 
 	def test_rel_value_noparse(self):
 		with self.assertRaises(TimeSpecificationError):
@@ -47,20 +47,24 @@ class TimeSpecificationTests(unittest.TestCase):
 	def test_abs_value_secs(self):
 		tspec = TimeSpecification.parse(abs_string = "10 sec")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 10)
+		self.assertAlmostEqual(tspec.duration_secs, 10)
 
 		tspec = TimeSpecification.parse(abs_string = "123s")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 123)
+		self.assertAlmostEqual(tspec.duration_secs, 123)
+
+		tspec = TimeSpecification.parse(abs_string = "123s")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.duration_mins, 2.05)
 
 	def test_abs_value_min(self):
 		tspec = TimeSpecification.parse(abs_string = "1min")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 60)
+		self.assertAlmostEqual(tspec.duration_secs, 60)
 
 		tspec = TimeSpecification.parse(abs_string = "1.5m")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 90)
+		self.assertAlmostEqual(tspec.duration_secs, 90)
 
 	def test_abs_value_xx_yy_unspecified(self):
 		with self.assertRaises(TimeSpecificationError):
@@ -69,36 +73,36 @@ class TimeSpecificationTests(unittest.TestCase):
 	def test_abs_value_xx_yy_default(self):
 		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "hm")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 9000)
+		self.assertAlmostEqual(tspec.duration_secs, 9000)
 
 		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "h:m")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 9000)
+		self.assertAlmostEqual(tspec.duration_secs, 9000)
 
 		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "ms")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 150)
+		self.assertAlmostEqual(tspec.duration_secs, 150)
 
 		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "m:s")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 150)
+		self.assertAlmostEqual(tspec.duration_secs, 150)
 
 	def test_abs_value_xx_yy_specified(self):
 		tspec = TimeSpecification.parse(abs_string = "2:30hm", default_abs_interpretation = "m:s")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 9000)
+		self.assertAlmostEqual(tspec.duration_secs, 9000)
 
 		tspec = TimeSpecification.parse(abs_string = "2:30 h:m")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 9000)
+		self.assertAlmostEqual(tspec.duration_secs, 9000)
 
 		tspec = TimeSpecification.parse(abs_string = "2:30ms", default_abs_interpretation = "hm")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 150)
+		self.assertAlmostEqual(tspec.duration_secs, 150)
 
 		tspec = TimeSpecification.parse(abs_string = "2:30ms")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 150)
+		self.assertAlmostEqual(tspec.duration_secs, 150)
 
 
 	def test_abs_value_noparse(self):
@@ -111,38 +115,8 @@ class TimeSpecificationTests(unittest.TestCase):
 		with self.assertRaises(TimeSpecificationError):
 			TimeSpecification.parse(abs_string = "1.234:30 min")
 
-	def test_timerange_simple(self):
-		tr = TimeRange.parse("11:12 - 22:23")
-		self.assertEqual(tr.range_begin, (11 * 60) + 12)
-		self.assertEqual(tr.range_end, (22 * 60) + 23)
-		self.assertEqual(tr.begin_time, (11, 12))
-		self.assertEqual(tr.end_time, (22, 23))
-		self.assertEqual(tr.duration_mins, 48 + (60 * 10) + 23)
-
-	def test_timerange_crossover(self):
-		tr = TimeRange.parse(" 23:45-0:15 ")
-		self.assertEqual(tr.range_begin, (23 * 60) + 45)
-		self.assertEqual(tr.range_end, 1440 + (0 * 60) + 15)
-		self.assertEqual(tr.begin_time, (23, 45))
-		self.assertEqual(tr.end_time, (0, 15))
-		self.assertEqual(tr.duration_mins, 30)
-
-	def test_timerange_noparse(self):
-		with self.assertRaises(TimeSpecificationError):
-			TimeRange.parse("0 : 10 - 10:12")
-		with self.assertRaises(TimeSpecificationError):
-			TimeRange.parse(" 23:23 - 24:12")
-		with self.assertRaises(TimeSpecificationError):
-			TimeRange.parse(" 23:23 - 24:12")
-		with self.assertRaises(TimeSpecificationError):
-			TimeRange.parse(" 23:23 - 22:x2")
-
-	def test_timeranges_simple(self):
-		trs = TimeRanges.parse("10:00-10:15 10:20-10:30")
-		self.assertEqual(trs.duration_mins, 15 + 10)
-
 	def test_presentation_schedule_simple(self):
-		ps = PresentationSchedule(active_presentation_time_minutes = 45)
+		ps = PresentationSchedule(presentation_time_seconds = 60 * 45)
 		ps.set_slide_no(1, TimeSpecification.parse(abs_string = "2 min"))
 		ps.set_slide_no(5, TimeSpecification.parse(rel_string = "2"))
 		ps.have_slide(15)
