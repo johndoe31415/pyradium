@@ -102,9 +102,7 @@ class Presentation():
 		return cls(meta, content, sources)
 
 	def _validate_metadata(self):
-		if self.meta is not None:
-			if not isinstance(self.meta.get("schedule", { }), dict):
-				raise MalformedXMLInputException("The 'meta' child node 'schedule' must not contain text, but two child nodes (<total-presentation-time> and <pause-minutes>).")
+		pass
 
 	def _determine_sha256(self, filename):
 		with open(filename, "rb") as f:

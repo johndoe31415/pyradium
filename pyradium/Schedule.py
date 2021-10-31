@@ -22,14 +22,21 @@
 import re
 import enum
 import collections
+import logging
 from .Exceptions import TimeSpecificationError
+
+_log = logging.getLogger(__spec__.name)
 
 class TimeSpecificationType(enum.IntEnum):
 	Relative = 0
 	Absolute = 1
 
 class TimeSpecification():
-	_ABS_REGEX = re.compile(r"((?P<single_value>(\d*\.)?\d+)\s*(?P<unit>min|sec|m|s)|(?P<mins>\d+):(?P<secs>\d+))")
+	_ABS_REGEX = re.compile(r"("
+							+ r"(?P<single_value>(\d*\.)?\d+)\s*(?P<unit>hrs?|mins?|secs?|h|m|s)"
+							+ r"|(?P<hrs>\d+):(?P<mins>\d+):(?P<secs>\d+)"
+							+ r"|(?P<val1>\d+):(?P<val2>\d+)\s*(?P<valunit>h:?m|m:?s)?"
+							+ r")")
 	_REL_REGEX = re.compile(r"(?P<rel_value>(\d*\.)?\d+)")
 
 	def __init__(self, value, spec_type):
@@ -38,15 +45,26 @@ class TimeSpecification():
 		self._spec_type = spec_type
 
 	@property
-	def value(self):
+	def relvalue(self):
+		assert(self.spec_type == TimeSpecificationType.Relative)
 		return self._value
+
+	@property
+	def duration_secs(self):
+		assert(self.spec_type == TimeSpecificationType.Absolute)
+		return self._value
+
+	@property
+	def duration_mins(self):
+		assert(self.spec_type == TimeSpecificationType.Absolute)
+		return self._value / 60
 
 	@property
 	def spec_type(self):
 		return self._spec_type
 
 	@classmethod
-	def parse(cls, abs_string = None, rel_string = None):
+	def parse(cls, abs_string = None, rel_string = None, default_abs_interpretation = None):
 		if (abs_string is None) and (rel_string is None):
 			raise TimeSpecificationError("Either absolute or relative timing must be supplied.")
 		if (abs_string is not None) and (rel_string is not None):
@@ -57,14 +75,30 @@ class TimeSpecification():
 			if match is None:
 				raise TimeSpecificationError("Invalid string for absolute timespecification: \"%s\"" % (abs_string))
 			match = match.groupdict()
-			if match["unit"] in [ "min", "m" ]:
-				value = float(match["single_value"]) * 60
-			elif match["unit"] in [ "sec", "s" ]:
-				value = float(match["single_value"])
-			elif match["unit"] is None:
-				value = (60 * int(match["mins"])) + int(match["secs"])
+			if match["unit"] is not None:
+				# A unit was supplied
+				if match["unit"] in [ "hr", "hrs", "h" ]:
+					value = float(match["single_value"]) * 3600
+				elif match["unit"] in [ "min", "mins", "m" ]:
+					value = float(match["single_value"]) * 60
+				elif match["unit"] in [ "sec", "secs", "s" ]:
+					value = float(match["single_value"])
+				else:
+					raise NotImplementedError(match["unit"])
+			elif match["hrs"] is not None:
+				value = (3600 * int(match["hrs"])) + (60 * int(match["mins"])) + int(match["secs"])
 			else:
-				raise NotImplementedError(match["unit"])
+				# xx:yy format, need to infer the correct unit (hrs:mins or
+				# mins:secs)
+				given_format = match["valunit"] or default_abs_interpretation
+				if given_format is None:
+					raise TimeSpecificationError("For the given timespec '%s' of format xx:yy it is impossible to tell wether hrs:mins or mins:secs is meant and no default value is available. Please specify." % (abs_string))
+				if given_format in [ "h:m", "hm" ]:
+					value = (3600 * int(match["val1"])) + (60 * int(match["val2"]))
+				elif given_format in [ "m:s", "ms" ]:
+					value = (60 * int(match["val1"])) + int(match["val2"])
+				else:
+					raise NotImplementedError(given_format)
 			return cls(spec_type = TimeSpecificationType.Absolute, value = value)
 		else:
 			match = cls._REL_REGEX.fullmatch(rel_string)
@@ -76,86 +110,11 @@ class TimeSpecification():
 	def __str__(self):
 		return "TimeSpecification<%s, %.0f>" % (self.spec_type.name, self.value)
 
-class TimeRange():
-	_TIME_RE = re.compile(r"\s*(?P<begin_hrs>\d+):(?P<begin_mins>\d{2})\s*-\s*(?P<end_hrs>\d+):(?P<end_mins>\d{2})\s*")
-	def __init__(self, range_begin, range_end):
-		self._range_begin = range_begin
-		self._range_end = range_end
-
-	@property
-	def range_begin(self):
-		return self._range_begin
-
-	@property
-	def range_end(self):
-		return self._range_end
-
-	@property
-	def begin_time(self):
-		return divmod(self.range_begin % 1440, 60)
-
-	@property
-	def end_time(self):
-		return divmod(self.range_end % 1440, 60)
-
-	@property
-	def duration_mins(self):
-		return self.range_end - self.range_begin
-
-	@classmethod
-	def parse(cls, text):
-		match = cls._TIME_RE.fullmatch(text)
-		if match is None:
-			raise TimeSpecificationError("Invalid time range: \"%s\"" % (text))
-		match = match.groupdict()
-		match = { key: int(value) for (key, value) in match.items() }
-		if not (0 <= match["begin_hrs"] <= 23):
-			raise TimeSpecificationError("Invalid time range: \"%s\"; begin hours must be in range 0..23" % (text))
-		if not (0 <= match["end_hrs"] <= 23):
-			raise TimeSpecificationError("Invalid time range: \"%s\"; end hours must be in range 0..23" % (text))
-		if not (0 <= match["begin_mins"] <= 59):
-			raise TimeSpecificationError("Invalid time range: \"%s\"; begin minutes must be in range 0..59" % (text))
-		if not (0 <= match["end_mins"] <= 59):
-			raise TimeSpecificationError("Invalid time range: \"%s\"; end minutes must be in range 0..59" % (text))
-
-		range_begin = (int(match["begin_hrs"]) * 60) + int(match["begin_mins"])
-		range_end = (int(match["end_hrs"]) * 60) + int(match["end_mins"])
-		if range_end < range_begin:
-			range_end += 1440
-		return cls(range_begin = range_begin, range_end = range_end)
-
-	def __str__(self):
-		return "%d:%02d-%d:%02d" % (self.begin_time[0], self.begin_time[1], self.end_time[0], self.end_time[1])
-
-class TimeRanges():
-	_SPLITTER_RE = re.compile(r"\s+")
-
-	def __init__(self, time_ranges):
-		assert(all(isinstance(time_range, TimeRange) for time_range in time_ranges))
-		self._time_ranges = tuple(time_ranges)
-
-	@classmethod
-	def parse(cls, text):
-		return cls(tuple(TimeRange.parse(text_value) for text_value in cls._SPLITTER_RE.split(text)))
-
-	@property
-	def duration_mins(self):
-		return sum(time_range.duration_mins for time_range in self)
-
-	def __iter__(self):
-		return iter(self._time_ranges)
-
-	def __str__(self):
-		return " ".join(str(time_range) for time_range in self)
-
 class PresentationSchedule():
 	_TimeSlice = collections.namedtuple("TimeSlice", [ "slide_no", "slide_ratio", "begin_ratio", "end_ratio", "time_seconds" ])
 
-	def __init__(self, active_presentation_time_minutes):
-		if active_presentation_time_minutes is not None:
-			self._active_presentation_time_seconds = 60 * active_presentation_time_minutes
-		else:
-			self._active_presentation_time_seconds = None
+	def __init__(self, presentation_time_seconds = None):
+		self._presentation_time_seconds = presentation_time_seconds
 		self._time_specs = { }
 		self._timeslices = None
 		self._max_slide_no = 0
@@ -182,21 +141,21 @@ class PresentationSchedule():
 			for (slide_no, time_spec) in self._slide_no_timespec():
 				if time_spec is not None:
 					if time_spec.spec_type == TimeSpecificationType.Absolute:
-						abs_sum_secs += time_spec.value
+						abs_sum_secs += time_spec.duration_secs
 					elif time_spec.spec_type == TimeSpecificationType.Relative:
-						rel_sum_pts += time_spec.value
+						rel_sum_pts += time_spec.relvalue
 					else:
 						raise NotImplementedError(time_spec.spec_type)
 				else:
 					rel_sum_pts += 1
 
-			if (abs_sum_secs > 0) and (self._active_presentation_time_seconds is None):
+			if (abs_sum_secs > 0) and (self._presentation_time_seconds is None):
 				raise TimeSpecificationError("You are free to not define a presentation length beforehand, but then absolute time references may not be used.")
 
-			if self._active_presentation_time_seconds is not None:
-				active_rel_time_secs = self._active_presentation_time_seconds - abs_sum_secs
+			if self._presentation_time_seconds is not None:
+				active_rel_time_secs = self._presentation_time_seconds - abs_sum_secs
 				if active_rel_time_secs < 0:
-					raise TimeSpecificationError("Presentation active time is %.0f seconds, but %.0f seconds already allocated for absolute slides." % (self._active_presentation_time_seconds, abs_sum_secs))
+					raise TimeSpecificationError("Presentation active time is %.0f seconds, but %.0f seconds already allocated for absolute slides." % (self._presentation_time_seconds, abs_sum_secs))
 			else:
 				# Doesn't matter at all, we're only dealing with relative references
 				active_rel_time_secs = 1
@@ -212,14 +171,14 @@ class PresentationSchedule():
 			for (slide_no, time_spec) in self._slide_no_timespec():
 				if time_spec is not None:
 					if time_spec.spec_type == TimeSpecificationType.Absolute:
-						slide_time_secs = time_spec.value
+						slide_time_secs = time_spec.duration_secs
 					elif time_spec.spec_type == TimeSpecificationType.Relative:
-						slide_time_secs = time_spec.value / rel_sum_pts * active_rel_time_secs
+						slide_time_secs = time_spec.relvalue / rel_sum_pts * active_rel_time_secs
 				else:
 					slide_time_secs = 1 / rel_sum_pts * active_rel_time_secs
 
-				if self._active_presentation_time_seconds is not None:
-					slide_ratio = slide_time_secs / self._active_presentation_time_seconds
+				if self._presentation_time_seconds is not None:
+					slide_ratio = slide_time_secs / self._presentation_time_seconds
 				else:
 					slide_ratio = slide_time_secs
 				timeslice = self._TimeSlice(slide_no = slide_no, slide_ratio = slide_ratio, begin_ratio = current_slide_ratio, end_ratio = current_slide_ratio + slide_ratio, time_seconds = slide_time_secs)
@@ -227,7 +186,19 @@ class PresentationSchedule():
 				timeslices[slide_no] = timeslice
 
 			self._timeslices = timeslices
+		if _log.isEnabledFor(logging.TRACE):
+			self.dump()
 		return self._timeslices
+
+	def dump(self):
+		_log.trace("Dumping %d timeslices determined from presentation schedule:", len(self._timeslices))
+		sum_ratios = 0
+		sum_duration = 0
+		for (slide_no, timeslice) in sorted(self._timeslices.items()):
+			sum_ratios += timeslice.slide_ratio
+			sum_duration += timeslice.time_seconds
+			_log.trace("Slide %2d: ratio %.4f  from %.4f  to %.4f  duration %.0f secs", timeslice.slide_no, timeslice.slide_ratio, timeslice.begin_ratio, timeslice.end_ratio, timeslice.time_seconds)
+		_log.trace("Schedule sum of ratios %.3f (should be 1), sum of time %.0f secs", sum_ratios, sum_duration)
 
 	def __getitem__(self, slide_no):
 		if self._timeslices is None:

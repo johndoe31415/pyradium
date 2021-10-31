@@ -21,8 +21,6 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-import {TimeKeeper} from "./pyradium_timekeeper.js";
-
 const CursorStyle = {
 	CURSOR_OFF: 0,
 	CURSOR_DEFAULT: 1,
@@ -45,7 +43,6 @@ export class Presentation {
 		this._ui_elements.slides.forEach((slide) => {
 			this._intersect_obs.observe(slide);
 		});
-		this._timekeeper = new TimeKeeper();
 		this._session_id = Math.random();
 		this._presentation_mode = "stopped";
 		this._bc = new BroadcastChannel("presentation");
@@ -72,7 +69,6 @@ export class Presentation {
 	set presentation_mode(value) {
 		const changed = (this._presentation_mode != value);
 		this._presentation_mode = value;
-		this._timekeeper.mode = value;
 		if (changed) {
 			this._tx_status();
 		}
@@ -83,7 +79,6 @@ export class Presentation {
 	}
 
 	_tx_status() {
-
 		const msg = {
 			"type":						"status",
 			"session_id":				this._session_id,
@@ -91,10 +86,6 @@ export class Presentation {
 				"presentation_mode":	this.presentation_mode,
 				"begin_ratio":			this.current_slide.getAttribute("begin_ratio") * 1,
 				"end_ratio":			this.current_slide.getAttribute("end_ratio") * 1,
-				"timekeeper": {
-					"started":			this._timekeeper.time_spent_in("started"),
-					"paused":			this._timekeeper.time_spent_in("paused"),
-				},
 			},
 		};
 		this._bc.postMessage(msg);

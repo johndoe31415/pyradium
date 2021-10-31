@@ -62,14 +62,44 @@ class TimeSpecificationTests(unittest.TestCase):
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
 		self.assertAlmostEqual(tspec.value, 90)
 
-	def test_abs_value_colon(self):
-		tspec = TimeSpecification.parse(abs_string = "2:30")
+	def test_abs_value_xx_yy_unspecified(self):
+		with self.assertRaises(TimeSpecificationError):
+			TimeSpecification.parse(abs_string = "2:30")
+
+	def test_abs_value_xx_yy_default(self):
+		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "hm")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.value, 9000)
+
+		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "h:m")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.value, 9000)
+
+		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "ms")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
 		self.assertAlmostEqual(tspec.value, 150)
 
-		tspec = TimeSpecification.parse(abs_string = "0:12")
+		tspec = TimeSpecification.parse(abs_string = "2:30", default_abs_interpretation = "m:s")
 		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
-		self.assertAlmostEqual(tspec.value, 12)
+		self.assertAlmostEqual(tspec.value, 150)
+
+	def test_abs_value_xx_yy_specified(self):
+		tspec = TimeSpecification.parse(abs_string = "2:30hm", default_abs_interpretation = "m:s")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.value, 9000)
+
+		tspec = TimeSpecification.parse(abs_string = "2:30 h:m")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.value, 9000)
+
+		tspec = TimeSpecification.parse(abs_string = "2:30ms", default_abs_interpretation = "hm")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.value, 150)
+
+		tspec = TimeSpecification.parse(abs_string = "2:30ms")
+		self.assertEqual(tspec.spec_type, TimeSpecificationType.Absolute)
+		self.assertAlmostEqual(tspec.value, 150)
+
 
 	def test_abs_value_noparse(self):
 		with self.assertRaises(TimeSpecificationError):
