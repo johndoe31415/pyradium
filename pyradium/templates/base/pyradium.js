@@ -214,11 +214,19 @@ export class Presentation {
 		}
 		if (event.key == "PageDown") {
 			console.log("Keydown: 'PageDown' -> next slide");
-			this.next_slide();
+			this.goto_next_slide();
 			event.preventDefault();
 		} else if (event.key == "PageUp") {
 			console.log("Keydown: 'PageUp' -> previous slide");
-			this.prev_slide();
+			this.goto_prev_slide();
+			event.preventDefault();
+		} else if (event.key == "Home") {
+			console.log("Keydown: 'Home' -> first slide");
+			this.goto_first_slide();
+			event.preventDefault();
+		} else if (event.key == "End") {
+			console.log("Keydown: 'End' -> last slide");
+			this.goto_last_slide();
 			event.preventDefault();
 		} else {
 			console.log("Keydown other: ", event);
@@ -230,10 +238,10 @@ export class Presentation {
 		if (this.fullscreen_mode) {
 			if (scroll_up) {
 				console.log("Wheel: 'ScrollUp' -> previous slide");
-				this.prev_slide();
+				this.goto_prev_slide();
 			} else {
 				console.log("Wheel: 'ScrollDown' -> next slide");
-				this.next_slide();
+				this.goto_next_slide();
 			}
 		}
 	}
@@ -328,11 +336,19 @@ export class Presentation {
 		}
 	}
 
-	next_slide() {
+	goto_first_slide() {
+		this._goto_slide(0, true);
+	}
+
+	goto_last_slide() {
+		this._goto_slide(this.slide_count - 1, true);
+	}
+
+	goto_next_slide() {
 		this._goto_slide(this._internal_slide_index + 1, true);
 	}
 
-	prev_slide() {
+	goto_prev_slide() {
 		this._goto_slide(this._internal_slide_index - 1, true);
 	}
 
