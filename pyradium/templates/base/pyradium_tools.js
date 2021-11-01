@@ -36,26 +36,22 @@ class Timestamp {
 
 	compute(presentation_duration_seconds) {
 		if (this._ts_type == TimestampMode.ABSOLUTE) {
-			this._timestamp = this._ts_value;
+			return this._ts_value;
 		} else if (this._ts_type == TimestampMode.RELATIVE_NOW) {
 			const now = new Date();
-			this._timestamp = new Date(now.getTime() + (this._ts_value * 1000));
-		} else if (this._ts_type == TimestampMode.RELATIVE_NOW) {
+			return new Date(now.getTime() + (this._ts_value * 1000));
+		} else if (this._ts_type == TimestampMode.RELATIVE_PRESENTATION_LENGTH) {
 			const now = new Date();
-			this._timestamp = new Date(now.getTime() + (this._ts_value * presentation_duration_seconds * 1000));
+			return new Date(now.getTime() + (this._ts_value * presentation_duration_seconds * 1000));
 		} else {
 			console.log("Invalid TS type:", this._ts_type);
 		}
-	}
-
-	get timestamp() {
-		return this._timestamp;
 	}
 }
 
 export class TimeTools {
 	static parse_hh_mm(hh_mm_str) {
-		const match = timestamp_str.match(/^\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
+		const match = hh_mm_str.match(/^\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
 		if (match) {
 			const timestamp_hour = match.groups.timestamp_hour | 0;
 			const timestamp_minute = match.groups.timestamp_minute | 0;
@@ -71,7 +67,7 @@ export class TimeTools {
 	}
 
 	static parse_timestamp(timestamp_str) {
-		/* Easiest first: absolute timestamp given day, hour, minute */
+		/* Absolute timestamp given day, hour, minute */
 		{
 			const now = new Date();
 			const match = timestamp_str.match(/^\s*((?<timestamp_day>\d{1,2})-)?\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
@@ -89,8 +85,9 @@ export class TimeTools {
 					return null;
 				}
 
-				const option1 = new Date(now.getYear(), now.getMonth(), timestamp_day, timestamp_hour, timestamp_minute, 0);
-				const option2 = new Date(now.getYear(), now.getMonth() + 1, timestamp_day, timestamp_hour, timestamp_minute, 0);
+				const option1 = new Date(now.getFullYear(), now.getMonth(), timestamp_day, timestamp_hour, timestamp_minute, 0);
+				const option2 = new Date(now.getFullYear(), now.getMonth() + 1, timestamp_day, timestamp_hour, timestamp_minute, 0);
+				console.log(option1);
 				const diff1 = Math.abs(option1.getTime() - now.getTime());
 				const diff2 = Math.abs(option2.getTime() - now.getTime());
 				const timestamp = (diff1 < diff2) ? option1 : option2;
@@ -98,7 +95,7 @@ export class TimeTools {
 			}
 		}
 
-		/* Second easiest then: relative timestamp relative to current time */
+		/* Relative timestamp relative to current time */
 		{
 			const match = timestamp_str.match(/^\s*\+\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
 			if (match) {
@@ -109,16 +106,28 @@ export class TimeTools {
 			}
 		}
 
-		/* Last is a fracton of the presentation duration */
+		/* Fraction of the presentation duration */
 		{
 			const match = timestamp_str.match(/^\s*(?<numerator>\d+)\s*\/\s*(?<denominator>\d+)\s*$/);
 			if (match) {
 				const numerator = match.groups.numerator | 0;
 				const denominator = match.groups.denominator | 0;
 				if (denominator == 0) {
-					return 0;
+					return null;
 				}
 				return new Timestamp(TimestampMode.RELATIVE_PRESENTATION_LENGTH, numerator / denominator);
+			}
+		}
+
+		/* Percent value of the presentation duration */
+		{
+			const match = timestamp_str.match(/^\s*(?<percent>\d+)\s*%\s*$/);
+			if (match) {
+				const percent = match.groups.percent | 0;
+				if (percent == 0) {
+					return null;
+				}
+				return new Timestamp(TimestampMode.RELATIVE_PRESENTATION_LENGTH, percent / 100);
 			}
 		}
 
@@ -137,6 +146,28 @@ export class TimeTools {
 			return String(minutes) + ":" + String(seconds).padStart(2, "0");
 		} else {
 			return String(hours) + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+		}
+	}
+
+	static format_hm(total_seconds) {
+		if (total_seconds <= -0.5) {
+			return "-" + TimeTools.format_hm(-total_seconds);
+		}
+		total_seconds = Math.round(total_seconds);
+		const hours = Math.floor(total_seconds / 3600);
+		const minutes = Math.floor(total_seconds % 3600 / 60);
+		return String(hours) + ":" + String(minutes).padStart(2, "0");
+	}
+}
+
+export class MathTools {
+	static clamp(value, minval, maxval) {
+		if (value < minval) {
+			return minval;
+		} else if (value > maxval) {
+			return maxval;
+		} else {
+			return value;
 		}
 	}
 }

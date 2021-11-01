@@ -21,7 +21,7 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-import {TimeTools} from "./pyradium_tools.js";
+import {TimeTools, MathTools} from "./pyradium_tools.js";
 
 class SlideSubset {
 	constructor(begin_slide, end_slide) {
@@ -38,13 +38,79 @@ class SlideSubset {
 	}
 
 	static parse(selector, total_slide_count) {
-		if ((selector.toLowerCase() == "all") || (selection == "*")) {
+		if ((selector.toLowerCase() == "all") || (selector == "*")) {
 			if (total_slide_count != null) {
 				return new SlideSubset(1, total_slide_count);
 			} else {
 				return null;
 			}
 		}
+
+		{
+			const match = selector.match(/^\s*((?<lhs>(?<lhs_num>\d+)(?<lhs_percent>\s*%)?))?\s*-\s*((?<rhs>(?<rhs_num>\d+)(?<rhs_percent>\s*%)?))?\s*$/);
+			if (match) {
+				let lhs = 1;
+				if (match.groups.lhs != null) {
+					const lhs_percent = (match.groups.lhs_percent != null);
+					lhs = match.groups.lhs_num | 0;
+					if (lhs_percent) {
+						lhs = Math.round(lhs / 100 * (total_slide_count - 1)) + 1;
+						if (lhs > 1) {
+							/* We want to start offset one, so that for 100 slides,
+							 * 0% - 50%   =>   1 - 50
+							 * 50% - 100% =>   51 - 100
+							 */
+							lhs += 1;
+						}
+					}
+				}
+
+				let rhs = total_slide_count;
+				if (match.groups.rhs != null) {
+					const rhs_percent = (match.groups.rhs_percent != null);
+					rhs = match.groups.rhs_num | 0;
+					if (rhs_percent) {
+						rhs = Math.round(rhs / 100 * (total_slide_count - 1)) + 1;
+					}
+				}
+
+				lhs = MathTools.clamp(lhs, 1, total_slide_count);
+				rhs = MathTools.clamp(rhs, 1, total_slide_count);
+
+				if (lhs <= rhs) {
+					return new SlideSubset(lhs, rhs);
+				} else {
+					return null;
+				}
+			}
+		}
+		{
+			const match = selector.match(/^\s*(?<lhs>\d+)\s*\/\s*(?<rhs>\d+)\s*$/);
+			if (match) {
+				const lhs = match.groups.lhs | 0;
+				const rhs = match.groups.rhs | 0;
+				if (rhs == 0) {
+					return null;
+				}
+
+				let begin_slide = Math.round((lhs - 1) / rhs * (total_slide_count - 1)) + 1;
+				if (begin_slide > 1) {
+					begin_slide += 1;
+				}
+				let end_slide = Math.round(lhs / rhs * (total_slide_count - 1)) + 1;
+
+				begin_slide = MathTools.clamp(begin_slide, 1, total_slide_count);
+				end_slide = MathTools.clamp(end_slide, 1, total_slide_count);
+
+				if (begin_slide <= end_slide) {
+					return new SlideSubset(begin_slide, end_slide);
+				} else {
+					return null;
+				}
+			}
+		}
+
+
 		return null;
 	}
 }
@@ -62,9 +128,15 @@ export class PresentationTimer {
 		this._tx_message({ "type": "query_presentation_meta" });
 		this._timeout_handle = null;
 		this._reset_timeout();
+		this._initialize_ui();
+	}
+
+	_initialize_ui() {
 		this._ui_elements.slide_subset.value = "all";
 		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._ui_change());
 		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_change());
+		this._ui_elements.btn_arm_timer.addEventListener("click", (event) => this.arm_timer());
+		this._ui_elements.btn_start_stop_timer.addEventListener("click", (event) => this.start_stop_timer());
 	}
 
 	_ui_change() {
@@ -74,6 +146,7 @@ export class PresentationTimer {
 		} else {
 			this._ui_elements.presentation_end_time.classList.remove("parse-error");
 		}
+
 		this._slide_subset = SlideSubset.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count);
 		if (this._slide_subset == null) {
 			this._ui_elements.slide_subset.classList.add("parse-error");
@@ -82,9 +155,16 @@ export class PresentationTimer {
 		}
 
 		if (this._presentation_end_time != null) {
-			this._ui_elements.presentation_end_time_display.innerText = "foo";
+			const presentation_duration_seconds = TimeTools.parse_hh_mm(this._meta.xml_meta.presentation_time) * 60;
+			const end_ts = this._presentation_end_time.compute(presentation_duration_seconds);
+			const hh_mm_str = end_ts.getHours() + ":" + end_ts.getMinutes().toString().padStart(2, "0");
+			const now = new Date();
+			const duration_secs = (end_ts.getTime() - now.getTime()) / 1000;
+			this._ui_elements.presentation_end_time_display.innerText = hh_mm_str;
+			this._ui_elements.presentation_duration_display.innerText = TimeTools.format_hm(duration_secs);
 		} else {
 			this._ui_elements.presentation_end_time_display.innerText = "-";
+			this._ui_elements.presentation_duration_display.innerText = "-";
 		}
 		if (this._slide_subset != null) {
 			this._ui_elements.slide_subset_display.innerText = this._slide_subset.begin_slide + " - " + this._slide_subset.end_slide;
@@ -203,5 +283,11 @@ export class PresentationTimer {
 				this._update();
 			}
 		}
+	}
+
+	arm_timer() {
+	}
+
+	start_stop_timer() {
 	}
 }

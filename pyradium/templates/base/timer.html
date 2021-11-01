@@ -12,20 +12,23 @@
 			<div class="menugrid">
 				<div class="menucell">
 					<label for="presentation_end_time">End of Presentation:</label>
-					<input type="text" value="" id="presentation_end_time" class="control ui-element" style="width: 150px" title="Can be in the following example forms: '14:30', '+0:45', '1/3'" />
+					<input type="text" value="" id="presentation_end_time" class="control ui-element" style="width: 150px" title="Can be in the following example forms: '14:30', '+0:45', '1/3', '125%'" />
 				</div>
 				<div class="menucell">
 					<label for="slide_subset">Slide subset:</label>
-					<input type="text" value="" id="slide_subset" class="control ui-element" style="width: 150px" title="Can be in the following example forms: 'all', '1-20', '21-end', '1-50%', '1/3'." />
+					<input type="text" value="" id="slide_subset" class="control ui-element" style="width: 150px" title="Can be in the following example forms: 'all', '1-20', '21-end', '1-40%', '1/3'." />
 				</div>
 				<div class="menucell">
 					<button id="btn_arm_timer" class="control ui-element">Arm Timer</button>
 				</div>
 				<div class="menucell">
-					Effective end: <span class="ui-element" id="presentation_end_time_display"></span>
+					Effective end: <span class="ui-element" id="presentation_end_time_display"></span><br />
+					Duration: <span class="ui-element" id="presentation_duration_display"></span>
 				</div>
 				<div class="menucell">
-					Slide selection: <span class="ui-element" id="slide_subset_display"></span>
+					Slide selection: <span class="ui-element" id="slide_subset_display"></span><br />
+					Slide count: <span class="ui-element" id="slide_count_display"></span><br />
+					Nominal slide duration: <span class="ui-element" id="nominal_slide_duration_display"></span>
 				</div>
 				<div class="menucell">
 					<button id="btn_start_stop_timer" class="control ui-element">Start Timer</button>
