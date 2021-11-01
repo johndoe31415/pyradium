@@ -36,74 +36,142 @@ class SlideSubset {
 	get end_slide() {
 		return this._end_slide;
 	}
+}
 
-	static parse(selector, total_slide_count) {
+class SlideSubsetSelector {
+	constructor(slide_ratios) {
+		this._slide_ratios = slide_ratios;
+		this._cumulative_ratios = [ ];
+
+		let cumulative_ratio = 0;
+		for (let slide_ratio of this._slide_ratios) {
+			cumulative_ratio += slide_ratio;
+			this._cumulative_ratios.push(cumulative_ratio);
+		}
+	}
+
+	get_ratio_of_subset(slide_subset) {
+		const begin_ratio = (slide_subset.begin_slide == 1) ? 0 : this._cumulative_ratios[slide_subset.begin_slide - 2];
+		const end_ratio = this._cumulative_ratios[slide_subset.end_slide - 1];
+		return end_ratio - begin_ratio;
+	}
+
+	_find_slide_ratio(ratio, start_slide = 1) {
+		for (let i = start_slide - 1; i < this._cumulative_ratios.length; i++) {
+			const cumulative_ratio = this._cumulative_ratios[i];
+			if (cumulative_ratio >= ratio) {
+				return i + 1;
+			}
+		}
+		return this.slide_count;
+	}
+
+	get slide_count() {
+		return this._slide_ratios.length;
+	}
+
+	parse(selector) {
+		/* Special keywords 'all' or '*' */
 		if ((selector.toLowerCase() == "all") || (selector == "*")) {
-			if (total_slide_count != null) {
-				return new SlideSubset(1, total_slide_count);
+			if (this.slide_count != null) {
+				return new SlideSubset(1, this.slide_count);
 			} else {
 				return null;
 			}
 		}
 
+		/* Range in the form of "begin - end" where
+		 *     a prefix of '#' means: count-based instead of time-based
+		 *     any value of 'begin' or 'end' can be a percent value by using a '%' suffix
+		 */
 		{
-			const match = selector.match(/^\s*((?<lhs>(?<lhs_num>\d+)(?<lhs_percent>\s*%)?))?\s*-\s*((?<rhs>(?<rhs_num>\d+)(?<rhs_percent>\s*%)?))?\s*$/);
+			const match = selector.match(/^\s*(?<count>#\s*)?((?<lhs>(?<lhs_num>\d+)(?<lhs_percent>\s*%)?))?\s*-\s*((?<rhs>(?<rhs_num>\d+)(?<rhs_percent>\s*%)?))?\s*$/);
 			if (match) {
-				let lhs = 1;
+				const count_based = (match.groups.count != null);
+				let begin_slide = 1;
 				if (match.groups.lhs != null) {
 					const lhs_percent = (match.groups.lhs_percent != null);
-					lhs = match.groups.lhs_num | 0;
-					if (lhs_percent) {
-						lhs = Math.round(lhs / 100 * (total_slide_count - 1)) + 1;
-						if (lhs > 1) {
+					const lhs_value = match.groups.lhs_num | 0;
+
+					if (!lhs_percent) {
+						/* Plain value like '5', always count-based */
+						begin_slide = lhs_value;
+					} else {
+						if (count_based) {
+							/* Percent value like '33%', count-based */
+							begin_slide = Math.round(lhs_value / 100 * (this.slide_count - 1)) + 1;
+						} else {
+							/* Percent value like '33%', time-based */
+							begin_slide = this._find_slide_ratio(lhs_value / 100);
+						}
+						if (begin_slide > 1) {
 							/* We want to start offset one, so that for 100 slides,
 							 * 0% - 50%   =>   1 - 50
 							 * 50% - 100% =>   51 - 100
 							 */
-							lhs += 1;
+							begin_slide += 1;
 						}
 					}
 				}
+				begin_slide = MathTools.clamp(begin_slide, 1, this.slide_count);
 
-				let rhs = total_slide_count;
+
+				let end_slide = this.slide_count;
 				if (match.groups.rhs != null) {
 					const rhs_percent = (match.groups.rhs_percent != null);
-					rhs = match.groups.rhs_num | 0;
-					if (rhs_percent) {
-						rhs = Math.round(rhs / 100 * (total_slide_count - 1)) + 1;
+					const rhs_value = match.groups.rhs_num | 0;
+
+					if (!rhs_percent) {
+						/* Plain value like '15', always count-based */
+						end_slide = match.groups.rhs_num | 0;
+					} else {
+
+						if (count_based) {
+							/* Percent value like '66%', count-based */
+							end_slide = Math.round(rhs_value / 100 * (this.slide_count - 1)) + 1;
+						} else {
+							/* Percent value like '66%', time-based */
+							end_slide = this._find_slide_ratio(rhs_value / 100, begin_slide);
+						}
 					}
 				}
+				end_slide = MathTools.clamp(end_slide, 1, this.slide_count);
 
-				lhs = MathTools.clamp(lhs, 1, total_slide_count);
-				rhs = MathTools.clamp(rhs, 1, total_slide_count);
-
-				if (lhs <= rhs) {
-					return new SlideSubset(lhs, rhs);
+				if (begin_slide <= end_slide) {
+					return new SlideSubset(begin_slide, end_slide);
 				} else {
 					return null;
 				}
 			}
 		}
+
+		/* Fraction in the form of n/m */
 		{
-			const match = selector.match(/^\s*(?<lhs>\d+)\s*\/\s*(?<rhs>\d+)\s*$/);
+			const match = selector.match(/^\s*(?<count>#\s*)?(?<numerator>\d+)\s*\/\s*(?<denominator>\d+)\s*$/);
 			if (match) {
-				const lhs = match.groups.lhs | 0;
-				const rhs = match.groups.rhs | 0;
-				if (lhs < 1) {
+				const count_based = (match.groups.count != null);
+				const numerator = match.groups.numerator | 0;
+				const denominator = match.groups.denominator | 0;
+				if (numerator < 1) {
 					return null;
-				}
-				if (rhs < lhs) {
+				} else if (denominator < numerator) {
 					return null;
 				}
 
-				let begin_slide = Math.round((lhs - 1) / rhs * (total_slide_count - 1)) + 1;
+				let begin_slide, end_slide;
+				if (count_based) {
+					begin_slide = Math.round((numerator - 1) / denominator * (this.slide_count - 1)) + 1;
+					end_slide = Math.round(numerator / denominator * (this.slide_count - 1)) + 1;
+				} else {
+					begin_slide = this._find_slide_ratio((numerator - 1) / denominator);
+					end_slide = this._find_slide_ratio(numerator / denominator, begin_slide);
+				}
 				if (begin_slide > 1) {
 					begin_slide += 1;
 				}
-				let end_slide = Math.round(lhs / rhs * (total_slide_count - 1)) + 1;
 
-				begin_slide = MathTools.clamp(begin_slide, 1, total_slide_count);
-				end_slide = MathTools.clamp(end_slide, 1, total_slide_count);
+				begin_slide = MathTools.clamp(begin_slide, 1, this.slide_count);
+				end_slide = MathTools.clamp(end_slide, 1, this.slide_count);
 
 				if (begin_slide <= end_slide) {
 					return new SlideSubset(begin_slide, end_slide);
@@ -124,6 +192,8 @@ export class PresentationTimer {
 		this._ui_elements = ui_elements;
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
+		this._nominal_presentation_duration_secs = null;
+		this._slide_subset_selector = null;
 		this._session_id = null;
 		this._status = null;
 		this._meta = null;
@@ -150,16 +220,17 @@ export class PresentationTimer {
 			this._ui_elements.presentation_end_time.classList.remove("parse-error");
 		}
 
-		this._slide_subset = SlideSubset.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count);
-		if (this._slide_subset == null) {
-			this._ui_elements.slide_subset.classList.add("parse-error");
-		} else {
-			this._ui_elements.slide_subset.classList.remove("parse-error");
+		if (this._slide_subset_selector != null) {
+			this._slide_subset = this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count);
+			if (this._slide_subset == null) {
+				this._ui_elements.slide_subset.classList.add("parse-error");
+			} else {
+				this._ui_elements.slide_subset.classList.remove("parse-error");
+			}
 		}
 
 		if (this._presentation_end_time != null) {
-			const presentation_duration_seconds = TimeTools.parse_hh_mm(this._meta.xml_meta.presentation_time) * 60;
-			const end_ts = this._presentation_end_time.compute(presentation_duration_seconds);
+			const end_ts = this._presentation_end_time.compute(this._nominal_presentation_duration_secs);
 			const hh_mm_str = end_ts.getHours() + ":" + end_ts.getMinutes().toString().padStart(2, "0");
 			const now = new Date();
 			const duration_secs = (end_ts.getTime() - now.getTime()) / 1000;
@@ -171,10 +242,22 @@ export class PresentationTimer {
 		}
 		if (this._slide_subset != null) {
 			this._ui_elements.slide_subset_display.innerText = this._slide_subset.begin_slide + " - " + this._slide_subset.end_slide;
+			this._ui_elements.slide_count_display.innerText = this._slide_subset.end_slide - this._slide_subset.begin_slide + 1;
+			this._ui_elements.nominal_slide_duration_display.innerText = TimeTools.format_hm(this._compute_nominal_slide_duration_secs());
 		} else {
 			this._ui_elements.slide_subset_display.innerText = "-";
+			this._ui_elements.slide_count_display.innerText = "-";
+			this._ui_elements.nominal_slide_duration_display.innerText = "-";
 		}
 		this._update();
+	}
+
+	_compute_nominal_slide_duration_secs() {
+		if (this._slide_subset == null) {
+			return null;
+		}
+		const ratio = this._slide_subset_selector.get_ratio_of_subset(this._slide_subset);
+		return ratio * this._nominal_presentation_duration_secs;
 	}
 
 	_reset_timeout() {
@@ -254,9 +337,11 @@ export class PresentationTimer {
 	}
 
 	_update_meta() {
-		if (this._meta.xml_meta.presentation_time != null) {
-			this._ui_elements.presentation_end_time.value = "+" + this._meta.xml_meta.presentation_time;
+		if (this._meta.presentation_time != null) {
+			this._ui_elements.presentation_end_time.value = "+" + this._meta.presentation_time;
+			this._nominal_presentation_duration_secs = TimeTools.parse_hh_mm(this._meta.presentation_time) * 60;
 		}
+		this._slide_subset_selector = new SlideSubsetSelector(this._meta.slide_ratios);
 		this._ui_change();
 	}
 

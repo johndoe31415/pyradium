@@ -57,10 +57,7 @@ export class Presentation {
 	}
 
 	get presentation_meta() {
-		return {
-			"xml_meta": this._presentation_meta,
-			"slide_count": this.slide_count,
-		}
+		return this._presentation_meta
 	}
 
 	get slide_count() {

@@ -200,6 +200,10 @@ class PresentationSchedule():
 			_log.trace("Slide %2d: ratio %.4f  from %.4f  to %.4f  duration %.0f secs", timeslice.slide_no, timeslice.slide_ratio, timeslice.begin_ratio, timeslice.end_ratio, timeslice.time_seconds)
 		_log.trace("Schedule sum of ratios %.3f (should be 1), sum of time %.0f secs", sum_ratios, sum_duration)
 
+	@property
+	def slide_ratio_list(self):
+		return [ timeslice.slide_ratio for (slide_no, timeslice) in sorted(self._timeslices.items()) ]
+
 	def __getitem__(self, slide_no):
 		if self._timeslices is None:
 			return self._TimeSlice(slide_no = slide_no, slide_ratio = 1, begin_ratio = 0, end_ratio = 1, time_seconds = 1)

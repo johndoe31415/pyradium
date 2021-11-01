@@ -166,6 +166,7 @@ class RenderedPresentation():
 	@property
 	def meta(self):
 		return {
+			"slide_ratios":			self.schedule.slide_ratio_list,
 			"presentation_time":	self.renderer.presentation.meta.get("presentation-time"),
 		}
 

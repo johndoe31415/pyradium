@@ -2,7 +2,7 @@
 <a class="slideanchor" name="slide${slide.var("current_slide_number")}"></a>
 %endif
 <div class="size_container <%block name="container_classes"></%block>">
-	<div class="slide <%block name="slide_classes"></%block>" slide_no="${slide.var("current_slide_number")}" sub_slide_index="${slide.var("sub_slide_index")}" begin_ratio="${slide.var("timeslice").begin_ratio}" end_ratio="${slide.var("timeslice").end_ratio}">
+	<div class="slide <%block name="slide_classes"></%block>" slide_no="${slide.var("current_slide_number")}" sub_slide_index="${slide.var("sub_slide_index")}">
 		${next.body()}
 	</div>
 </div>
