@@ -89,7 +89,10 @@ class SlideSubset {
 			if (match) {
 				const lhs = match.groups.lhs | 0;
 				const rhs = match.groups.rhs | 0;
-				if (rhs == 0) {
+				if (lhs < 1) {
+					return null;
+				}
+				if (rhs < lhs) {
 					return null;
 				}
 
