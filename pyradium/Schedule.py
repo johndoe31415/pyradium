@@ -108,7 +108,12 @@ class TimeSpecification():
 			return cls(spec_type = TimeSpecificationType.Relative, value = float(match["rel_value"]))
 
 	def __str__(self):
-		return "TimeSpecification<%s, %.0f>" % (self.spec_type.name, self.value)
+		if self.spec_type == TimeSpecificationType.Relative:
+			return "TimeSpecification<%s, %.1f>" % (self.spec_type.name, self.relvalue)
+		elif self.spec_type == TimeSpecificationType.Absolute:
+			return "TimeSpecification<%s, %.0f sec>" % (self.spec_type.name, self.duration_secs)
+		else:
+			return "TimeSpecification<%s>" % (self.spec_type.name)
 
 class PresentationSchedule():
 	_TimeSlice = collections.namedtuple("TimeSlice", [ "slide_no", "slide_ratio", "begin_ratio", "end_ratio", "time_seconds" ])
