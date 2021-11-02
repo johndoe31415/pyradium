@@ -56,9 +56,25 @@ class SlideSubsetSelector {
 		}
 	}
 
+	get_cumulative_ratio_before(slide_no) {
+		if (slide_no == 1) {
+			return 0;
+		} else {
+			return this._cumulative_ratios[slide_no - 2];
+		}
+	}
+
+	get_cumulative_ratio_after(slide_no) {
+		return this._cumulative_ratios[slide_no - 1];
+	}
+
+	get_ratio_of(slide_no) {
+		return this._slide_ratios[slide_no - 1];
+	}
+
 	get_ratio_of_subset(slide_subset) {
-		const begin_ratio = (slide_subset.begin_slide == 1) ? 0 : this._cumulative_ratios[slide_subset.begin_slide - 2];
-		const end_ratio = this._cumulative_ratios[slide_subset.end_slide - 1];
+		const begin_ratio = this.get_cumulative_ratio_before(slide_subset.begin_slide);
+		const end_ratio = this.get_cumulative_ratio_after(slide_subset.end_slide);
 		return end_ratio - begin_ratio;
 	}
 
@@ -198,15 +214,17 @@ export class PresentationTimer {
 		this._nominal_presentation_duration_secs = null;
 		this._slide_subset_selector = null;
 		this._session_id = null;
-		this._status = null;
+		this._current_slide = null;
 		this._meta = null;
-		this._tx_message({ "type": "query_status" });
+		this._tx_message({ "type": "query_slide_info" });
 		this._tx_message({ "type": "query_presentation_meta" });
 		this._timer_mode = TimerMode.STOPPED;
 		this._timeout_handle = null;
+		this._have_connection = false;
 		this._active_timer = null;
 		this._reset_timeout();
 		this._initialize_ui();
+		setInterval(() => this._ui_update_display(), 1000);
 	}
 
 	_initialize_ui() {
@@ -301,30 +319,32 @@ export class PresentationTimer {
 	}
 
 	_ui_update_display() {
-		switch (this._timer_mode) {
-			case TimerMode.STARTED:
-				this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_play.svg\" class=\"media\">";
-				break;
+		if (this._have_connection) {
+			switch (this._timer_mode) {
+				case TimerMode.STARTED:
+					this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_play.svg\" class=\"media\">";
+					break;
 
-			case TimerMode.STOPPED:
-				this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_stop.svg\" class=\"media\">";
-				break;
+				case TimerMode.STOPPED:
+					this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_stop.svg\" class=\"media\">";
+					break;
 
-			case TimerMode.ARMED:
-				this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_pause.svg\" class=\"media\">";
-				break;
+				case TimerMode.ARMED:
+					this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_pause.svg\" class=\"media\">";
+					break;
 
-			default:
-				console.log("Error, unknown presentation mode:", this._status.presentation_mode);
-				this._ui_elements.presentation_mode_display.innerHTML = "Error: Unknown presentation mode.";
+				default:
+					console.log("Error, unknown timer mode:", this._timer_mode);
+					this._ui_elements.presentation_mode_display.innerHTML = "Error: Unknown timer mode.";
+			}
+		} else {
+			this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_error.svg\" class=\"media\" title=\"Error: Connection to presentation lost.\">"
 		}
 
-
-		if ((this._status == null) || (this._meta == null) || (this._active_timer == null)) {
+		if ((this._current_slide == null) || (this._meta == null) || (this._active_timer == null)) {
 			return;
 		}
 
-		console.log(this._active_timer);
 		const now = new Date();
 		const remaining_presentation_time_secs = (this._active_timer.presentation_end.getTime() - now.getTime()) / 1000;
 		const elapsed_time_secs = (now.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
@@ -333,33 +353,27 @@ export class PresentationTimer {
 		this._ui_elements.elapsed_time_display.innerText = TimeTools.format_hms(elapsed_time_secs);
 		this._ui_elements.remaining_time_display.innerText = TimeTools.format_hms(remaining_presentation_time_secs);
 
-		return;
+		const current_slide_ratio = this._slide_subset_selector.get_ratio_of(this._current_slide);
+		const current_slide_nominal_duration_secs = current_slide_ratio / this._active_timer.subset_ratio * this._active_timer.presentation_duration_secs;
+		this._ui_elements.slide_time_display.innerText = TimeTools.format_hms(current_slide_nominal_duration_secs);
 
-		const begin_time_secs = this._status.begin_ratio * this._active_presentation_time_secs;
-		const end_time_secs = this._status.end_ratio * this._active_presentation_time_secs;
-		const slide_time_allocation_secs = end_time_secs - begin_time_secs;
-		const slide_time_remaining_secs = end_time_secs - this._status.timekeeper.started;
-		const slide_time_used_secs = slide_time_allocation_secs - slide_time_remaining_secs;
-		//const remaining_presentation_time_secs = this._active_presentation_time_secs - this._status.timekeeper.started;
 
-		/* The speed error is 0 as long as we're in the time window for that
-		 * slide.
-		 */
+		const subset_begin_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._active_timer.slide_subset.begin_slide);
+		const cumulative_current_slide_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._current_slide);
+		const current_completion_ratio = (cumulative_current_slide_ratio - subset_begin_ratio) / this._active_timer.subset_ratio;
+		const nominal_elapsed_time_secs = current_completion_ratio * this._active_timer.presentation_duration_secs;
+
+		const delta_time_secs = nominal_elapsed_time_secs - elapsed_time_secs + current_slide_nominal_duration_secs;
+		this._ui_elements.delta_time_display.innerText = TimeTools.format_hms(delta_time_secs);
+
 		let speed_error_secs = 0;
-		if (this._status.timekeeper.started < begin_time_secs) {
+		if (delta_time_secs > current_slide_nominal_duration_secs) {
 			/* We're too fast. Speed error is positive. */
-			speed_error_secs = begin_time_secs - this._status.timekeeper.started;
-		} else if (this._status.timekeeper.started > end_time_secs) {
+			speed_error_secs = delta_time_secs - current_slide_nominal_duration_secs;
+		} else if (delta_time_secs < 0) {
 			/* We're too slow. Speed error is negative. */
-			speed_error_secs = end_time_secs - this._status.timekeeper.started;
+			speed_error_secs = delta_time_secs;
 		}
-
-		this._ui_elements.presentation_mode.className = this._status.presentation_mode;
-		this._ui_elements.spent_time.innerHTML = TimeTools.format_hms(this._status.timekeeper.started);
-		this._ui_elements.slide_time_allocation.innerHTML = TimeTools.format_hms(slide_time_allocation_secs);
-		this._ui_elements.slide_time_used.innerHTML = TimeTools.format_hms(slide_time_used_secs);
-		this._ui_elements.slide_time_remaining.innerHTML = TimeTools.format_hms(slide_time_remaining_secs);
-		this._ui_elements.remaining_time.innerHTML = TimeTools.format_hms(remaining_presentation_time_secs);
 
 		this._ui_elements.main_indicator.className = "main_indicator";
 		const delay_large_cutoff_secs = 300;
@@ -396,11 +410,12 @@ export class PresentationTimer {
 			window.clearTimeout(this._timeout_handle);
 		}
 		this._timeout_handle = window.setTimeout(() => this._connection_lost(), 5000);
+		this._have_connection = true;
 	}
 
 	_connection_lost() {
 		console.log("Connection to presentation lost.");
-		this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_error.svg\" class=\"media\" title=\"Error: Could not connect to presentation.\">"
+		this._have_connection = false;
 	}
 
 	_update_meta() {
@@ -422,15 +437,27 @@ export class PresentationTimer {
 			/* Other presentation window open, ignore data. */
 			return;
 		}
+		if (this._session_id == null) {
+			/* Bind to first session that comes along and stick with it. Better
+			 * than switching back and forth between unrelated presentations.
+			 */
+			this._session_id = data.session_id;
+
+		}
 
 		this._reset_timeout();
-		if (data.type == "status") {
-			if (this._session_id == null) {
-				this._session_id = data.session_id;
+		if (data.type == "slide_info") {
+			const update_ui = this._current_slide != data.data.current_slide;
+			const slide_change = (this._current_slide != null) && update_ui;
+			this._current_slide = data.data.current_slide;
+			if (slide_change) {
+				this.start_timer_if_armed();
 			}
-			this._status = data.data;
-
-			this._ui_update_display();
+			if (update_ui) {
+				this._ui_update_display();
+			}
+		} else if (data.type == "start_presentation") {
+			this.start_timer_if_armed();
 		} else if (data.type == "presentation_meta") {
 			if (this._meta == null) {
 				this._meta = data.data;
@@ -452,6 +479,7 @@ export class PresentationTimer {
 		};
 
 		this._active_timer.presentation_duration_secs = (this._active_timer.presentation_end.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
+		this._active_timer.subset_ratio = this._slide_subset_selector.get_ratio_of_subset(this._active_timer.slide_subset);
 	}
 
 	start_timer_if_armed() {
@@ -483,6 +511,8 @@ export class PresentationTimer {
 		} else if (this._timer_mode == TimerMode.STARTED) {
 			/* Stopping timer */
 			this._timer_mode = TimerMode.STOPPED;
+			this._current_slide = null;
+			this._active_timer = null;
 		}
 		this._ui_update_everything();
 	}

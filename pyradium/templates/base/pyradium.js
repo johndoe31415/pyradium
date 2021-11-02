@@ -47,7 +47,7 @@ export class Presentation {
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
 		this._debugging = false;
-		setInterval(() => this._tx_status(), 1000);
+		setInterval(() => this._tx_slide_info(), 3000);
 	}
 
 	_log(...args) {
@@ -72,19 +72,26 @@ export class Presentation {
 		return document.fullscreenElement != null;
 	}
 
-	_tx_status() {
+	_tx_start_presentation() {
 		const msg = {
-			"type":						"status",
+			"type":						"start_presentation",
+			"session_id":				this._session_id,
+		};
+		this._bc.postMessage(msg);
+	}
+
+	_tx_slide_info() {
+		const msg = {
+			"type":						"slide_info",
 			"session_id":				this._session_id,
 			"data": {
-				"begin_ratio":			this.current_slide.getAttribute("begin_ratio") * 1,
-				"end_ratio":			this.current_slide.getAttribute("end_ratio") * 1,
+				"current_slide":		this.current_slide.getAttribute("slide_no") | 0,
 			},
 		};
 		this._bc.postMessage(msg);
 	}
 
-	_tx_presentation_info() {
+	_tx_presentation_meta() {
 		const msg = {
 			"type":					"presentation_meta",
 			"session_id":			this._session_id,
@@ -95,10 +102,10 @@ export class Presentation {
 
 	_rx_message(msg) {
 		const data = msg.data;
-		if (data["type"] == "query_status") {
-			this._tx_status();
+		if (data["type"] == "query_slide_info") {
+			this._tx_slide_info();
 		} else if (data["type"] == "query_presentation_meta") {
-			this._tx_presentation_info();
+			this._tx_presentation_meta();
 		}
 	}
 
@@ -138,6 +145,11 @@ export class Presentation {
 
 	start_presentation() {
 		this._log("Presentation started.");
+		if (this.fullscreen_mode) {
+			/* If armed and presentation is duplicate started, this means start
+			 * timer. */
+			this._tx_start_presentation();
+		}
 		this._cursor_style = 0;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
@@ -293,7 +305,7 @@ export class Presentation {
 			this._internal_slide_index = slide_index;
 			this._update(scroll_to_slide);
 			if (this.fullscreen_mode) {
-				this._tx_status();
+				this._tx_slide_info();
 			}
 		}
 	}
