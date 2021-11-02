@@ -23,6 +23,12 @@
 
 import {TimeTools, MathTools} from "./pyradium_tools.js";
 
+const TimerMode = {
+	STOPPED: 0,
+	ARMED: 1,
+	STARTED: 2,
+}
+
 class SlideSubset {
 	constructor(begin_slide, end_slide) {
 		this._begin_slide = begin_slide;
@@ -196,20 +202,23 @@ export class PresentationTimer {
 		this._meta = null;
 		this._tx_message({ "type": "query_status" });
 		this._tx_message({ "type": "query_presentation_meta" });
+		this._timer_mode = TimerMode.STOPPED;
 		this._timeout_handle = null;
+		this._active_timer = null;
 		this._reset_timeout();
 		this._initialize_ui();
 	}
 
 	_initialize_ui() {
 		this._ui_elements.slide_subset.value = "all";
-		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._ui_change());
-		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_change());
+		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._ui_update_everything());
+		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_update_everything());
 		this._ui_elements.btn_arm_timer.addEventListener("click", (event) => this.arm_timer());
 		this._ui_elements.btn_start_stop_timer.addEventListener("click", (event) => this.start_stop_timer());
+		this._ui_update_everything();
 	}
 
-	_ui_change() {
+	_ui_update_input_fields() {
 		this._presentation_end_time = TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value);
 		if (this._presentation_end_time == null) {
 			this._ui_elements.presentation_end_time.classList.add("parse-error");
@@ -256,32 +265,43 @@ export class PresentationTimer {
 		} else {
 			this._ui_elements.presentation_pace_display.innerText = "-";
 		}
-
-		this._update();
 	}
 
-	_compute_nominal_slide_duration_secs() {
-		if (this._slide_subset == null) {
-			return null;
+	_ui_update_buttons() {
+		const time_and_slides_set = (this._presentation_end_time != null) && (this._slide_subset != null);
+		switch (this._timer_mode) {
+			case TimerMode.STOPPED:
+				this._ui_elements.btn_arm_timer.innerText = "Arm Timer";
+				this._ui_elements.btn_start_stop_timer.innerText = "Start Timer";
+				this._ui_elements.btn_arm_timer.disabled = !time_and_slides_set;
+				this._ui_elements.btn_start_stop_timer.disabled = !time_and_slides_set;
+				this._ui_elements.presentation_end_time.disabled = false;
+				this._ui_elements.slide_subset.disabled = false;
+				break;
+
+			case TimerMode.ARMED:
+				this._ui_elements.btn_arm_timer.disabled = false;
+				this._ui_elements.btn_arm_timer.innerText = "Disarm Timer";
+				this._ui_elements.btn_start_stop_timer.innerText = "Start Timer";
+				this._ui_elements.btn_arm_timer.disabled = false;
+				this._ui_elements.btn_start_stop_timer.disabled = false;
+				this._ui_elements.presentation_end_time.disabled = true;
+				this._ui_elements.slide_subset.disabled = true;
+				break;
+
+			case TimerMode.STARTED:
+				this._ui_elements.btn_arm_timer.innerText = "Arm Timer";
+				this._ui_elements.btn_start_stop_timer.innerText = "Stop Timer";
+				this._ui_elements.btn_arm_timer.disabled = true;
+				this._ui_elements.btn_start_stop_timer.disabled = false;
+				this._ui_elements.presentation_end_time.disabled = true;
+				this._ui_elements.slide_subset.disabled = true;
+				break;
 		}
-		const ratio = this._slide_subset_selector.get_ratio_of_subset(this._slide_subset);
-		return ratio * this._nominal_presentation_duration_secs;
 	}
 
-	_reset_timeout() {
-		if (this._timeout_handle != null) {
-			window.clearTimeout(this._timeout_handle);
-		}
-		this._timeout_handle = window.setTimeout(() => this._connection_lost(), 5000);
-	}
-
-	_connection_lost() {
-		console.log("Connection to presentation lost.");
-		this._ui_elements.presentation_mode.innerHTML = "Error: Could not connect to presentation.";
-	}
-
-	_update() {
-		if ((this._status == null) || (this._meta == null) || (this._active_presentation_time_secs == null)) {
+	_ui_update_display() {
+		if ((this._status == null) || (this._meta == null) || (this._active_timer == null)) {
 			return;
 		}
 
@@ -344,13 +364,39 @@ export class PresentationTimer {
 		}
 	}
 
+	_ui_update_everything() {
+		this._ui_update_input_fields();
+		this._ui_update_buttons();
+		this._ui_update_display();
+	}
+
+	_compute_nominal_slide_duration_secs() {
+		if (this._slide_subset == null) {
+			return null;
+		}
+		const ratio = this._slide_subset_selector.get_ratio_of_subset(this._slide_subset);
+		return ratio * this._nominal_presentation_duration_secs;
+	}
+
+	_reset_timeout() {
+		if (this._timeout_handle != null) {
+			window.clearTimeout(this._timeout_handle);
+		}
+		this._timeout_handle = window.setTimeout(() => this._connection_lost(), 5000);
+	}
+
+	_connection_lost() {
+		console.log("Connection to presentation lost.");
+		this._ui_elements.presentation_mode.innerHTML = "Error: Could not connect to presentation.";
+	}
+
 	_update_meta() {
 		if (this._meta.presentation_time != null) {
 			this._ui_elements.presentation_end_time.value = "+" + this._meta.presentation_time;
 			this._nominal_presentation_duration_secs = TimeTools.parse_hh_mm(this._meta.presentation_time) * 60;
 		}
 		this._slide_subset_selector = new SlideSubsetSelector(this._meta.slide_ratios);
-		this._ui_change();
+		this._ui_update_everything();
 	}
 
 	_tx_message(msg) {
@@ -371,19 +417,58 @@ export class PresentationTimer {
 			}
 			this._status = data.data;
 
-			this._update();
+			this._ui_update_display();
 		} else if (data.type == "presentation_meta") {
 			if (this._meta == null) {
 				this._meta = data.data;
 				this._update_meta();
-				this._update();
 			}
 		}
 	}
 
+	start_timer() {
+		if (this._timer_mode == TimerMode.STARTED) {
+			return;
+		}
+
+		this._timer_mode = TimerMode.STARTED;
+		this._active_timer = {
+			presentation_start: new Date(),
+			presentation_end: TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value).compute(this._nominal_presentation_duration_secs),
+			slide_subset: this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count),
+		};
+	}
+
+	start_timer_if_armed() {
+		if (this._timer_mode == TimerMode.ARMED) {
+			this.start_timer();
+			this._ui_update_everything();
+		}
+	}
+
 	arm_timer() {
+		console.log("Arm timer.");
+		if (this._timer_mode == TimerMode.ARMED) {
+			/* Disarm timer */
+			this._timer_mode = TimerMode.STOPPED;
+			this._active_timer = null;
+		} else {
+			/* Arm timer */
+			this._timer_mode = TimerMode.ARMED;
+		}
+		this._ui_update_everything();
 	}
 
 	start_stop_timer() {
+		console.log("Start timer.");
+
+		if ((this._timer_mode == TimerMode.STOPPED) || (this._timer_mode == TimerMode.ARMED)) {
+			/* Starting timer */
+			this.start_timer();
+		} else if (this._timer_mode == TimerMode.STARTED) {
+			/* Stopping timer */
+			this._timer_mode = TimerMode.STOPPED;
+		}
+		this._ui_update_everything();
 	}
 }
