@@ -1,3 +1,23 @@
+div.timermenu {
+	padding: 20px 10px;
+	border-bottom: 1px solid black;
+}
+
+div.sub_indicator {
+	padding: 20px;
+}
+
+div.main_indicator {
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 30px;
+	width: 25%;
+	font-size: 5em;
+	text-align: center;
+	border-radius: 10px;
+}
+
 div.menugrid {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
@@ -22,17 +42,6 @@ div.topgrid div.top {
 
 div.topgrid div.bottom {
 	grid-row: 2;
-}
-
-div.main_indicator {
-	margin-top: 20px;
-	margin-left: auto;
-	margin-right: auto;
-	padding: 30px;
-	width: 25%;
-	font-size: 5em;
-	text-align: center;
-	border-radius: 10px;
 }
 
 div.gradient_test {
@@ -67,3 +76,6 @@ div.main_indicator.largely_behind {
 	color: white;
 }
 
+img.media {
+	width: 48px;
+}

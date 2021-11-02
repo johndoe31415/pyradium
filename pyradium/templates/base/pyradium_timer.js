@@ -301,16 +301,46 @@ export class PresentationTimer {
 	}
 
 	_ui_update_display() {
+		switch (this._timer_mode) {
+			case TimerMode.STARTED:
+				this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_play.svg\" class=\"media\">";
+				break;
+
+			case TimerMode.STOPPED:
+				this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_stop.svg\" class=\"media\">";
+				break;
+
+			case TimerMode.ARMED:
+				this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_pause.svg\" class=\"media\">";
+				break;
+
+			default:
+				console.log("Error, unknown presentation mode:", this._status.presentation_mode);
+				this._ui_elements.presentation_mode_display.innerHTML = "Error: Unknown presentation mode.";
+		}
+
+
 		if ((this._status == null) || (this._meta == null) || (this._active_timer == null)) {
 			return;
 		}
+
+		console.log(this._active_timer);
+		const now = new Date();
+		const remaining_presentation_time_secs = (this._active_timer.presentation_end.getTime() - now.getTime()) / 1000;
+		const elapsed_time_secs = (now.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
+
+		this._ui_elements.presentation_time_display.innerText = TimeTools.format_hms(this._active_timer.presentation_duration_secs);
+		this._ui_elements.elapsed_time_display.innerText = TimeTools.format_hms(elapsed_time_secs);
+		this._ui_elements.remaining_time_display.innerText = TimeTools.format_hms(remaining_presentation_time_secs);
+
+		return;
 
 		const begin_time_secs = this._status.begin_ratio * this._active_presentation_time_secs;
 		const end_time_secs = this._status.end_ratio * this._active_presentation_time_secs;
 		const slide_time_allocation_secs = end_time_secs - begin_time_secs;
 		const slide_time_remaining_secs = end_time_secs - this._status.timekeeper.started;
 		const slide_time_used_secs = slide_time_allocation_secs - slide_time_remaining_secs;
-		const remaining_presentation_time_secs = this._active_presentation_time_secs - this._status.timekeeper.started;
+		//const remaining_presentation_time_secs = this._active_presentation_time_secs - this._status.timekeeper.started;
 
 		/* The speed error is 0 as long as we're in the time window for that
 		 * slide.
@@ -325,23 +355,6 @@ export class PresentationTimer {
 		}
 
 		this._ui_elements.presentation_mode.className = this._status.presentation_mode;
-		switch (this._status.presentation_mode) {
-			case "started":
-				this._ui_elements.presentation_mode.innerHTML = "<img src=\"media_play.svg\" class=\"media\">";
-				break;
-
-			case "stopped":
-				this._ui_elements.presentation_mode.innerHTML = "<img src=\"media_stop.svg\" class=\"media\">";
-				break;
-
-			case "pause":
-				this._ui_elements.presentation_mode.innerHTML = "<img src=\"media_pause.svg\" class=\"media\">";
-				break;
-
-			default:
-				console.log("Error, unknown presentation mode:", this._status.presentation_mode);
-				this._ui_elements.presentation_mode.innerHTML = "Error: Unknown presentation mode.";
-		}
 		this._ui_elements.spent_time.innerHTML = TimeTools.format_hms(this._status.timekeeper.started);
 		this._ui_elements.slide_time_allocation.innerHTML = TimeTools.format_hms(slide_time_allocation_secs);
 		this._ui_elements.slide_time_used.innerHTML = TimeTools.format_hms(slide_time_used_secs);
@@ -387,7 +400,7 @@ export class PresentationTimer {
 
 	_connection_lost() {
 		console.log("Connection to presentation lost.");
-		this._ui_elements.presentation_mode.innerHTML = "Error: Could not connect to presentation.";
+		this._ui_elements.presentation_mode_display.innerHTML = "<img src=\"media_error.svg\" class=\"media\" title=\"Error: Could not connect to presentation.\">"
 	}
 
 	_update_meta() {
@@ -437,6 +450,8 @@ export class PresentationTimer {
 			presentation_end: TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value).compute(this._nominal_presentation_duration_secs),
 			slide_subset: this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count),
 		};
+
+		this._active_timer.presentation_duration_secs = (this._active_timer.presentation_end.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
 	}
 
 	start_timer_if_armed() {
