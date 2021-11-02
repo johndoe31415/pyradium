@@ -56,8 +56,8 @@ class SlideSubsetSelector {
 		return end_ratio - begin_ratio;
 	}
 
-	_find_slide_ratio(ratio, start_slide = 1) {
-		for (let i = start_slide - 1; i < this._cumulative_ratios.length; i++) {
+	_find_slide_ratio(ratio, begin_slide = 1) {
+		for (let i = begin_slide - 1; i < this._cumulative_ratios.length; i++) {
 			const cumulative_ratio = this._cumulative_ratios[i];
 			if (cumulative_ratio >= ratio) {
 				return i + 1;
@@ -160,14 +160,11 @@ class SlideSubsetSelector {
 
 				let begin_slide, end_slide;
 				if (count_based) {
-					begin_slide = Math.round((numerator - 1) / denominator * (this.slide_count - 1)) + 1;
-					end_slide = Math.round(numerator / denominator * (this.slide_count - 1)) + 1;
+					begin_slide = Math.round((numerator - 1) / denominator * this.slide_count) + 1;
+					end_slide = Math.round(numerator / denominator * this.slide_count);
 				} else {
 					begin_slide = this._find_slide_ratio((numerator - 1) / denominator);
-					end_slide = this._find_slide_ratio(numerator / denominator, begin_slide);
-				}
-				if (begin_slide > 1) {
-					begin_slide += 1;
+					end_slide = this._find_slide_ratio(numerator / denominator, begin_slide) - 1;
 				}
 
 				begin_slide = MathTools.clamp(begin_slide, 1, this.slide_count);

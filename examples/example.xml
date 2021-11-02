@@ -257,10 +257,10 @@
 	</slide>
 
 	<slide>
-		<s:time abs="2 min" />
-		<s:var name="heading" value="TEST SLIDE" />
+		<s:time abs="10 min" />
+		<s:var name="heading" value="Demo Slide!" />
 		<ul>
-			<li>This is a test!</li>
+			<li>Demo time! This will take 10 minutes!</li>
 		</ul>
 	</slide>
 
