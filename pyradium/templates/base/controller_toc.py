@@ -34,10 +34,12 @@ class TOCController(BaseController):
 			toc_item_count = toc.count_toc_items(start_at = start_at, end_before = end_before)
 			toc_slide_count = (toc_item_count + self.toc_items_per_slide - 1) // self.toc_items_per_slide
 
+			additional_slide_var_list = [ ]
 			for toc_slide_index in range(toc_slide_count):
 				subset = list(toc.subset(start_at = start_at, end_before = end_before, max_items = self.toc_items_per_slide))
 				start_at = subset[-1].index + 1
 				additional_slide_vars = {
 					"partial_toc":	toc.emit_commands(subset),
 				}
-				yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)
+				additional_slide_var_list.append(additional_slide_vars)
+			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_var_list)
