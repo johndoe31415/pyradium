@@ -57,6 +57,9 @@ class XMLHookRegistry():
 						if replace_by is None:
 							# Delete node
 							XMLTools.remove_node(node)
+						elif replace_by is node:
+							# Keep node
+							pass
 						else:
 							XMLTools.replace_node(node, replace_by)
 							if not isinstance(replace_by, list):

@@ -34,7 +34,7 @@ class BaseAction():
 			loglevel = logging.DEBUG
 		elif self._args.verbose == 3:
 			loglevel = logging.TRACE
-		elif self._args.verbose == 4:
+		else:
 			loglevel = logging.SINGLESTEP
 		logging.basicConfig(format = "{name:>30s} [{levelname:.1s}]: {message}", style = "{", level = loglevel)
 		self.run()

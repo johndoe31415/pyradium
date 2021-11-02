@@ -59,6 +59,7 @@
 			<li>After the first pause! Another acronym: <s:ac>DES</s:ac></li>
 			<s:pause />
 			<li>This is after the second pause! Explaining <s:ac>AES</s:ac>-<s:ac>CBC</s:ac></li>
+			<li><s:ac>A</s:ac> <s:ac>AB</s:ac> <s:ac>ABC</s:ac> <s:ac>ABCD</s:ac> <s:ac>ABCDE</s:ac></li>
 		</ul>
 	</slide>
 
@@ -255,6 +256,14 @@
 		<s:tt>first <b>bold <i>bolditalics</i></b> last</s:tt>
 	</slide>
 
+	<slide>
+		<s:time abs="2 min" />
+		<s:var name="heading" value="TEST SLIDE" />
+		<ul>
+			<li>This is a test!</li>
+		</ul>
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0" />
 	</slide>
@@ -263,7 +272,7 @@
 	</slide>
 
 	<slide type="feedback">
-		<s:time rel="0" />
 		<s:var name="endpoint" value="https://myserver.com/feedback-api" />
+		<s:time rel="0" />
 	</slide>
 </presentation>

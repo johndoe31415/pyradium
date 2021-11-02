@@ -140,8 +140,8 @@ class Renderer():
 		self._compute_renderable_slides(rendered_presentation)
 		rendered_presentation.finalize_toc()
 
-		# Compute the schedule
-		rendered_presentation.schedule.compute()
+		# Initialize schedule
+		rendered_presentation.init_schedule()
 
 		for renderable_slide in self._compute_renderable_slides(rendered_presentation):
 			additional_template_args = {
@@ -153,4 +153,8 @@ class Renderer():
 
 		rendered_index = self.render_file("base/index.html", rendered_presentation = rendered_presentation)
 		rendered_presentation.add_file(self.rendering_params.index_filename, rendered_index)
+
+		# Compute the schedule after the last run
+		rendered_presentation.schedule.compute()
+
 		return rendered_presentation

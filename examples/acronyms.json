@@ -2,5 +2,10 @@
 	"AES": { "text": "Advanced Encryption Standard", "uri": "https://en.wikipedia.org/wiki/Advanced_Encryption_Standard" },
 	"DES": { "text": "Data Encryption Standard", "uri": "https://en.wikipedia.org/wiki/Data_Encryption_Standard" },
 	"WEP": { "text": "Wired Equivalent Privacy", "uri": "https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" },
-	"CBC": { "text": "Cipher Block Chaining", "uri": "https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)" }
+	"CBC": { "text": "Cipher Block Chaining", "uri": "https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)" },
+	"A": { "text": "Alpha" },
+	"AB": { "text": "Alpha Bravo" },
+	"ABC": { "text": "Alpha Bravo Charlie" },
+	"ABCD": { "text": "Alpha Bravo Charlie Delta" },
+	"ABCDE": { "text": "Alpha Bravo Charlie Delta Echo" }
 }

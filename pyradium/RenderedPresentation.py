@@ -43,10 +43,13 @@ class RenderedPresentation():
 
 		time_range = self._renderer.presentation.meta.get("presentation-time")
 		if time_range is None:
-			presentation_length_mins = None
+			self._presentation_length_mins = None
 		else:
-			presentation_length_mins = TimeSpecification.parse(time_range, default_abs_interpretation = "h:m").duration_secs
-		self._schedule = PresentationSchedule(presentation_length_mins)
+			self._presentation_length_mins = TimeSpecification.parse(time_range, default_abs_interpretation = "h:m").duration_secs
+		self._schedule = None
+
+	def init_schedule(self):
+		self._schedule = PresentationSchedule(self._presentation_length_mins)
 
 	@property
 	def next_unique_id(self):
@@ -65,7 +68,8 @@ class RenderedPresentation():
 		self._current_slide_number += 1
 		self._total_slide_count = max(self._total_slide_count, self._current_slide_number)
 		self._toc.at_page(self.current_slide_number)
-		self.schedule.have_slide(self.current_slide_number)
+		if self.schedule is not None:
+			self.schedule.have_slide(self.current_slide_number)
 
 	def finalize_toc(self):
 		self._frozen_toc = self._toc.finalize()

@@ -129,6 +129,7 @@ class PresentationSchedule():
 
 	def set_slide_no(self, slide_no, time_spec):
 		assert(isinstance(time_spec, TimeSpecification))
+		_log.trace("Setting slide timing of %d to %s", slide_no, str(time_spec))
 		self._time_specs[slide_no] = time_spec
 		self._max_slide_no = max(self._max_slide_no, slide_no)
 
@@ -207,7 +208,10 @@ class PresentationSchedule():
 
 	@property
 	def slide_ratio_list(self):
-		return [ timeslice.slide_ratio for (slide_no, timeslice) in sorted(self._timeslices.items()) ]
+		if self._timeslices is None:
+			return [ ]
+		else:
+			return [ timeslice.slide_ratio for (slide_no, timeslice) in sorted(self._timeslices.items()) ]
 
 	def __getitem__(self, slide_no):
 		if self._timeslices is None:

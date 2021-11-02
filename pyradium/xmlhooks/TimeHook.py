@@ -31,5 +31,6 @@ class TimeHook(BaseHook):
 		abs_string = node.getAttribute("abs") if node.hasAttribute("abs") else None
 		rel_string = node.getAttribute("rel") if node.hasAttribute("rel") else None
 		time_spec = TimeSpecification.parse(abs_string = abs_string, rel_string = rel_string)
-		rendered_presentation.schedule.set_slide_no(rendered_presentation.current_slide_number, time_spec)
-		return None
+		if rendered_presentation.schedule is not None:
+			rendered_presentation.schedule.set_slide_no(rendered_presentation.current_slide_number, time_spec)
+		return node
