@@ -30,6 +30,9 @@ class AcronymController(BaseController):
 		acronyms = self.rendered_presentation.renderer.get_custom_renderer("acronym")
 		used_acronyms = list(acronyms.get_all_used_acronyms())
 		pages = (len(used_acronyms) + self.acronyms_per_slide - 1) // self.acronyms_per_slide
+		additional_slide_var_list = [ ]
 		for page in range(pages):
 			page_content = used_acronyms[page * self.acronyms_per_slide : (page + 1) * self.acronyms_per_slide]
-			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, { "acronyms": page_content })
+			additional_slide_vars = { "acronyms": page_content }
+			additional_slide_var_list.append(additional_slide_vars)
+		yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_var_list)
