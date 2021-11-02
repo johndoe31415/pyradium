@@ -71,7 +71,12 @@ class RenderSlideDirective(BaseDirective):
 			slide_vars["toc_entry"] = rendered_presentation.frozen_toc.current_item
 		return slide_vars
 
-	def emit_nocontent_slide(self, rendered_presentation, additional_slide_var_list = None):
+	def emit_nocontent_slide(self, rendered_presentation, content_containers, additional_slide_var_list = None):
+		# We need to render the content containers even though they're not
+		# used: Traversal of the containers is necessary because they might
+		# contain instructions such as the <s:time> specification.
+		for container_node in content_containers.values():
+			XMLHookRegistry.mangle(rendered_presentation, container_node)
 		if additional_slide_var_list is None:
 			additional_slide_var_list = [ { } ]
 		elif not isinstance(additional_slide_var_list, list):

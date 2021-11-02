@@ -40,4 +40,4 @@ class TOCController(BaseController):
 				additional_slide_vars = {
 					"partial_toc":	toc.emit_commands(subset),
 				}
-				yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_vars)
+				yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_vars)

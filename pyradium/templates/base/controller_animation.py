@@ -65,6 +65,6 @@ class AnimationController(BaseController):
 			})
 
 		if not self.rendered_presentation.renderer.rendering_params.collapse_animation:
-			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_var_list)
+			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_var_list)
 		else:
-			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, additional_slide_var_list[-1])
+			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_var_list[-1])
