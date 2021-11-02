@@ -128,6 +128,10 @@ class PresentationSchedule():
 		self._max_slide_no = max(self._max_slide_no, slide_no)
 
 	def set_slide_no(self, slide_no, time_spec):
+		if self._timeslices is not None:
+			# Already computed, disregards
+			return
+
 		assert(isinstance(time_spec, TimeSpecification))
 		_log.trace("Setting slide timing of %d to %s", slide_no, str(time_spec))
 		self._time_specs[slide_no] = time_spec

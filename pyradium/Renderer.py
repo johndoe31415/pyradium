@@ -135,14 +135,17 @@ class Renderer():
 			rendered_presentation.handle_dependencies(self._template_config.get("dependencies", { }).get("feature", { }).get(feature))
 
 		# Then run it again to get the page numbers straight (e.g., the TOC
-		# pages will be emitted, giving different page numbers)
+		# pages will be emitted, giving different page numbers). Initialize
+		# schedule for second run as well.
 		rendered_presentation.finalize_toc()
+		rendered_presentation.init_schedule()
 		self._compute_renderable_slides(rendered_presentation)
 		rendered_presentation.finalize_toc()
 
-		# Initialize schedule
-		rendered_presentation.init_schedule()
+		# Compute the schedule before the last run
+		rendered_presentation.schedule.compute()
 
+		# Third and final slide run
 		for renderable_slide in self._compute_renderable_slides(rendered_presentation):
 			additional_template_args = {
 				"slide":			renderable_slide,
@@ -153,8 +156,5 @@ class Renderer():
 
 		rendered_index = self.render_file("base/index.html", rendered_presentation = rendered_presentation)
 		rendered_presentation.add_file(self.rendering_params.index_filename, rendered_index)
-
-		# Compute the schedule after the last run
-		rendered_presentation.schedule.compute()
 
 		return rendered_presentation
