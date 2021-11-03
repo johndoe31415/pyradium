@@ -87,6 +87,11 @@ class ActionRender(BaseAction):
 				injected_metadata = json.load(f)
 				_log.debug("Injected metadata: %s", str(injected_metadata))
 
+		if self._args.resource_dir is not None:
+			(resource_dir, resource_uri) = self._args.resource_dir
+		else:
+			(resource_dir, resource_uri) = (self._args.outdir, "")
+
 		renderer = None
 		render_success = True
 		while True:
@@ -100,13 +105,14 @@ class ActionRender(BaseAction):
 						extra_template_dirs = self._args.template_dir,
 						include_dirs = [ os.path.dirname(self._args.infile) or "." ] + self._args.include_dir,
 						index_filename = self._args.index_filename,
+						resource_uri = resource_uri,
 						geometry = self._args.geometry,
 						image_max_dimension = self._args.image_max_dimension,
 						presentation_features = presentation_features,
 						injected_metadata = injected_metadata)
 				presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 				renderer = Renderer(presentation, rendering_parameters)
-				rendered_presentation = renderer.render(deploy_directory = self._args.outdir)
+				rendered_presentation = renderer.render(resource_directory = resource_dir, deploy_directory = self._args.outdir)
 				t1 = time.time()
 				_log.info("Successfully rendered presentation into directory \"%s\", took %.1f seconds", self._args.outdir, t1 - t0)
 			except PyRadiumException as e:

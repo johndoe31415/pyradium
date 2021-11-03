@@ -33,7 +33,7 @@ class ImgHook(BaseHook):
 		}
 		img_renderer = rendered_presentation.renderer.get_custom_renderer("img")
 		rendered_image = img_renderer.render(properties)
-		local_filename = "imgs/img/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
+		local_filename = "%simgs/img/%s.%s" % (rendered_presentation.renderer.rendering_params.resource_uri, rendered_image.keyhash, rendered_image.data["extension"])
 
 		replacement_node = node.ownerDocument.createElement("div")
 		replacement_node.setAttribute("class", "fillimg")

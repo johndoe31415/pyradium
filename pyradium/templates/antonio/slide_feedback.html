@@ -44,13 +44,13 @@
 	</div>
 </div>
 <div class="footer">
-	<img src="template/antonio/bar.svg" class="bar" />
+	<img src="${preuri}template/antonio/bar.svg" class="bar" />
 </div>
 
 <script type="module">
-	import {ButtonCheckbox} from "./template/base/pyradium_forms.js";
-	import {FeedbackSender} from "./template/base/pyradium_feedback.js";
-	import {ModalWindow} from "./template/base/pyradium_modal.js";
+	import {ButtonCheckbox} from "${preuri_ds}template/base/pyradium_forms.js";
+	import {FeedbackSender} from "${preuri_ds}template/base/pyradium_feedback.js";
+	import {ModalWindow} from "${preuri_ds}template/base/pyradium_modal.js";
 
 	let slide_info = ${slide.var("json_slide_info") | n};
 	slide_info["uri"] = location.href;

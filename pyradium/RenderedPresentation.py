@@ -27,9 +27,10 @@ from .OrderedSet import OrderedSet
 from .Schedule import PresentationSchedule, TimeSpecification
 
 class RenderedPresentation():
-	def __init__(self, renderer, deploy_directory):
+	def __init__(self, renderer, deploy_directory, resource_directory):
 		self._renderer = renderer
 		self._deploy_directory = deploy_directory
+		self._resource_directory = resource_directory
 		self._rendered_slides = [ ]
 		self._css = { }
 		self._js = OrderedSet()
@@ -130,13 +131,14 @@ class RenderedPresentation():
 	def append_slide(self, rendered_slide):
 		self._rendered_slides.append(rendered_slide)
 
-	def add_file(self, destination_relpath, content, target_directory = "/"):
+	def add_file(self, destination_relpath, content, target_directory = "/", to_deployment_dir = False):
 		assert(target_directory.startswith("/"))
 		assert(target_directory.endswith("/"))
 		if destination_relpath in self._added_files:
 			return
 		self._added_files.add(destination_relpath)
-		filename = self._deploy_directory + target_directory + destination_relpath
+		directory = self._deploy_directory if to_deployment_dir else self._resource_directory
+		filename = directory + target_directory + destination_relpath
 		dirname = os.path.dirname(filename)
 		with contextlib.suppress(FileExistsError):
 			os.makedirs(dirname)

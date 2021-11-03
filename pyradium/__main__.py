@@ -37,12 +37,19 @@ def _geometry(text):
 		raise argparse.ArgumentTypeError("Not a valid geometry: %s" % (text))
 	return (int(text[0]), int(text[1]))
 
+def _resource_dir(text):
+	text = text.split(":", maxsplit = 1)
+	if len(text) != 2:
+		raise argparse.ArgumentTypeError("Not a valid resource directory/URI combination: %s" % (text))
+	return (text[0], text[1])
+
 def main():
 	mc = MultiCommand(description = "HTML presentation/slide show generator", trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
 
 	def genparser(parser):
 		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1920, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")
 		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
+		parser.add_argument("-R", "--resource-dir", metavar = "path:uripath", type = _resource_dir, help = "Specifies the resource directory both as the actual deployment directory and the URI it has when serving the presentation. By default, the deployment directory of resources is identical to the output directory and the uripath is '.'.")
 		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
 		parser.add_argument("-t", "--template-style", metavar = "name", default = "antonio", help = "Template style to use. Defaults to %(default)s.")
 		parser.add_argument("-g", "--geometry", metavar = "width x height", type = _geometry, default = "1280x720", help = "Slide geometry, in pixels. Defaults to %(default)s.")

@@ -106,6 +106,8 @@ class Renderer():
 			"renderer":					self,
 			"presentation":				self._presentation,
 			"template_error":			_template_error,
+			"preuri":					self.rendering_params.resource_uri,
+			"preuri_ds":				self.rendering_params.resource_uri if self.rendering_params.resource_uri.startswith("/") else ("./" + self.rendering_params.resource_uri),
 		}
 		if rendered_presentation is not None:
 			template_args["rendered_presentation"] = rendered_presentation
@@ -116,8 +118,10 @@ class Renderer():
 		result = template.render(**template_args)
 		return result
 
-	def render(self, deploy_directory):
-		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory)
+	def render(self, deploy_directory, resource_directory = None):
+		if resource_directory is None:
+			resource_directory = deploy_directory
+		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory, resource_directory = resource_directory)
 
 		for feature in self.rendering_params.presentation_features:
 			rendered_presentation.add_feature(feature.value)
@@ -155,6 +159,6 @@ class Renderer():
 			rendered_presentation.append_slide(rendered_slide)
 
 		rendered_index = self.render_file("base/index.html", rendered_presentation = rendered_presentation)
-		rendered_presentation.add_file(self.rendering_params.index_filename, rendered_index)
+		rendered_presentation.add_file(self.rendering_params.index_filename, rendered_index, to_deployment_dir = True)
 
 		return rendered_presentation
