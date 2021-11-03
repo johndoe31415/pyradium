@@ -52,12 +52,12 @@ div.gradient_test {
 }
 
 div.main_indicator.largely_ahead {
-	background: #27ae60;
+	background: #339900;
 	color: white;
 }
 
 div.main_indicator.slightly_ahead {
-	background: #3498db;
+	background: #99cc33;
 	color: black;
 }
 
@@ -67,12 +67,12 @@ div.main_indicator.caught_up {
 }
 
 div.main_indicator.slightly_behind {
-	background: #f1c40f;
+	background: #ff9966;
 	color: black;
 }
 
 div.main_indicator.largely_behind {
-	background: #c0392b;
+	background: #cc3300;
 	color: white;
 }
 
