@@ -38,7 +38,8 @@ class TexHook(BaseHook):
 			user_scale = 1
 		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
 		rendered_formula = tex_renderer.render(properties)
-		local_filename = "%simgs/latex/%s.png" % (rendered_presentation.renderer.rendering_params.resource_uri, rendered_formula.keyhash)
+		local_filename = "imgs/latex/%s.png" % (rendered_formula.keyhash)
+		uri = "%simgs/latex/%s.png" % (rendered_presentation.renderer.rendering_params.resource_uri, rendered_formula.keyhash)
 
 		scale_factor = 0.625 * user_scale
 		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
@@ -46,7 +47,7 @@ class TexHook(BaseHook):
 		#print(properties["formula"], rendered_formula.data["info"], width_px)
 
 		replacement_node = node.ownerDocument.createElement("img")
-		replacement_node.setAttribute("src", local_filename)
+		replacement_node.setAttribute("src", uri)
 		if properties["long"]:
 			replacement_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
 		else:
