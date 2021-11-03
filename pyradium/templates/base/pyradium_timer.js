@@ -409,13 +409,19 @@ export class PresentationTimer {
 		if (this._timeout_handle != null) {
 			window.clearTimeout(this._timeout_handle);
 		}
-		this._timeout_handle = window.setTimeout(() => this._connection_lost(), 5000);
-		this._have_connection = true;
+		this._timeout_handle = window.setTimeout(() => this._connection_lost(), 6000);
+		const reconnected = !this._have_connection;
+		if (reconnected) {
+			console.log("Connection to presentation established.");
+			this._have_connection = true;
+			this._ui_update_display();
+		}
 	}
 
 	_connection_lost() {
 		console.log("Connection to presentation lost.");
 		this._have_connection = false;
+		this._ui_update_display();
 	}
 
 	_update_meta() {
@@ -435,6 +441,7 @@ export class PresentationTimer {
 		const data = msg.data;
 		if ((this._session_id != null) && (this._session_id != data.session_id)) {
 			/* Other presentation window open, ignore data. */
+			console.log("Warning: Conflicting presentation session detected.");
 			return;
 		}
 		if (this._session_id == null) {
@@ -442,7 +449,6 @@ export class PresentationTimer {
 			 * than switching back and forth between unrelated presentations.
 			 */
 			this._session_id = data.session_id;
-
 		}
 
 		this._reset_timeout();
