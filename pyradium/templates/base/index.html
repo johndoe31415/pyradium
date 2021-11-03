@@ -13,7 +13,7 @@
 	</head>
 
 	<body>
-%if renderer.rendering_params.presentation_mode.name == "Interactive":
+%if rendered_presentation.has_feature("interactive"):
 		<div class="menu">
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
 			<button id="btn_goto_slide" class="control">Goto</button>
@@ -30,7 +30,7 @@
 		%endfor
 		</div>
 
-%if renderer.rendering_params.presentation_mode.name == "Interactive":
+%if rendered_presentation.has_feature("interactive"):
 		<div id="full_screen_div" class="fullscreen size_container" style="display: none;"></div>
 
 		<script type="module">

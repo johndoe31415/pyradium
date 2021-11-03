@@ -29,7 +29,7 @@ from .ActionAcroSort import ActionAcroSort
 from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
 from .ActionDumpMetadata import ActionDumpMetadata
-from .Enums import PresentationMode, PresentationFeature
+from .Enums import PresentationFeature
 
 def _geometry(text):
 	text = text.split("x", maxsplit = 1)
@@ -57,7 +57,6 @@ def main():
 		parser.add_argument("--collapse-animation", action = "store_true", help = "Do not render animations as multiple slides, just show one complete slide.")
 		parser.add_argument("-i", "--index-filename", metavar = "filename", default = "index.html", help = "Gives the name of the presentation index file. Defaults to %(default)s. Useful if you want to render multiple presentations in one subdirectory.")
 		parser.add_argument("-j", "--inject-metadata", metavar = "filename", help = "Gives the option to inject metadata into the presentation. Must point to a JSON filename and will override the respective metadata fields of the presentation. Useful for changing things like the presentation date on the command line.")
-		parser.add_argument("-m", "--presentation-mode", metavar = "{%s}" % (",".join(enumitem.value for enumitem in PresentationMode)), type = PresentationMode, default = "interactive", help = "Generate this type of presentation. Can be one of %(choices)s, defaults to %(default)s.")
 		parser.add_argument("-e", "--enable-presentation-feature", choices = [ enumitem.value for enumitem in PresentationFeature ], default = [ ], action = "append", help = "Enable a specific presentation feature. Can be one of %(choices)s and can be given multiple times.")
 		parser.add_argument("-d", "--disable-presentation-feature", choices = [ enumitem.value for enumitem in PresentationFeature ], default = [ ], action = "append", help = "Disable a specific presentation feature. Can be one of %(choices)s and can be given multiple times.")
 		parser.add_argument("-l", "--re-render-loop", action = "store_true", help = "Stay in a continuous loop, re-rendering the presentation if anything changes.")

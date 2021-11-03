@@ -3,6 +3,6 @@
 #
 
 while true; do
-	./pyradium.py render -f -I examples/sub examples/example.xml rendered -v
+	./pyradium.py render -f -I examples/sub examples/example.xml -R rendered/foobar:foobar/ rendered -v
 	inotifywait -q --exclude '\..*\.sw[a-z]' -e modify -e close_write -e create -r pyradium.py pyradium examples 
 done

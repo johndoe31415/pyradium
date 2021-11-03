@@ -12,12 +12,10 @@ div.size_container {
 
 a.slideanchor {
 	position: relative;
-%if renderer.rendering_params.presentation_mode.name == "Interactive":
+%if rendered_presentation.has_feature("interactive"):
 	top: -100px;
-%elif renderer.rendering_params.presentation_mode.name == "Static":
-	top: -10px;
 %else:
-	${template_error("Presentation mode not explicitly caught in template: %s" % (renderer.rendering_params.presentation_mode.name))}
+	top: -10px;
 %endif
 }
 

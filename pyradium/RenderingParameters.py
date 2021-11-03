@@ -20,15 +20,13 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
-from .Enums import PresentationMode
 from .FileLookup import FileLookup
 
 class RenderingParameters():
-	def __init__(self, template_style = "default", honor_pauses = True, collapse_animation = False, presentation_mode = PresentationMode.Interactive, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None):
+	def __init__(self, template_style = "default", honor_pauses = True, collapse_animation = False, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None):
 		self._template_style = template_style
 		self._honor_pauses = honor_pauses
 		self._collapse_animation = collapse_animation
-		self._presentation_mode = presentation_mode
 		template_dirs = [ os.path.expanduser("~/.config/pyradium/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
 		if extra_template_dirs is not None:
 			template_dirs += extra_template_dirs
@@ -55,10 +53,6 @@ class RenderingParameters():
 	@property
 	def collapse_animation(self):
 		return self._collapse_animation
-
-	@property
-	def presentation_mode(self):
-		return self._presentation_mode
 
 	@property
 	def template_dirs(self):

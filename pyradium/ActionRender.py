@@ -35,7 +35,7 @@ from .Enums import PresentationFeature
 _log = logging.getLogger(__spec__.name)
 
 class ActionRender(BaseAction):
-	_DEFAULT_PRESENTATION_FEATURES = set([ PresentationFeature.Timer ])
+	_DEFAULT_PRESENTATION_FEATURES = set([ PresentationFeature.Interactive, PresentationFeature.Timer ])
 
 	def _wait_for_change(self, renderer):
 		cmd = [ "inotifywait" ]
@@ -64,6 +64,10 @@ class ActionRender(BaseAction):
 			return None
 		presentation_features |= enabled_features
 		presentation_features -= disabled_features
+
+		if (PresentationFeature.Timer in presentation_features) and (PresentationFeature.Interactive not in presentation_features):
+			_log.warning("The 'timer' feature implies the 'interactive' feature, which has been selected as well.")
+			presentation_features.add(PresentationFeature.Interactive)
 		return presentation_features
 
 	def run(self):
@@ -101,7 +105,6 @@ class ActionRender(BaseAction):
 						template_style = self._args.template_style,
 						honor_pauses = not self._args.remove_pauses,
 						collapse_animation = self._args.collapse_animation,
-						presentation_mode = self._args.presentation_mode,
 						extra_template_dirs = self._args.template_dir,
 						include_dirs = [ os.path.dirname(self._args.infile) or "." ] + self._args.include_dir,
 						index_filename = self._args.index_filename,

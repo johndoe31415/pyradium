@@ -29,7 +29,6 @@ from pyradium.renderer.ExecRenderer import ExecRenderer
 from .Acronyms import Acronyms
 from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
-from .Enums import PresentationMode
 from .Exceptions import TemplateErrorException
 from .Slide import RenderSlideDirective
 
@@ -125,8 +124,6 @@ class Renderer():
 
 		for feature in self.rendering_params.presentation_features:
 			rendered_presentation.add_feature(feature.value)
-		if self.rendering_params.presentation_mode == PresentationMode.Interactive:
-			rendered_presentation.add_feature("interactive")
 
 		# Run it first to build the initial TOC and determine feature set
 		self._compute_renderable_slides(rendered_presentation)

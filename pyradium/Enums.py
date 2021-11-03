@@ -21,9 +21,6 @@
 
 import enum
 
-class PresentationMode(enum.Enum):
-	Interactive = "interactive"
-	Static = "static"
-
 class PresentationFeature(enum.Enum):
+	Interactive = "interactive"
 	Timer = "timer"
