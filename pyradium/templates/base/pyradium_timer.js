@@ -376,8 +376,8 @@ export class PresentationTimer {
 		}
 
 		this._ui_elements.main_indicator.className = "main_indicator";
-		const delay_large_cutoff_secs = 300;
-		const delay_small_cutoff_secs = 30;
+		const delay_small_cutoff_secs = this._active_timer.presentation_duration_secs / 60;		/* at 30 minutes, this is 30 seconds */
+		const delay_large_cutoff_secs = this._active_timer.presentation_duration_secs / 10;		/* at 30 minutes, this is 3 minutes */
 		if (speed_error_secs < -delay_large_cutoff_secs) {
 			this._ui_elements.main_indicator.classList.add("largely_behind");
 		} else if (speed_error_secs < -delay_small_cutoff_secs) {
