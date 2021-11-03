@@ -30,10 +30,13 @@ from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
 from .Renderer import Renderer
 from .Exceptions import CallingProcessException, PyRadiumException
+from .Enums import PresentationFeature
 
 _log = logging.getLogger(__spec__.name)
 
 class ActionRender(BaseAction):
+	_DEFAULT_PRESENTATION_FEATURES = set([ PresentationFeature.Timer ])
+
 	def _wait_for_change(self, renderer):
 		cmd = [ "inotifywait" ]
 		cmd += [ "-q", "-r" ]
@@ -51,7 +54,28 @@ class ActionRender(BaseAction):
 		if proc.returncode not in [ 0, 1 ]:
 			raise CallingProcessException("inotifywait returned with returncode %d." % (proc.returncode))
 
+	def _get_presentation_features(self):
+		presentation_features = set(self._DEFAULT_PRESENTATION_FEATURES)
+		enabled_features = set(PresentationFeature(x) for x in self._args.enable_presentation_feature)
+		disabled_features = set(PresentationFeature(x) for x in self._args.disable_presentation_feature)
+		overlap = enabled_features & disabled_features
+		if len(overlap) > 0:
+			print("Presentation feature can not be enabled and disabled at the same time: %s" % (", ".join(sorted(value.name for value in overlap))), file = sys.stderr)
+			return None
+		presentation_features |= enabled_features
+		presentation_features -= disabled_features
+		return presentation_features
+
 	def run(self):
+		presentation_features = self._get_presentation_features()
+		if presentation_features is None:
+			return 1
+
+		if len(presentation_features) == 0:
+			_log.debug("Rendering without any presentation features.")
+		else:
+			_log.debug("Rendering with features: %s", ", ".join(sorted(value.name for value in presentation_features)))
+
 		if (not self._args.force) and os.path.exists(self._args.outdir):
 			print("Refusing to overwrite: %s" % (self._args.outdir), file = sys.stderr)
 			return 1
@@ -78,7 +102,7 @@ class ActionRender(BaseAction):
 						index_filename = self._args.index_filename,
 						geometry = self._args.geometry,
 						image_max_dimension = self._args.image_max_dimension,
-						presentation_features = self._args.presentation_feature,
+						presentation_features = presentation_features,
 						injected_metadata = injected_metadata)
 				presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 				renderer = Renderer(presentation, rendering_parameters)
