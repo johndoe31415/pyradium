@@ -117,6 +117,7 @@ div.footer div.flex {
 div.flex div.flexchild {
 	flex: 1;
 	display: flex;
+	white-space: nowrap;
 }
 
 div.flexchild.left {
