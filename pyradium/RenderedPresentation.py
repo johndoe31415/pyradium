@@ -20,11 +20,11 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
-import json
 import contextlib
 from .GenericTOC import GenericTOC
 from .OrderedSet import OrderedSet
 from .Schedule import PresentationSchedule, TimeSpecification
+from .Enums import PresentationFeature
 
 class RenderedPresentation():
 	def __init__(self, renderer, deploy_directory, resource_directory):
@@ -123,9 +123,12 @@ class RenderedPresentation():
 		return self._features
 
 	def add_feature(self, feature):
+		assert(isinstance(feature, PresentationFeature))
 		self._features.add(feature)
 
 	def has_feature(self, feature):
+		if isinstance(feature, str):
+			feature = PresentationFeature(feature)
 		return feature in self.features
 
 	def append_slide(self, rendered_slide):
@@ -170,12 +173,12 @@ class RenderedPresentation():
 				self.add_css(rel_filename["name"], target_directory = "/template/", order = rel_filename.get("order"))
 
 	@property
-	def meta(self):
+	def meta_interactive(self):
 		return {
 			"slide_ratios":			self.schedule.slide_ratio_list,
 			"presentation_time":	self.renderer.presentation.meta.get("presentation-time"),
 		}
 
 	@property
-	def meta_json(self):
-		return json.dumps(self.meta)
+	def meta_info(self):
+		return self.renderer.presentation.meta_info

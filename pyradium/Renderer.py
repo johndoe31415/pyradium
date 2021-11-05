@@ -20,7 +20,9 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import json
+import logging
 import mako.lookup
+import markupsafe
 import pyradium
 from pyradium.Controller import ControllerManager
 from pyradium.renderer.LatexFormulaRenderer import LatexFormulaRenderer
@@ -31,6 +33,10 @@ from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
 from .Exceptions import TemplateErrorException
 from .Slide import RenderSlideDirective
+from .Enums import PresentationFeature
+from .Tools import JSONTools
+
+_log = logging.getLogger(__spec__.name)
 
 class Renderer():
 	def __init__(self, presentation, rendering_params):
@@ -100,11 +106,15 @@ class Renderer():
 		def _template_error(text):
 			raise TemplateErrorException(text)
 
+		def _jsonify(obj):
+			return markupsafe.Markup(json.dumps(JSONTools.round_dict_floats(obj), sort_keys = True, separators = (",", ":")))
+
 		template_args = {
 			"pyradium_version":			pyradium.VERSION,
 			"renderer":					self,
 			"presentation":				self._presentation,
 			"template_error":			_template_error,
+			"jsonify":					_jsonify,
 			"preuri":					self.rendering_params.resource_uri,
 			"preuri_ds":				self.rendering_params.resource_uri if self.rendering_params.resource_uri.startswith("/") else ("./" + self.rendering_params.resource_uri),
 		}
@@ -123,17 +133,34 @@ class Renderer():
 		rendered_presentation = RenderedPresentation(self, deploy_directory = deploy_directory, resource_directory = resource_directory)
 
 		for feature in self.rendering_params.presentation_features:
-			rendered_presentation.add_feature(feature.value)
+			rendered_presentation.add_feature(feature)
+		_log.trace("Initial feature set: %s", ", ".join(sorted(feature.name for feature in rendered_presentation.features)))
 
 		# Run it first to build the initial TOC and determine feature set
 		self._compute_renderable_slides(rendered_presentation)
 
-		# Then copy the dependencies
+		_log.debug("Finalized feature set: %s", ", ".join(sorted(feature.name for feature in rendered_presentation.features)))
+
+		# Then copy general dependencies by the used template
 		rendered_presentation.handle_dependencies(self._template_config.get("files"))
+
+		# Additionally look for dependencies which are effective because
+		# specific slide types are used (e.g., a "quote" slide might need its
+		# own CSS)
 		for slide_type in self._determine_slide_types():
-			rendered_presentation.handle_dependencies(self._template_config.get("dependencies", { }).get("slidetype", { }).get(slide_type))
+			slide_type_dependencies = self._template_config.get("dependencies", { }).get("slidetype", { }).get(slide_type)
+			if slide_type_dependencies is not None:
+				for feature_dependency in slide_type_dependencies.get("features", { }):
+					feature_dependency = PresentationFeature(feature_dependency)
+					rendered_presentation.add_feature(feature_dependency)
+				rendered_presentation.handle_dependencies(slide_type_dependencies)
+
+		# Lastly, add dependencies which are effective because a feature flag
+		# is active (e.g., when "interactive" is used, a menu needs to be
+		# generated which requires its own CSS)
 		for feature in rendered_presentation.features:
-			rendered_presentation.handle_dependencies(self._template_config.get("dependencies", { }).get("feature", { }).get(feature))
+			feature_dependency = self._template_config.get("dependencies", { }).get("feature", { }).get(feature.value)
+			rendered_presentation.handle_dependencies(feature_dependency)
 
 		# Then run it again to get the page numbers straight (e.g., the TOC
 		# pages will be emitted, giving different page numbers). Initialize

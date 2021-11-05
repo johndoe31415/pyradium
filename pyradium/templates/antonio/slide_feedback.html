@@ -52,8 +52,11 @@
 	import {FeedbackSender} from "${preuri_ds}template/base/pyradium_feedback.js";
 	import {ModalWindow} from "${preuri_ds}template/base/pyradium_modal.js";
 
-	let slide_info = ${slide.var("json_slide_info") | n};
-	slide_info["uri"] = location.href;
+	const static_info = {
+		"version":	1,
+		"uri":		location.href,
+		"info":		globalThis.pyradium.presentation.info,
+	};
 	const parent_div = document.querySelector("#${uid}");
 	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
 	const button_checkbox = new ButtonCheckbox(checkbox_group);
@@ -63,7 +66,7 @@
 	const submit_button = parent_div.querySelector("[lid=\"submit\"]");
 
 	const feedback_sender = new FeedbackSender("${slide.var("endpoint")}", {
-		"static_info":		slide_info,
+		"static_info":		static_info,
 		"on_success":		() => { modal.show("success", "Thank you for submitting your feedback!"); feedback_sender.clear_form(); },
 		"on_error":			() => modal.show("error", "<b>Error</b>: There was an error during network transmission. Your data has not been submitted. Please try again later."),
 		"on_form_empty":	() => modal.show("error", "<b>Error</b>: You need to enter at least some feedback. The form may not be completely empty."),

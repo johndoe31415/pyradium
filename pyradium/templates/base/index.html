@@ -13,6 +13,19 @@
 	</head>
 
 	<body>
+		<script type="module">
+			globalThis.pyradium = {
+				"format":		1,
+				"presentation":	{ },
+			};
+%if rendered_presentation.has_feature("info"):
+			globalThis.pyradium.presentation["info"] = ${jsonify(rendered_presentation.meta_info)};
+%endif
+%if rendered_presentation.has_feature("interactive"):
+			globalThis.pyradium.presentation["interactive"] = ${jsonify(rendered_presentation.meta_interactive)};
+%endif
+		</script>
+
 %if rendered_presentation.has_feature("interactive"):
 		<div class="menu">
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
@@ -35,13 +48,12 @@
 
 		<script type="module">
 			import {Presentation} from "${preuri_ds}template/base/pyradium.js";
-			const presentation_meta = ${rendered_presentation.meta_json | n};
 			const ui_elements = {
 				"slides":			document.querySelectorAll("div.slide"),
 				"slideno_text":		document.querySelector("#current_slideno"),
 				"full_screen_div":	document.querySelector("#full_screen_div"),
 			};
-			const presentation = new Presentation(ui_elements, presentation_meta);
+			const presentation = new Presentation(ui_elements, globalThis.pyradium.presentation.interactive);
 			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
 			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start_presentation());
 			document.addEventListener("wheel", (event) => presentation.event_wheel(event));

@@ -200,6 +200,18 @@ class XMLTools():
 		else:
 			raise InvalidBooleanValueException("Invalid boolean value for attribute %s of node %s." % (attr_name, node))
 
+class JSONTools():
+	@classmethod
+	def round_dict_floats(cls, obj, digits = 4):
+		if isinstance(obj, float):
+			return round(obj, digits)
+		elif isinstance(obj, list):
+			return [ cls.round_dict_floats(child, digits = digits) for child in obj ]
+		elif isinstance(obj, dict):
+			return { key: cls.round_dict_floats(value, digits = digits) for (key, value) in obj.items() }
+		else:
+			return obj
+
 class ImageTools():
 	@classmethod
 	def get_image_info(cls, filename):

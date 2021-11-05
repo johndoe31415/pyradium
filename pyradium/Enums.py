@@ -24,3 +24,6 @@ import enum
 class PresentationFeature(enum.Enum):
 	Interactive = "interactive"
 	Timer = "timer"
+	Info = "info"
+	Pygments = "pygments"
+	Acronyms = "acronyms"

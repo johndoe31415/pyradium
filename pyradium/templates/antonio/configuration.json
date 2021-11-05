@@ -63,10 +63,6 @@
 				"acronyms_per_slide":	8
 			}
 		},
-		"feedback": {
-			"file":			"base/controller_feedback.py",
-			"class":		"FeedbackController"
-		},
 		"animation": {
 			"file":			"base/controller_animation.py",
 			"class":		"AnimationController"
@@ -80,6 +76,9 @@
 				]
 			},
 			"feedback": {
+				"features": [
+					"info"
+				],
 				"css": [
 					"base/pyradium_forms.css",
 					"base/pyradium_modal.css"

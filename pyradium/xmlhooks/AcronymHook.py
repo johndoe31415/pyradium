@@ -21,6 +21,7 @@
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
+from pyradium.Enums import PresentationFeature
 
 @XMLHookRegistry.register_hook
 class AcronymHook(BaseHook):
@@ -35,7 +36,7 @@ class AcronymHook(BaseHook):
 		if resolved is None:
 			replacement_node = node.ownerDocument.createTextNode(acronym_id)
 		else:
-			rendered_presentation.add_feature("acronym")
+			rendered_presentation.add_feature(PresentationFeature.Acronyms)
 			replacement_node = node.ownerDocument.createElement("span")
 			replacement_node.setAttribute("class", "tooltip")
 			replacement_node.appendChild(node.ownerDocument.createTextNode(resolved.acronym))

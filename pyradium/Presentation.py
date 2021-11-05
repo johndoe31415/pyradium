@@ -22,6 +22,7 @@
 import hashlib
 import subprocess
 import logging
+import pyradium
 import xml.dom.minidom
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
@@ -123,6 +124,13 @@ class Presentation():
 	@property
 	def version_information(self):
 		return { filename: self._determine_version(filename) for filename in self.sources }
+
+	@property
+	def meta_info(self):
+		return {
+			"renderer":			pyradium.VERSION,
+			"source_versions":	self.version_information,
+		}
 
 	def __iter__(self):
 		return iter(self._content)

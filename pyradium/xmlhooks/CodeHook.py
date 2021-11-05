@@ -22,6 +22,7 @@
 import xml.dom.minidom
 import pygments
 from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
+from pyradium.Enums import PresentationFeature
 
 @XMLHookRegistry.register_hook
 class CodeHook(InnerTextHook):
@@ -33,5 +34,5 @@ class CodeHook(InnerTextHook):
 		highlighted_code = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter(cssclass = "code_highlight"))
 
 		replacement_node = xml.dom.minidom.parseString(highlighted_code).firstChild
-		rendered_presentation.add_feature("pygments")
+		rendered_presentation.add_feature(PresentationFeature.Pygments)
 		return replacement_node
