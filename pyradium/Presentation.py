@@ -123,7 +123,11 @@ class Presentation():
 
 	@property
 	def version_information(self):
-		return { filename: self._determine_version(filename) for filename in self.sources }
+		return [
+			{
+				"filename":	filename,
+				"version":	self._determine_version(filename),
+			} for filename in self.sources ]
 
 	@property
 	def meta_info(self):
