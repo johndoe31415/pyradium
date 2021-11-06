@@ -91,7 +91,7 @@
 			}
 		},
 		"feature": {
-			"acronym": {
+			"acronyms": {
 				"css": [
 					"base/pyradium_tooltip.css"
 				]

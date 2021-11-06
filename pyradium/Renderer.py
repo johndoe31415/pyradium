@@ -31,7 +31,7 @@ from pyradium.renderer.ExecRenderer import ExecRenderer
 from .Acronyms import Acronyms
 from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
-from .Exceptions import TemplateErrorException
+from .Exceptions import TemplateErrorException, MalformedStyleConfigurationException
 from .Slide import RenderSlideDirective
 from .Enums import PresentationFeature
 from .Tools import JSONTools
@@ -50,9 +50,18 @@ class Renderer():
 			"acronym":	Acronyms(),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])
-		with open(self.lookup_styled_template_file("configuration.json")) as f:
+		self._template_config_filename = self.lookup_styled_template_file("configuration.json")
+		with open(self._template_config_filename) as f:
 			self._template_config = json.load(f)
+		self._plausibilize_template_config()
 		self._ctrlr_mgr = ControllerManager(self)
+
+	def _plausibilize_template_config(self):
+		for feature_name in self._template_config.get("dependencies", { }).get("feature", { }):
+			try:
+				PresentationFeature(feature_name)
+			except ValueError as e:
+				raise MalformedStyleConfigurationException("The stylesheet file %s contains an unknown feature in config[\"dependencies\"][\"feature\"]: %s" % (self._template_config_filename, feature_name)) from e
 
 	@property
 	def presentation(self):

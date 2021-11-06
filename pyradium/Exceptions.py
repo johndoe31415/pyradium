@@ -24,6 +24,7 @@ class PyRadiumException(Exception): pass
 class CallingProcessException(PyRadiumException): pass
 
 class MalformedXMLInputException(PyRadiumException): pass
+class MalformedStyleConfigurationException(PyRadiumException): pass
 
 class SlideException(PyRadiumException): pass
 class UndefinedContentException(SlideException): pass
