@@ -194,6 +194,13 @@ export class Presentation {
 		} else if ((event.key == "X") && (event.ctrlKey) && (event.shiftKey)) {
 			this._debugging = true;
 			this._log("Debugging mode enabled.");
+		} else if ((event.key == "i") && (event.ctrlKey)) {
+			if (this._ui_elements.info_modal != null) {
+				this._log("Show info window.");
+				this._ui_elements.info_modal.pyradium_modal.show();
+			} else {
+				this._log("Info window functionality not implemented.");
+			}
 		} else {
 			this._log("Keypress other: ", event);
 		}

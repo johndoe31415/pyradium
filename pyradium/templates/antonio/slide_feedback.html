@@ -62,7 +62,9 @@
 	const button_checkbox = new ButtonCheckbox(checkbox_group);
 
 	const modal_div = parent_div.querySelector(".modal");
-	const modal = new ModalWindow(modal_div);
+	const modal = new ModalWindow(modal_div, {
+		close_on_popup_click: true,
+	});
 	const submit_button = parent_div.querySelector("[lid=\"submit\"]");
 
 	const feedback_sender = new FeedbackSender("${slide.var("endpoint")}", {

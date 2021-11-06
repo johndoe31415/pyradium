@@ -30,6 +30,10 @@ div.modal.type-success div.content {
 	border: 20px solid #2ecc71;
 }
 
+div.modal.type-info div.content {
+	border: 20px solid #3498db;
+}
+
 div.modal span.close {
 	color: #aaaaaa;
 	float: right;

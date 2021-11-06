@@ -91,6 +91,14 @@
 			}
 		},
 		"feature": {
+			"info": {
+				"css": [
+					"base/pyradium_modal.css"
+				],
+				"static": [
+					"base/pyradium_modal.js"
+				]
+			},
 			"acronyms": {
 				"css": [
 					"base/pyradium_tooltip.css"

@@ -26,6 +26,8 @@
 %endif
 		</script>
 
+
+
 %if rendered_presentation.has_feature("interactive"):
 		<div class="menu">
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
@@ -38,6 +40,26 @@
 %endif
 
 		<div class="belowmenu">
+%if rendered_presentation.has_feature("info"):
+			<div class="modal type-info" id="pyradium_info_popup">
+				<div class="content">
+					<span class="close">×</span>
+					<div class="msg">
+						Main presentation file: <span id="info_git_revision"></span>
+					</div>
+				</div>
+			</div>
+
+			<script type="module">
+				import {ModalWindow} from "${preuri_ds}template/base/pyradium_modal.js";
+				const modal_div = document.querySelector("#pyradium_info_popup");
+				modal_div.pyradium_modal = new ModalWindow(modal_div, {
+					close_on_popup_click:	false,
+				});
+				document.querySelector("#info_git_revision").innerText = globalThis.pyradium.presentation.info.source_versions[0].filename + " / git " + globalThis.pyradium.presentation.info.source_versions[0].version.git;
+			</script>
+%endif
+
 		%for slide in rendered_presentation.rendered_slides:
 		${slide | n}
 		%endfor
@@ -52,6 +74,7 @@
 				"slides":			document.querySelectorAll("div.slide"),
 				"slideno_text":		document.querySelector("#current_slideno"),
 				"full_screen_div":	document.querySelector("#full_screen_div"),
+				"info_modal":		document.querySelector("#pyradium_info_popup"),
 			};
 			const presentation = new Presentation(ui_elements, globalThis.pyradium.presentation.interactive);
 			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
