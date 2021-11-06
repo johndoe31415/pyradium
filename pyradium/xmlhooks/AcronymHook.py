@@ -37,10 +37,22 @@ class AcronymHook(BaseHook):
 			replacement_node = node.ownerDocument.createTextNode(acronym_id)
 		else:
 			rendered_presentation.add_feature(PresentationFeature.Acronyms)
-			replacement_node = node.ownerDocument.createElement("span")
-			replacement_node.setAttribute("class", "tooltip")
-			replacement_node.appendChild(node.ownerDocument.createTextNode(resolved.acronym))
-			inner_span = replacement_node.appendChild(node.ownerDocument.createElement("span"))
+
+			outer_span_node = node.ownerDocument.createElement("span")
+			replacement_node = outer_span_node
+
+			if resolved.uri is not None:
+				link_node = outer_span_node.appendChild(node.ownerDocument.createElement("a"))
+				link_node.setAttribute("href", resolved.uri)
+				link_node.setAttribute("class", "tooltip-link")
+				chain_node = link_node
+			else:
+				chain_node = outer_span_node
+
+			chain_node.setAttribute("class", "tooltip")
+			chain_node.appendChild(node.ownerDocument.createTextNode(resolved.acronym))
+
+			inner_span = chain_node.appendChild(node.ownerDocument.createElement("span"))
 			inner_span.setAttribute("class", "text")
 			inner_span.appendChild(node.ownerDocument.createTextNode(resolved.text))
 
