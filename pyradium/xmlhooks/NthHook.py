@@ -19,17 +19,30 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .AcronymHook import AcronymHook
-from .TimeHook import TimeHook
-from .ExecHook import ExecHook
-from .MonospaceHook import MonospaceHook
-from .DebugHook import DebugHook
-from .NthHook import NthHook
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.Tools import XMLTools
+
+@XMLHookRegistry.register_hook
+class NthHook(BaseHook):
+	_TAG_NAME = "nth"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		value = int(XMLTools.inner_text(node))
+		last_digit = value % 10
+		if last_digit == 1:
+			suffix = "st"
+		elif last_digit == 2:
+			suffix = "nd"
+		elif last_digit == 3:
+			suffix = "rd"
+		else:
+			suffix = "th"
+
+
+		replacement_nodes = [
+			node.ownerDocument.createTextNode(str(value)),
+			node.ownerDocument.createElement("sup"),
+		]
+		replacement_nodes[1].appendChild(node.ownerDocument.createTextNode(suffix))
+		return replacement_nodes

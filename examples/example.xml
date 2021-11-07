@@ -264,6 +264,16 @@
 		</ul>
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Nth" />
+		<ul>
+			<li>This is the <s:nth>1</s:nth> line.</li>
+			<li>This is the <s:nth>2</s:nth> line.</li>
+			<li>This is the <s:nth>3</s:nth> line.</li>
+			<li>This is the <s:nth>4</s:nth> line.</li>
+		</ul>
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0" />
 	</slide>
