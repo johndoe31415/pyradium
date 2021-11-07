@@ -84,7 +84,7 @@
 			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
 			document.addEventListener("keydown", (event) => presentation.event_keydown(event));
 			%if rendered_presentation.has_feature("timer"):
-			document.querySelector("#btn_timer").addEventListener("click", (event) => window.open("${preuri}template/base/timer.html"));
+			document.querySelector("#btn_timer").addEventListener("click", (event) => window.open("${preuri}template/base/timer.html#" + presentation.session_id));
 			%endif
 		</script>
 %endif

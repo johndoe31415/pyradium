@@ -80,12 +80,18 @@
 		</div>
 
 		<script type="module">
+			const url = new URL(location.href);
+			if (url.hash == "") {
+				console.log("Error: timer has no session ID to attach to.");
+			}
+			const session_id = url.hash.substr(1);
+
 			import {PresentationTimer} from "./pyradium_timer.js";
 			let ui_elements = { };
 			document.querySelectorAll(".ui-element").forEach((element) => {
 				ui_elements[element.id] = element;
 			});
-			const pt = new PresentationTimer(ui_elements);
+			const pt = new PresentationTimer(ui_elements, session_id);
 		</script>
 	</body>
 </html>

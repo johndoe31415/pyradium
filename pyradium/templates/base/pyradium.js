@@ -43,7 +43,7 @@ export class Presentation {
 		this._ui_elements.slides.forEach((slide) => {
 			this._intersect_obs.observe(slide);
 		});
-		this._session_id = Math.random();
+		this._session_id = Math.random().toString(36).substr(2);
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
 		this._debugging = false;
@@ -54,6 +54,10 @@ export class Presentation {
 		if (this._debugging) {
 			console.log(...args);
 		}
+	}
+
+	get session_id() {
+		return this._session_id;
 	}
 
 	get presentation_meta() {

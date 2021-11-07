@@ -207,13 +207,13 @@ class SlideSubsetSelector {
 
 
 export class PresentationTimer {
-	constructor(ui_elements) {
+	constructor(ui_elements, session_id) {
 		this._ui_elements = ui_elements;
+		this._session_id = session_id;
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
 		this._nominal_presentation_duration_secs = null;
 		this._slide_subset_selector = null;
-		this._session_id = null;
 		this._current_slide = null;
 		this._meta = null;
 		this._tx_message({ "type": "query_slide_info" });
@@ -439,16 +439,10 @@ export class PresentationTimer {
 
 	_rx_message(msg) {
 		const data = msg.data;
-		if ((this._session_id != null) && (this._session_id != data.session_id)) {
+		if (this._session_id != data.session_id) {
 			/* Other presentation window open, ignore data. */
-			console.log("Warning: Conflicting presentation session detected.");
+			//console.log("Warning: Conflicting presentation session detected.");
 			return;
-		}
-		if (this._session_id == null) {
-			/* Bind to first session that comes along and stick with it. Better
-			 * than switching back and forth between unrelated presentations.
-			 */
-			this._session_id = data.session_id;
 		}
 
 		this._reset_timeout();
