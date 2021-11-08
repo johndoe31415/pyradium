@@ -131,6 +131,10 @@ class TextChunks():
 		self._chunks = [ ]
 		self._offsets = [ ]
 
+	@property
+	def first_chunk(self):
+		return self._chunks[0]
+
 	def append(self, chunk):
 		assert(isinstance(chunk, TextChunk))
 		if len(self._offsets) == 0:
@@ -150,20 +154,19 @@ class TextChunks():
 		for chunk in self._chunks:
 			print(chunk)
 
-	def indexof(self, chunk):
-		return self._chunks.index(chunk)
+	def find_chunk(self, chunk):
+		index = self._chunks.index(chunk)
+		return self[index]
 
 	def find_offset(self, offset):
 		index = bisect.bisect(self._offsets, offset)
 		if index >= len(self._offsets):
 			index = len(self._offsets) - 1
-		return (index, self._offsets[index])
-
-	def get_offset(self, index):
-		return self._offsets[index]
+		return self[index]
 
 	def __getitem__(self, index):
-		return self._chunks[index]
+		start_offset = 0 if (index == 0) else self._offsets[index - 1]
+		return (self._chunks[index], start_offset)
 
 	def __iadd__(self, others):
 		for chunk in others:
@@ -212,7 +215,7 @@ class XMLSpellchecker():
 		Markup = 2
 
 	_SpellcheckGroup = collections.namedtuple("SpellcheckGroup", [ "description", "chunks" ])
-	_SpellcheckResult = collections.namedtuple("SpellcheckResult", [ "chunk", "match", "group", "group_offset" ])
+	_SpellcheckResult = collections.namedtuple("SpellcheckResult", [ "chunk", "chunk_offset", "group", "group_offset", "match", "row", "column" ])
 
 	def __init__(self):
 		self._parser = xml.parsers.expat.ParserCreate()
@@ -315,17 +318,22 @@ class XMLSpellchecker():
 		result = spellcheck_api.check_data(all_chunks.to_data())
 
 		for match in result["matches"]:
-			(global_index, global_start_offset) = all_chunks.find_offset(match["offset"])
-			chunk = all_chunks[global_index]
+			(chunk, chunk_start_offset) = all_chunks.find_offset(match["offset"])
+			chunk_offset = match["offset"] - chunk_start_offset
 
 			group = chunk.group
-			first_chunk_in_group = group.chunks[0]
-			first_chunk_global_index = all_chunks.indexof(first_chunk_in_group)
-			first_chunk_offset = all_chunks.get_offset(first_chunk_global_index)
+			(first_chunk, first_chunk_start_offset) = all_chunks.find_chunk(group.chunks.first_chunk)
+			group_offset = match["offset"] - first_chunk_start_offset
 
-			group_offset = global_start_offset - first_chunk_offset
-
-			spellcheck_result = self._SpellcheckResult(chunk = chunk, group = group, match = match, group_offset = group_offset)
+			row = chunk.row
+			column = chunk.column
+			for char in chunk.text[:chunk_offset]:
+				if char == "\n":
+					row += 1
+					column = 1
+				else:
+					column += 1
+			spellcheck_result = self._SpellcheckResult(chunk = chunk, chunk_offset = chunk_offset, group = group, group_offset = group_offset, match = match, row = row, column = column)
 			yield spellcheck_result
 
 if __name__ == "__main__":
@@ -334,7 +342,9 @@ if __name__ == "__main__":
 	xml_spellcheck.parse("examples/example.xml")
 	with ltp as api:
 		for result in xml_spellcheck.spellcheck(api):
-			raw_text = result.group.chunks.joinall()
-			offense = raw_text[result.group_offset : result.group_offset + result.match["length"]]
-			print("%s [line %d, row %d] \"%s\": %s" % (result.group.description, result.chunk.row, result.chunk.column, offense, result.match["message"]))
-			print("-" * 120)
+			offense = result.chunk.text[result.chunk_offset : result.chunk_offset + result.match["length"]]
+
+			group_text = result.group.chunks.joinall()
+			offense_group = group_text[result.group_offset : result.group_offset + result.match["length"]]
+			assert(offense == offense_group)
+			print("%s [line %d, row %d] \"%s\": %s" % (result.group.description, result.row, result.column, offense, result.match["message"]))
