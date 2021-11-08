@@ -21,6 +21,7 @@
 
 import os
 import sys
+import json
 from .BaseAction import BaseAction
 from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess
 
@@ -42,7 +43,24 @@ class ActionSpellcheck(BaseAction):
 		msg = "\"%s\": %s" % (offense, spellcheck_result.match["message"])
 		print("%s:%d:%d:%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
 
+	def _add_finding_fulljson(self, spellcheck_result):
+		finding = {
+			"chunk":			spellcheck_result.chunk.text,
+			"chunk_offset":		spellcheck_result.chunk_offset,
+			"group": {
+				"description":	spellcheck_result.group.description,
+				"chunks":		[ chunk.text for chunk in spellcheck_result.group.chunks ]
+			},
+			"group_offset":		spellcheck_result.group_offset,
+			"match":			spellcheck_result.match,
+		}
+		self._findings.append(finding)
+
+	def _emit_findings_fulljson(self):
+		json.dump(self._findings, self._f)
+
 	def _run_spellcheck(self, spellchecker_api):
+		self._findings = [ ]
 		finding_handler = getattr(self, "_add_finding_" + self._args.mode)
 		emission_handler = getattr(self, "_emit_findings_" + self._args.mode, None)
 		for spellcheck_result in self._xml_spellchecker.spellcheck(spellchecker_api):

@@ -41,7 +41,7 @@ class SpellcheckerAPI():
 		self._picky = picky
 		self._sess = requests.Session()
 		self._enabled_rules = None
-		self._disabled_rules = [ "WHITESPACE_RULE" ]
+		self._disabled_rules = [ "WHITESPACE_RULE", "COMMA_PARENTHESIS_WHITESPACE" ]
 		self._enabled_categories = None
 		self._disabled_categories = None
 
