@@ -29,6 +29,7 @@ from .ActionAcroSort import ActionAcroSort
 from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
 from .ActionDumpMetadata import ActionDumpMetadata
+from .ActionSpellcheck import ActionSpellcheck
 from .Enums import PresentationFeature
 
 def _geometry(text):
@@ -96,6 +97,15 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the slide show.")
 	mc.register("dumpmeta", "Dump the metadata dictionary in JSON format", genparser, action = ActionDumpMetadata)
+
+	def genparser(parser):
+		group = parser.add_mutually_exclusive_group(required = True)
+		group.add_argument("-u", "--uri", metavar = "uri", help = "Connect to this running LanguageTool server URI.")
+		group.add_argument("-j", "--jar", metavar = "jarfile", help = "Start a LanguageTool server using this languagetool-server.jar JAR, automatically connect to it and shut it down after use.")
+		parser.add_argument("-m", "--mode", choices = [ "print" ], default = "print", help = "Mode in which spellchecking is performed. Can be one of %(choices)s, defaults to %(default)s.")
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("infile", help = "Input XML file of the presentation.")
+	mc.register("spellcheck", "Spellcheck an XML presentation file", genparser, action = ActionSpellcheck)
 
 	return mc.run(sys.argv[1:])
 

@@ -1,0 +1,340 @@
+#	pyradium - HTML presentation/slide show generator
+#	Copyright (C) 2015-2021 Johannes Bauer
+#
+#	This file is part of pyradium.
+#
+#	pyradium is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; this program is ONLY licensed under
+#	version 3 of the License, later versions are explicitly excluded.
+#
+#	pyradium is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with pyradium; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#	Johannes Bauer <JohannesBauer@gmx.de>
+
+import enum
+import time
+import json
+import subprocess
+import collections
+import logging
+import bisect
+import urllib.parse
+import xml.parsers.expat
+import requests
+from pyradium.Tools import XMLTools
+from pyradium.Exceptions import SpellcheckerException
+
+_log = logging.getLogger(__spec__.name)
+
+class SpellcheckerAPI():
+	def __init__(self, languagetool_uri, language = "en-US", picky = False):
+		self._languagetool_uri = languagetool_uri
+		self._language = language
+		self._picky = picky
+		self._sess = requests.Session()
+		self._enabled_rules = None
+		self._disabled_rules = [ "WHITESPACE_RULE" ]
+		self._enabled_categories = None
+		self._disabled_categories = None
+
+	def check_data(self, annotations):
+		json_payload = {
+			"annotation": annotations,
+		}
+		json_data = json.dumps(json_payload, separators = (",", ":"))
+		query_args = {
+			"language":	self._language,
+			"data":		json_data,
+			"level":	"picky" if self._picky else "default",
+		}
+		if self._enabled_rules is not None:
+			query_args["enabledRules"] = ",".join(self._enabled_rules)
+		if self._disabled_rules is not None:
+			query_args["disabledRules"] = ",".join(self._disabled_rules)
+		if self._enabled_categories is not None:
+			query_args["enabledCategories"] = ",".join(self._enabled_categories)
+		if self._disabled_categories is not None:
+			query_args["disabledCategories"] = ",".join(self._disabled_categories)
+		query_str = urllib.parse.urlencode(query_args)
+		response = self._sess.post(self._languagetool_uri + "/check?" + query_str, headers = {
+			"Accept": "application/json",
+		})
+		assert(response.status_code == 200)
+		return response.json()
+
+	def check_multitext(self, *texts):
+		return self.check_data([ { "text": piece } for piece in texts ])
+
+	def check(self, text):
+		return self.check_data([{
+			"text": text,
+		}])
+
+	def try_connect(self, timeout_sec = 3.0, time_between_attempts_sec = 0.25):
+		t0 = time.time()
+		tend = t0 + timeout_sec
+		while time.time() < tend:
+			try:
+				response = self._sess.get(self._languagetool_uri + "/info")
+				if response.status_code == 200:
+					return True
+			except requests.exceptions.ConnectionError:
+				pass
+			time.sleep(time_between_attempts_sec)
+		return False
+
+class TextChunk():
+	def __init__(self, text_type, text, group = None, row = None, column = None):
+		assert(text_type in [ "text", "markup" ])
+		self._text_type = text_type
+		self._text = text
+		self._group = group
+		self._row = row
+		self._column = column
+
+	@property
+	def group(self):
+		return self._group
+
+	@property
+	def row(self):
+		return self._row
+
+	@property
+	def column(self):
+		return self._column
+
+	@property
+	def text(self):
+		return self._text
+
+	def to_dict(self):
+		return { self._text_type: self._text }
+
+	@classmethod
+	def joinall(cls, chunks):
+		return "".join(chunk.text for chunk in chunks)
+
+	def __str__(self):
+		return "Chunk<%s, \"%s\", %s/%s>" % (self._text_type, self._text.replace("\n", r"\n"), self.row, self.column)
+
+class TextChunks():
+	def __init__(self):
+		self._chunks = [ ]
+		self._offsets = [ ]
+
+	def append(self, chunk):
+		assert(isinstance(chunk, TextChunk))
+		if len(self._offsets) == 0:
+			start_offset = 0
+		else:
+			start_offset = self._offsets[-1]
+		self._chunks.append(chunk)
+		self._offsets.append(start_offset + len(chunk.text))
+
+	def joinall(self):
+		return "".join(chunk.text for chunk in self)
+
+	def to_data(self):
+		return [ chunk.to_dict() for chunk in self ]
+
+	def dump(self):
+		for chunk in self._chunks:
+			print(chunk)
+
+	def indexof(self, chunk):
+		return self._chunks.index(chunk)
+
+	def find_offset(self, offset):
+		index = bisect.bisect(self._offsets, offset)
+		if index >= len(self._offsets):
+			index = len(self._offsets) - 1
+		return (index, self._offsets[index])
+
+	def get_offset(self, index):
+		return self._offsets[index]
+
+	def __getitem__(self, index):
+		return self._chunks[index]
+
+	def __iadd__(self, others):
+		for chunk in others:
+			self.append(chunk)
+		return self
+
+	def __iter__(self):
+		return iter(self._chunks)
+
+class LanguageToolProcess():
+	def __init__(self, lt_server_jar_filename, port = 12764):
+		self._lt_server_jar_filename = lt_server_jar_filename
+		self._port = port
+		self._proc = None
+
+	@property
+	def uri(self):
+		return self._languagetool_uri
+
+	def __enter__(self):
+		assert(self._proc is None)
+		try:
+			self._proc = subprocess.Popen([ "java", "-cp", self._lt_server_jar_filename, "org.languagetool.server.HTTPServer", "--port", str(self._port), "--allow-origin", "*" ], stdout = _log.subproc_target, stderr = _log.subproc_target)
+		except FileNotFoundError as e:
+			raise SpellcheckerException("Unable to start LanguageTool on port %d: %s" % (self._port, str(e))) from e
+
+		languagetool_uri = "http://127.0.0.1:%d/v2" % (self._port)
+		sc = SpellcheckerAPI(languagetool_uri)
+		sc_available = sc.try_connect()
+		if not sc_available:
+			raise SpellcheckerException("Unable to establish connection to LanguageTool at %s" % (languagetool_uri))
+		return sc
+
+	def __exit__(self, *args):
+		self._proc.kill()
+		self._proc = None
+
+
+class XMLSpellchecker():
+	class ParserMode(enum.IntEnum):
+		Normal = 0
+		DropText = 1
+
+		# "Markup" does include the text, but if it finds errors in the span,
+		# ignores those. Useful for acronyms
+		Markup = 2
+
+	_SpellcheckGroup = collections.namedtuple("SpellcheckGroup", [ "description", "chunks" ])
+	_SpellcheckResult = collections.namedtuple("SpellcheckResult", [ "chunk", "match", "group", "group_offset" ])
+
+	def __init__(self):
+		self._parser = xml.parsers.expat.ParserCreate()
+		self._parser.StartElementHandler = self._handle_start_element
+		self._parser.EndElementHandler = self._handle_end_element
+		self._parser.CharacterDataHandler = self._handle_character_data
+		self._path = [ ]
+		self._mode = [ self.ParserMode.Normal ]
+		self._slides = [ ]
+		self._slide_no = 0
+		self._metadata = { }
+		self._current_group_path = None
+		self._current_group = None
+		self._groups = [ ]
+
+	@property
+	def current_mode(self):
+		return self._mode[-1]
+
+	def _add_group(self, group_description):
+		group = self._SpellcheckGroup(description = group_description, chunks = TextChunks())
+		self._groups.append(group)
+		return group
+
+	def _whereami(self):
+		byte_position = self._parser.CurrentByteIndex
+		column = self._parser.CurrentColumnNumber + 1
+		row = self._parser.CurrentLineNumber
+		return (byte_position, column, row)
+
+	def _record_group(self, group_description, text):
+		(byte_position, column, row) = self._whereami()
+		group = self._add_group(group_description)
+		group.chunks.append(TextChunk("text", text, group = group, column = column, row = row))
+
+	def _activate_group(self, group_description):
+		assert(self._current_group is None)
+		group = self._add_group(group_description)
+		self._current_group = group
+		self._current_group_path = list(self._path)
+
+	def _handle_start_element(self, tag, attributes):
+		self._path.append(tag)
+		next_mode = self.current_mode
+		if self._path == [ "presentation", "slide" ]:
+			self._slide_no += 1
+			self._activate_group("Slide %d content" % (self._slide_no))
+		elif (self._path == [ "presentation", "slide", "s:var" ]) and (attributes.get("name") == "heading"):
+			self._record_group("Slide %d heading" % (self._slide_no), text = attributes.get("value", ""))
+		elif self._path == [ "presentation", "meta", "title" ]:
+			self._activate_group("Title metadata")
+		elif self._path == [ "presentation", "meta", "subtitle" ]:
+			self._activate_group("Subtitle metadata")
+
+		if tag == "br":
+			self._handle_character_data("\n")
+		elif tag in [ "s:emo", "s:sym", "s:tex", "s:ar", "s:code", "s:term", "s:nsc" ]:
+			next_mode = self.ParserMode.DropText
+		elif tag == "s:ac":
+			next_mode = self.ParserMode.Markup
+		elif tag == "s:nth":
+			self._handle_character_data("1st")
+			next_mode = self.ParserMode.DropText
+
+		self._mode.append(next_mode)
+
+	def _handle_end_element(self, tag):
+		if self._current_group_path == self._path:
+			self._current_group_path = None
+			self._current_group = None
+		self._path.pop()
+		self._mode.pop()
+
+	def _handle_character_data(self, text):
+		if self._current_group is not None:
+			(byte_position, column, row) =  self._whereami()
+			if self.current_mode == self.ParserMode.Normal:
+				self._current_group.chunks.append(TextChunk("text", text, group = self._current_group, row = row, column = column))
+			elif self.current_mode == self.ParserMode.Markup:
+				self._current_group.chunks.append(TextChunk("markup", text, group = self._current_group, row = row, column = column))
+
+	def parse(self, xml_filename):
+		with open(xml_filename, "rb") as f:
+			self._parser.ParseFile(f)
+
+	def dump(self):
+		for group in self._groups:
+			print("=> %s" % (group.description))
+			for chunk in group.chunks:
+				print(chunk)
+			print("-" * 120)
+
+	def spellcheck(self, spellcheck_api):
+		separator = "\n\n"
+
+		all_chunks = TextChunks()
+		for group in self._groups:
+			all_chunks += group.chunks
+			all_chunks.append(TextChunk("markup", separator))
+		result = spellcheck_api.check_data(all_chunks.to_data())
+
+		for match in result["matches"]:
+			(global_index, global_start_offset) = all_chunks.find_offset(match["offset"])
+			chunk = all_chunks[global_index]
+
+			group = chunk.group
+			first_chunk_in_group = group.chunks[0]
+			first_chunk_global_index = all_chunks.indexof(first_chunk_in_group)
+			first_chunk_offset = all_chunks.get_offset(first_chunk_global_index)
+
+			group_offset = global_start_offset - first_chunk_offset
+
+			spellcheck_result = self._SpellcheckResult(chunk = chunk, group = group, match = match, group_offset = group_offset)
+			yield spellcheck_result
+
+if __name__ == "__main__":
+	ltp = LanguageToolProcess("lt/LanguageTool-5.5/languagetool-server.jar")
+	xml_spellcheck = XMLSpellchecker()
+	xml_spellcheck.parse("examples/example.xml")
+	with ltp as api:
+		for result in xml_spellcheck.spellcheck(api):
+			raw_text = result.group.chunks.joinall()
+			offense = raw_text[result.group_offset : result.group_offset + result.match["length"]]
+			print("%s [line %d, row %d] \"%s\": %s" % (result.group.description, result.chunk.row, result.chunk.column, offense, result.match["message"]))
+			print("-" * 120)

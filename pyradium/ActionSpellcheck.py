@@ -19,25 +19,18 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-class PyRadiumException(Exception): pass
+from .BaseAction import BaseAction
+from .Spellcheck import XMLInterpreter, SpellcheckAPI, LanguageToolProcess
 
-class CallingProcessException(PyRadiumException): pass
+class ActionSpellcheck(BaseAction):
+	def _run_spellcheck(self, sc):
+		pass
 
-class MalformedXMLInputException(PyRadiumException): pass
-class MalformedStyleConfigurationException(PyRadiumException): pass
-
-class SlideException(PyRadiumException): pass
-class UndefinedContentException(SlideException): pass
-class TemplateErrorException(SlideException): pass
-class TimeSpecificationError(SlideException): pass
-class UsageException(SlideException): pass
-
-class XMLHookRegistryException(PyRadiumException): pass
-
-class DuplicateOrderException(PyRadiumException): pass
-class InvalidBooleanValueException(PyRadiumException): pass
-class FailedToLookupFileException(PyRadiumException): pass
-
-class FailedToExecuteSubprocessException(PyRadiumException): pass
-
-class SpellcheckerException(PyRadiumException): pass
+	def run(self):
+		if self._args.jarfile:
+			ltp = LanguageToolProcess(self._args.jarfile)
+			with ltp as sc:
+				self._run_spellcheck(sc)
+		else:
+			sc = SpellcheckAPI(lt_uri = self._args.uri)
+			self._run_spellcheck(sc)
