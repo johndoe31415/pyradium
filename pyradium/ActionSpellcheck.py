@@ -23,7 +23,7 @@ import os
 import sys
 import json
 from .BaseAction import BaseAction
-from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess
+from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess, LanguageToolConfig
 
 class ActionSpellcheck(BaseAction):
 	def _add_finding_print(self, spellcheck_result):
@@ -77,12 +77,13 @@ class ActionSpellcheck(BaseAction):
 		else:
 			self._f = open(self._args.outfile, "w")
 
+		languagetool_config = LanguageToolConfig(language = self._args.language, disabled_rules = [ "WHITESPACE_RULE", "COMMA_PARENTHESIS_WHITESPACE" ])
 		try:
 			self._xml_spellchecker = XMLSpellchecker()
 			self._xml_spellchecker.parse(self._args.infile)
 
 			if self._args.jar is not None:
-				ltp = LanguageToolProcess(self._args.jar)
+				ltp = LanguageToolProcess(self._args.jar, languagetool_config = languagetool_config)
 				with ltp as spellchecker_api:
 					self._run_spellcheck(spellchecker_api)
 			else:

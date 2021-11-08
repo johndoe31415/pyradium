@@ -34,16 +34,46 @@ from pyradium.Exceptions import SpellcheckerException
 
 _log = logging.getLogger(__spec__.name)
 
-class SpellcheckerAPI():
-	def __init__(self, languagetool_uri, language = "en-US", picky = False):
-		self._languagetool_uri = languagetool_uri
+class LanguageToolConfig():
+	def __init__(self, language = "en-US", picky = False, enabled_rules = None, disabled_rules = None, enabled_categories = None, disabled_categories = None):
 		self._language = language
 		self._picky = picky
-		self._sess = requests.Session()
 		self._enabled_rules = None
-		self._disabled_rules = [ "WHITESPACE_RULE", "COMMA_PARENTHESIS_WHITESPACE" ]
+		self._disabled_rules = None
 		self._enabled_categories = None
 		self._disabled_categories = None
+
+	@property
+	def language(self):
+		return self._language
+
+	@property
+	def picky(self):
+		return self._picky
+
+	@property
+	def enabled_rules(self):
+		return self._enabled_rules
+
+	@property
+	def disabled_rules(self):
+		return self._disabled_rules
+
+	@property
+	def enabled_categories(self):
+		return self._enabled_categories
+
+	@property
+	def disabled_categories(self):
+		return self._disabled_categories
+
+class SpellcheckerAPI():
+	def __init__(self, languagetool_uri, languagetool_config = None):
+		self._languagetool_uri = languagetool_uri
+		self._languagetool_config = languagetool_config
+		if self._languagetool_config is None:
+			self._languagetool_config = LanguageToolConfig()
+		self._sess = requests.Session()
 
 	def check_data(self, annotations):
 		json_payload = {
@@ -51,18 +81,18 @@ class SpellcheckerAPI():
 		}
 		json_data = json.dumps(json_payload, separators = (",", ":"))
 		query_args = {
-			"language":	self._language,
+			"language":	self._languagetool_config.language,
 			"data":		json_data,
-			"level":	"picky" if self._picky else "default",
+			"level":	"picky" if self._languagetool_config.picky else "default",
 		}
-		if self._enabled_rules is not None:
-			query_args["enabledRules"] = ",".join(self._enabled_rules)
-		if self._disabled_rules is not None:
-			query_args["disabledRules"] = ",".join(self._disabled_rules)
-		if self._enabled_categories is not None:
-			query_args["enabledCategories"] = ",".join(self._enabled_categories)
-		if self._disabled_categories is not None:
-			query_args["disabledCategories"] = ",".join(self._disabled_categories)
+		if self._languagetool_config.enabled_rules is not None:
+			query_args["enabledRules"] = ",".join(self._languagetool_config.enabled_rules)
+		if self._languagetool_config.disabled_rules is not None:
+			query_args["disabledRules"] = ",".join(self._languagetool_config.disabled_rules)
+		if self._languagetool_config.enabled_categories is not None:
+			query_args["enabledCategories"] = ",".join(self._languagetool_config.enabled_categories)
+		if self._languagetool_config.disabled_categories is not None:
+			query_args["disabledCategories"] = ",".join(self._languagetool_config.disabled_categories)
 		query_str = urllib.parse.urlencode(query_args)
 		response = self._sess.post(self._languagetool_uri + "/check?" + query_str, headers = {
 			"Accept": "application/json",
@@ -177,9 +207,10 @@ class TextChunks():
 		return iter(self._chunks)
 
 class LanguageToolProcess():
-	def __init__(self, lt_server_jar_filename, port = 12764):
-		self._lt_server_jar_filename = lt_server_jar_filename
+	def __init__(self, languagetool_server_jar_filename, port = 12764, languagetool_config = None):
+		self._languagetool_server_jar_filename = languagetool_server_jar_filename
 		self._port = port
+		self._languagetool_config = languagetool_config
 		self._proc = None
 
 	@property
@@ -189,12 +220,12 @@ class LanguageToolProcess():
 	def __enter__(self):
 		assert(self._proc is None)
 		try:
-			self._proc = subprocess.Popen([ "java", "-cp", self._lt_server_jar_filename, "org.languagetool.server.HTTPServer", "--port", str(self._port), "--allow-origin", "*" ], stdout = _log.subproc_target, stderr = _log.subproc_target)
+			self._proc = subprocess.Popen([ "java", "-cp", self._languagetool_server_jar_filename, "org.languagetool.server.HTTPServer", "--port", str(self._port), "--allow-origin", "*" ], stdout = _log.subproc_target, stderr = _log.subproc_target)
 		except FileNotFoundError as e:
 			raise SpellcheckerException("Unable to start LanguageTool on port %d: %s" % (self._port, str(e))) from e
 
 		languagetool_uri = "http://127.0.0.1:%d/v2" % (self._port)
-		sc = SpellcheckerAPI(languagetool_uri)
+		sc = SpellcheckerAPI(languagetool_uri, self._languagetool_config)
 		sc_available = sc.try_connect()
 		if not sc_available:
 			raise SpellcheckerException("Unable to establish connection to LanguageTool at %s" % (languagetool_uri))
