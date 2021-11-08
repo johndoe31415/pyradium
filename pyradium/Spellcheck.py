@@ -347,4 +347,4 @@ if __name__ == "__main__":
 			group_text = result.group.chunks.joinall()
 			offense_group = group_text[result.group_offset : result.group_offset + result.match["length"]]
 			assert(offense == offense_group)
-			print("%s [line %d, row %d] \"%s\": %s" % (result.group.description, result.row, result.column, offense, result.match["message"]))
+			print("%s [line %d, col %d] \"%s\": %s" % (result.group.description, result.row, result.column, offense, result.match["message"]))

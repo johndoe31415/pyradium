@@ -19,18 +19,56 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
+import sys
 from .BaseAction import BaseAction
-from .Spellcheck import XMLInterpreter, SpellcheckAPI, LanguageToolProcess
+from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess
 
 class ActionSpellcheck(BaseAction):
-	def _run_spellcheck(self, sc):
-		pass
+	def _add_finding_print(self, spellcheck_result):
+		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
+
+		msg = [ ]
+		msg.append("%s " % (spellcheck_result.group.description))
+		msg.append("[line %d, col %d] " % (spellcheck_result.row, spellcheck_result.column))
+		msg.append("\"%s\": " % (offense))
+		msg.append("%s" % (spellcheck_result.match["message"]))
+		if len(spellcheck_result.match["replacements"]) > 0:
+			msg.append(" (suggest %s)" % (" or ".join(replacement["value"] for replacement in spellcheck_result.match["replacements"][:3])))
+		print("".join(msg), file = self._f)
+
+	def _add_finding_vim(self, spellcheck_result):
+		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
+		msg = "\"%s\": %s" % (offense, spellcheck_result.match["message"])
+		print("%s:%d:%d:%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
+
+	def _run_spellcheck(self, spellchecker_api):
+		finding_handler = getattr(self, "_add_finding_" + self._args.mode)
+		emission_handler = getattr(self, "_emit_findings_" + self._args.mode, None)
+		for spellcheck_result in self._xml_spellchecker.spellcheck(spellchecker_api):
+			finding_handler(spellcheck_result)
+		if emission_handler is not None:
+			emission_handler()
 
 	def run(self):
-		if self._args.jarfile:
-			ltp = LanguageToolProcess(self._args.jarfile)
-			with ltp as sc:
-				self._run_spellcheck(sc)
+		if (self._args.outfile is not None) and (not self._args.force) and (os.path.exists(self._args.outfile)):
+			print("Refusing to overwrite: %s" % (self._args.outfile))
+			return 1
+		if self._args.outfile is None:
+			self._f = sys.stdout
 		else:
-			sc = SpellcheckAPI(lt_uri = self._args.uri)
-			self._run_spellcheck(sc)
+			self._f = open(self._args.outfile, "w")
+
+		try:
+			self._xml_spellchecker = XMLSpellchecker()
+			self._xml_spellchecker.parse(self._args.infile)
+
+			if self._args.jar is not None:
+				ltp = LanguageToolProcess(self._args.jar)
+				with ltp as spellchecker_api:
+					self._run_spellcheck(spellchecker_api)
+			else:
+				spellchecker_api = SpellcheckAPI(lt_uri = self._args.uri)
+				self._run_spellcheck(spellchecker_api)
+		finally:
+			self._f.close()
