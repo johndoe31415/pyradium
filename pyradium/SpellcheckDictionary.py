@@ -23,6 +23,8 @@ import json
 import logging
 import collections
 import enum
+import os
+import contextlib
 
 _log = logging.getLogger(__spec__.name)
 
@@ -47,6 +49,13 @@ class SpellcheckDictionary():
 			self._entries = collections.OrderedDict()
 			self.write()
 			_log.warning("Creating empty dictionary because it was malformed JSON: %s (%s)", self._filename, str(e))
+
+	@classmethod
+	def open_global_dict(cls):
+		directory = os.path.realpath(os.path.expanduser("~/.config/pyradium"))
+		with contextlib.suppress(FileExistsError):
+			os.makedirs(directory)
+		return cls(filename = directory + "/dictionary.json")
 
 	def write(self):
 		with open(self._filename, "w") as f:
@@ -104,4 +113,4 @@ class SpellcheckDictionary():
 			raise NotImplementedError(exception_type)
 
 if __name__ == "__main__":
-	dictionary = SpellcheckDictionary("dict.json")
+	dictionary = SpellcheckDictionary.open_global_dict()

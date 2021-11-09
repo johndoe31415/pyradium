@@ -27,6 +27,7 @@ import zlib
 import subprocess
 from .BaseAction import BaseAction
 from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess, LanguageToolConfig
+from .SpellcheckDictionary import SpellcheckDictionary
 
 class ActionSpellcheck(BaseAction):
 	def _add_finding_print(self, spellcheck_result):
@@ -75,7 +76,8 @@ class ActionSpellcheck(BaseAction):
 		finding_handler = getattr(self, "_add_finding_" + self._args.mode)
 		emission_handler = getattr(self, "_emit_findings_" + self._args.mode, None)
 		for spellcheck_result in self._xml_spellchecker.spellcheck(spellchecker_api):
-			finding_handler(spellcheck_result)
+			if not self._dictionary.has_exception(offense = spellcheck_result.offense, context = spellcheck_result.match["context"]["text"], rule_id = spellcheck_result.match["rule"]["id"]):
+				finding_handler(spellcheck_result)
 		if emission_handler is not None:
 			emission_handler()
 
@@ -96,6 +98,7 @@ class ActionSpellcheck(BaseAction):
 		else:
 			self._f = open(self._args.outfile, "w")
 
+		self._dictionary = SpellcheckDictionary.open_global_dict()
 		languagetool_config = LanguageToolConfig(language = self._args.language, disabled_rules = [ "WHITESPACE_RULE", "COMMA_PARENTHESIS_WHITESPACE" ])
 		try:
 			self._xml_spellchecker = XMLSpellchecker()
