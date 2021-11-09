@@ -29,27 +29,23 @@ from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess, L
 
 class ActionSpellcheck(BaseAction):
 	def _add_finding_print(self, spellcheck_result):
-		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
-
 		msg = [ ]
 		msg.append("%s " % (spellcheck_result.group.description))
 		msg.append("[line %d, col %d] " % (spellcheck_result.row, spellcheck_result.column))
-		msg.append("\"%s\": " % (offense))
+		msg.append("\"%s\": " % (spellcheck_result.offense))
 		msg.append("%s" % (spellcheck_result.match["message"]))
 		if len(spellcheck_result.match["replacements"]) > 0:
 			msg.append(" (suggest %s)" % (" or ".join(replacement["value"] for replacement in spellcheck_result.match["replacements"][:3])))
 		print("".join(msg), file = self._f)
 
 	def _add_finding_vim(self, spellcheck_result):
-		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
-		msg = "\"%s\": %s" % (offense, spellcheck_result.match["message"])
+		msg = "\"%s\": %s" % (spellcheck_result.offense, spellcheck_result.match["message"])
 		print("%s:%d:%d:%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
 
 	def _add_finding_evim(self, spellcheck_result):
-		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
-		msg = "\"%s\": %s" % (offense, spellcheck_result.match["message"])
+		msg = "\"%s\": %s" % (spellcheck_result.offense, spellcheck_result.match["message"])
 		data = {
-			"word":		offense,
+			"offense":	spellcheck_result.offense,
 			"ctx":		spellcheck_result.match["context"]["text"],
 			"rule":		spellcheck_result.match["rule"]["id"],
 		}
