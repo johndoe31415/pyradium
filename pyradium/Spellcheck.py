@@ -246,7 +246,7 @@ class XMLSpellchecker():
 		Markup = 2
 
 	_SpellcheckGroup = collections.namedtuple("SpellcheckGroup", [ "description", "chunks" ])
-	_SpellcheckResult = collections.namedtuple("SpellcheckResult", [ "chunk", "chunk_offset", "group", "group_offset", "match", "row", "column" ])
+	_SpellcheckResult = collections.namedtuple("SpellcheckResult", [ "offense", "chunk", "chunk_offset", "group", "group_offset", "match", "row", "column" ])
 
 	def __init__(self):
 		self._parser = xml.parsers.expat.ParserCreate()
@@ -364,7 +364,8 @@ class XMLSpellchecker():
 					column = 1
 				else:
 					column += 1
-			spellcheck_result = self._SpellcheckResult(chunk = chunk, chunk_offset = chunk_offset, group = group, group_offset = group_offset, match = match, row = row, column = column)
+			offense = chunk.text[chunk_offset : chunk_offset + match["length"]]
+			spellcheck_result = self._SpellcheckResult(offense = offense, chunk = chunk, chunk_offset = chunk_offset, group = group, group_offset = group_offset, match = match, row = row, column = column)
 			yield spellcheck_result
 
 if __name__ == "__main__":
