@@ -105,6 +105,7 @@ def main():
 		parser.add_argument("-l", "--language", metavar = "lang", default = "en-US", help = "Spellcheck in this language. Defaults to %(default)s.")
 		parser.add_argument("-m", "--mode", choices = [ "print", "vim", "evim", "fulljson" ], default = "print", help = "Mode in which spellchecking is performed. Can be one of %(choices)s, defaults to %(default)s.")
 		parser.add_argument("-o", "--outfile", metavar = "filename", help = "Write output to this file. By default, outputs to stdout.")
+		parser.add_argument("--vim", action = "store_true", help = "Run vim to actually spellcheck the file in question.")
 		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")

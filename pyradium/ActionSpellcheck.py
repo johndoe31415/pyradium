@@ -24,6 +24,7 @@ import sys
 import json
 import base64
 import zlib
+import subprocess
 from .BaseAction import BaseAction
 from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess, LanguageToolConfig
 
@@ -51,7 +52,7 @@ class ActionSpellcheck(BaseAction):
 		}
 		bin_data = zlib.compress(json.dumps(data, sort_keys = True, separators = (",", ":")).encode("ascii"))
 		encoded_data = base64.b64encode(bin_data).decode("ascii")
-		print("%s:%d:%d:%s	%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg, encoded_data), file = self._f)
+		print("%s:%s:%d:%d:%s" % (encoded_data, self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
 
 	def _add_finding_fulljson(self, spellcheck_result):
 		finding = {
@@ -79,8 +80,16 @@ class ActionSpellcheck(BaseAction):
 			emission_handler()
 
 	def run(self):
+		if self._args.vim:
+			if not self._args.mode in [ "vim", "evim" ]:
+				print("When trying to run in VIM mode, you need to specify either the 'vim' or 'evim' output facility.", file = sys.stderr)
+				return 1
+			if self._args.outfile is None:
+				print("When trying to run in VIM mode, you need to specify an output file, not stdout.", file = sys.stderr)
+				return 1
+
 		if (self._args.outfile is not None) and (not self._args.force) and (os.path.exists(self._args.outfile)):
-			print("Refusing to overwrite: %s" % (self._args.outfile))
+			print("Refusing to overwrite: %s" % (self._args.outfile), file = sys.stderr)
 			return 1
 		if self._args.outfile is None:
 			self._f = sys.stdout
@@ -101,3 +110,11 @@ class ActionSpellcheck(BaseAction):
 				self._run_spellcheck(spellchecker_api)
 		finally:
 			self._f.close()
+
+		if self._args.vim:
+			vim_errorformat = {
+				"vim":		r"%f:%l:%c:%m",
+				"evim":		r"%[A-Za-z0-9/+=]%\\\\+:%f:%l:%c:%m",
+			}[self._args.mode]
+			cmd = [ "vi", "-c", ":set errorformat=%s" % (vim_errorformat), "-c", ":cf %s" % (self._args.outfile) ]
+			subprocess.check_call(cmd)
