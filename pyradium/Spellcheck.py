@@ -38,10 +38,10 @@ class LanguageToolConfig():
 	def __init__(self, language = "en-US", picky = False, enabled_rules = None, disabled_rules = None, enabled_categories = None, disabled_categories = None):
 		self._language = language
 		self._picky = picky
-		self._enabled_rules = None
-		self._disabled_rules = None
-		self._enabled_categories = None
-		self._disabled_categories = None
+		self._enabled_rules = enabled_rules
+		self._disabled_rules = disabled_rules
+		self._enabled_categories = enabled_categories
+		self._disabled_categories = disabled_categories
 
 	@property
 	def language(self):
