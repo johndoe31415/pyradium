@@ -22,6 +22,8 @@
 import os
 import sys
 import json
+import base64
+import zlib
 from .BaseAction import BaseAction
 from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess, LanguageToolConfig
 
@@ -42,6 +44,18 @@ class ActionSpellcheck(BaseAction):
 		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
 		msg = "\"%s\": %s" % (offense, spellcheck_result.match["message"])
 		print("%s:%d:%d:%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
+
+	def _add_finding_evim(self, spellcheck_result):
+		offense = spellcheck_result.chunk.text[spellcheck_result.chunk_offset : spellcheck_result.chunk_offset + spellcheck_result.match["length"]]
+		msg = "\"%s\": %s" % (offense, spellcheck_result.match["message"])
+		data = {
+			"word":		offense,
+			"ctx":		spellcheck_result.match["context"]["text"],
+			"rule":		spellcheck_result.match["rule"]["id"],
+		}
+		bin_data = zlib.compress(json.dumps(data, sort_keys = True, separators = (",", ":")).encode("ascii"))
+		encoded_data = base64.b64encode(bin_data).decode("ascii")
+		print("%s:%d:%d:%s	%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg, encoded_data), file = self._f)
 
 	def _add_finding_fulljson(self, spellcheck_result):
 		finding = {
