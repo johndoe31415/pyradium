@@ -68,11 +68,13 @@ class SpellcheckDictionary():
 			self.write()
 
 	def add_general_word_exception(self, offense):
+		self._modified = True
 		if "general_words" not in self._entries:
 			self._entries["general_words"] = [ ]
 		self._entries["general_words"].append(offense)
 
 	def add_word_exception(self, offense, rule_id):
+		self._modified = True
 		if "rule_words" not in self._entries:
 			self._entries["rule_words"] = { }
 		if rule_id not in self._entries["rule_words"]:
@@ -80,6 +82,7 @@ class SpellcheckDictionary():
 		self._entries["rule_words"][rule_id].append(offense)
 
 	def add_context_exception(self, context, rule_id):
+		self._modified = True
 		if "rule_context" not in self._entries:
 			self._entries["rule_context"] = { }
 		if rule_id not in self._entries["rule_context"]:
@@ -101,14 +104,14 @@ class SpellcheckDictionary():
 
 		return False
 
-	def add_exception(self, spellcheck_result, exception_type):
+	def add_exception(self, offense, context, rule_id, exception_type):
 		assert(isinstance(exception_type, SpellcheckExceptionType))
 		if exception_type == SpellcheckExceptionType.GeneralWord:
-			self.add_general_word_exception(spellcheck_result.offense)
+			self.add_general_word_exception(offense)
 		elif exception_type == SpellcheckExceptionType.RuleWord:
-			self.add_word_exception(spellcheck_result.offense, spellcheck_result.match["rule"]["id"])
+			self.add_word_exception(offense, rule_id)
 		elif exception_type == SpellcheckExceptionType.RuleContext:
-			self.add_context_exception(spellcheck_result.match["context"]["text"], spellcheck_result.match["rule"]["id"])
+			self.add_context_exception(context, rule_id)
 		else:
 			raise NotImplementedError(exception_type)
 

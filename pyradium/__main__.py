@@ -30,6 +30,7 @@ from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
 from .ActionDumpMetadata import ActionDumpMetadata
 from .ActionSpellcheck import ActionSpellcheck
+from .ActionDictAdd import ActionDictAdd
 from .Enums import PresentationFeature
 
 def _geometry(text):
@@ -110,6 +111,11 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")
 	mc.register("spellcheck", "Spellcheck an XML presentation file", genparser, action = ActionSpellcheck)
+
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("infile", help = "Input file, needs to be a quickfix file in evim format.")
+	mc.register("dictadd", "Add false-positive spellcheck errors to the dictionary", genparser, action = ActionDictAdd)
 
 	return mc.run(sys.argv[1:])
 
