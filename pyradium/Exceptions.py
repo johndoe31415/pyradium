@@ -41,3 +41,7 @@ class FailedToLookupFileException(PyRadiumException): pass
 class FailedToExecuteSubprocessException(PyRadiumException): pass
 
 class SpellcheckerException(PyRadiumException): pass
+
+class StyleParameterException(PyRadiumException): pass
+class InvalidStyleParameterDefinitionException(StyleParameterException): pass
+class InvalidStyleParameterValueException(StyleParameterException): pass

@@ -27,6 +27,14 @@
 			"license_uri": "http://www.gust.org.pl/projects/e-foundry/licenses/GUST-FONT-SOURCE-LICENSE.txt/view"
 		}
 	],
+	"parameters": {
+		"font-style": {
+			"description": "influences the font choice used as the main slide text",
+			"type":	"choice",
+			"choices": [ "normal", "light" ],
+			"default": "normal"
+		}
+	},
 	"files": {
 		"css": [
 			{ "name": "base/pyradium.css", "render": true },
