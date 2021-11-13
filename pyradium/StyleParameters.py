@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import textwrap
 from .Exceptions import InvalidStyleParameterDefinitionException, InvalidStyleParameterValueException
 
 class ParsedStyleParameters():
@@ -85,6 +86,19 @@ class StyleParameters():
 			else:
 				raise InvalidStyleParameterDefinitionException("Unknown type defined for parameter %s: %s" % (key, parameter_type))
 		parser.set_value(key, value)
+
+	def print(self):
+		print("Known style parameters:")
+		for (name, definition) in sorted(self._defs.items()):
+			if definition["type"] == "choice":
+				value = "{%s}" % (",".join(definition["choices"]))
+			else:
+				value = "[%s]" % (definition.get("type", "str"))
+			command_name = "%s %s" % (name, value)
+
+			for description_line in textwrap.wrap(definition.get("description", "no description available"), width = 56):
+				print("    %-15s    %s" % (command_name, description_line))
+				command_name = ""
 
 if __name__ == "__main__":
 	sp = StyleParameters({

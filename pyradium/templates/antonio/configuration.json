@@ -39,7 +39,7 @@
 		"css": [
 			{ "name": "base/pyradium.css", "render": true },
 			{ "name": "base/pyradium_print.css", "order": 1000 },
-			"antonio/antonio.css",
+			{ "name": "antonio/antonio.css", "render": true },
 			"antonio/font_fira.css",
 			"antonio/font_latinmodernmono.css"
 		],

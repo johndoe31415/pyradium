@@ -103,6 +103,7 @@ class ActionRender(BaseAction):
 				t0 = time.time()
 				rendering_parameters = RenderingParameters(
 						template_style = self._args.template_style,
+						template_style_opts = self._args.style_option,
 						honor_pauses = not self._args.remove_pauses,
 						collapse_animation = self._args.collapse_animation,
 						extra_template_dirs = self._args.template_dir,

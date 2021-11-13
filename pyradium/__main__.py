@@ -31,6 +31,7 @@ from .ActionHashPresentation import ActionHashPresentation
 from .ActionDumpMetadata import ActionDumpMetadata
 from .ActionSpellcheck import ActionSpellcheck
 from .ActionDictAdd import ActionDictAdd
+from .ActionShowStyleOpts import ActionShowStyleOpts
 from .Enums import PresentationFeature
 
 def _geometry(text):
@@ -54,6 +55,7 @@ def main():
 		parser.add_argument("-R", "--resource-dir", metavar = "path:uripath", type = _resource_dir, help = "Specifies the resource directory both as the actual deployment directory and the URI it has when serving the presentation. By default, the deployment directory of resources is identical to the output directory and the uripath is '.'.")
 		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
 		parser.add_argument("-t", "--template-style", metavar = "name", default = "antonio", help = "Template style to use. Defaults to %(default)s.")
+		parser.add_argument("-o", "--style-option", metavar = "key=value", action = "append", default = [ ], help = "Pass template-style specific options to the renderer. Must always be in the form of \"key=value\", but what keys are permissible depends on the chosen style. Use the 'showstyleopts' command to find out what is valid for a given template name.")
 		parser.add_argument("-g", "--geometry", metavar = "width x height", type = _geometry, default = "1280x720", help = "Slide geometry, in pixels. Defaults to %(default)s.")
 		parser.add_argument("-r", "--remove-pauses", action = "store_true", help = "Ignore all pause directives and just render the final slides.")
 		parser.add_argument("--collapse-animation", action = "store_true", help = "Do not render animations as multiple slides, just show one complete slide.")
@@ -68,6 +70,12 @@ def main():
 		parser.add_argument("infile", help = "Input XML file of the slide show.")
 		parser.add_argument("outdir", help = "Output directory the presentation is put into.")
 	mc.register("render", "Render a slide show", genparser, action = ActionRender)
+
+	def genparser(parser):
+		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
+		parser.add_argument("template_style", help = "Name of the template that should be shown.")
+	mc.register("showstyleopts", "Show all options a specific style permits", genparser, action = ActionShowStyleOpts)
 
 	def genparser(parser):
 		parser.add_argument("-b", "--bind-addr", metavar = "addr", type = str, default = "127.0.0.1", help = "Address to bind to. Defaults to %(default)s.")

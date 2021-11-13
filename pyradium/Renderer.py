@@ -35,6 +35,7 @@ from .Exceptions import TemplateErrorException, MalformedStyleConfigurationExcep
 from .Slide import RenderSlideDirective
 from .Enums import PresentationFeature
 from .Tools import JSONTools
+from .StyleParameters import StyleParameters
 
 _log = logging.getLogger(__spec__.name)
 
@@ -55,6 +56,7 @@ class Renderer():
 			self._template_config = json.load(f)
 		self._plausibilize_template_config()
 		self._ctrlr_mgr = ControllerManager(self)
+		self._style_parameters = self._parse_style_parameters()
 
 	def _plausibilize_template_config(self):
 		for feature_name in self._template_config.get("dependencies", { }).get("feature", { }):
@@ -62,6 +64,13 @@ class Renderer():
 				PresentationFeature(feature_name)
 			except ValueError as e:
 				raise MalformedStyleConfigurationException("The stylesheet file %s contains an unknown feature in config[\"dependencies\"][\"feature\"]: %s" % (self._template_config_filename, feature_name)) from e
+
+	def _parse_style_parameters(self):
+		params = StyleParameters(self._template_config.get("parameters", { }))
+		parser = params.new_parser()
+		for param in self._rendering_params.template_style_opts:
+			parser.parse(param)
+		return parser.values
 
 	@property
 	def presentation(self):
@@ -126,6 +135,7 @@ class Renderer():
 			"jsonify":					_jsonify,
 			"preuri":					self.rendering_params.resource_uri,
 			"preuri_ds":				self.rendering_params.resource_uri if self.rendering_params.resource_uri.startswith("/") else ("./" + self.rendering_params.resource_uri),
+			"styleopt":					self._style_parameters,
 		}
 		if rendered_presentation is not None:
 			template_args["rendered_presentation"] = rendered_presentation

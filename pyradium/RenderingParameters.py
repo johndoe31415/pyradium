@@ -23,8 +23,11 @@ import os
 from .FileLookup import FileLookup
 
 class RenderingParameters():
-	def __init__(self, template_style = "default", honor_pauses = True, collapse_animation = False, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None):
+	def __init__(self, template_style = "default", template_style_opts = None, honor_pauses = True, collapse_animation = False, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None):
 		self._template_style = template_style
+		self._template_style_opts = template_style_opts
+		if self._template_style_opts is None:
+			self._template_style_opts = [ ]
 		self._honor_pauses = honor_pauses
 		self._collapse_animation = collapse_animation
 		template_dirs = [ os.path.expanduser("~/.config/pyradium/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
@@ -45,6 +48,10 @@ class RenderingParameters():
 	@property
 	def template_style(self):
 		return self._template_style
+
+	@property
+	def template_style_opts(self):
+		return self._template_style_opts
 
 	@property
 	def honor_pauses(self):
