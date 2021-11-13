@@ -104,18 +104,21 @@ more. To get an overview over the available facilities:
 $ ./pyradium.py --help
 usage: ./pyradium.py [command] [options]
 
-HTML presentation/slide show generator
+HTML presentation renderer
 
 Available commands:
-    render             Render a slide show
-    serve              Serve a slide show as HTTP
+    render             Render a presentation
+    showstyleopts      Show all options a specific style permits
+    serve              Serve a rendered presentation over HTTP
     acrosort           Sort an acryonym database
     purge              Purge the document cache
     hash               Create a hash of a presentation and all dependencies to
                        detect modifications
     dumpmeta           Dump the metadata dictionary in JSON format
+    spellcheck         Spellcheck an XML presentation file
+    dictadd            Add false-positive spellcheck errors to the dictionary
 
-version: pyradium v0.0.5
+version: pyradium v0.0.6rc0
 
 Options vary from command to command. To receive further info, type
     ./pyradium.py [command] --help
@@ -126,17 +129,18 @@ Each facility has its own help page. The `render` facility, for example:
 ```
 $ ./pyradium.py render --help
 usage: ./pyradium.py render [--image-max-dimension pixels] [-I path]
-                            [--template-dir path] [-t name]
-                            [-g width x height] [-r] [--collapse-animation]
-                            [-i filename] [-j filename]
-                            [-m {interactive,static}] [-F {timer}] [-l]
-                            [--re-render-watch path] [-f] [-v] [--help]
+                            [-R path:uripath] [--template-dir path] [-t name]
+                            [-o key=value] [-g width x height] [-r]
+                            [--collapse-animation] [-i filename] [-j filename]
+                            [-e {interactive,timer,info,pygments,acronyms}]
+                            [-d {interactive,timer,info,pygments,acronyms}]
+                            [-l] [--re-render-watch path] [-f] [-v] [--help]
                             infile outdir
 
-Render a slide show
+Render a presentation
 
 positional arguments:
-  infile                Input XML file of the slide show.
+  infile                Input XML file of the presentation.
   outdir                Output directory the presentation is put into.
 
 optional arguments:
@@ -149,11 +153,23 @@ optional arguments:
                         Specifies an additional include directory in which,
                         for example, images are located which are referenced
                         from the presentation. Can be issued multiple times.
+  -R path:uripath, --resource-dir path:uripath
+                        Specifies the resource directory both as the actual
+                        deployment directory and the URI it has when serving
+                        the presentation. By default, the deployment directory
+                        of resources is identical to the output directory and
+                        the uripath is '.'.
   --template-dir path   Specifies an additional template directories in which
                         template style files are located. Can be issued
                         multiple times.
   -t name, --template-style name
                         Template style to use. Defaults to antonio.
+  -o key=value, --style-option key=value
+                        Pass template-style specific options to the renderer.
+                        Must always be in the form of "key=value", but what
+                        keys are permissible depends on the chosen style. Use
+                        the 'showstyleopts' command to find out what is
+                        supported for a given template.
   -g width x height, --geometry width x height
                         Slide geometry, in pixels. Defaults to 1280x720.
   -r, --remove-pauses   Ignore all pause directives and just render the final
@@ -170,12 +186,14 @@ optional arguments:
                         override the respective metadata fields of the
                         presentation. Useful for changing things like the
                         presentation date on the command line.
-  -m {interactive,static}, --presentation-mode {interactive,static}
-                        Generate this type of presentation. Can be one of
-                        None, defaults to interactive.
-  -F {timer}, --presentation-feature {timer}
+  -e {interactive,timer,info,pygments,acronyms}, --enable-presentation-feature {interactive,timer,info,pygments,acronyms}
                         Enable a specific presentation feature. Can be one of
-                        None and can be given multiple times.
+                        interactive, timer, info, pygments, acronyms and can
+                        be given multiple times.
+  -d {interactive,timer,info,pygments,acronyms}, --disable-presentation-feature {interactive,timer,info,pygments,acronyms}
+                        Disable a specific presentation feature. Can be one of
+                        interactive, timer, info, pygments, acronyms and can
+                        be given multiple times.
   -l, --re-render-loop  Stay in a continuous loop, re-rendering the
                         presentation if anything changes.
   --re-render-watch path
