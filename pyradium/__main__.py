@@ -75,7 +75,7 @@ def main():
 		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
 		parser.add_argument("template_style", help = "Name of the template that should be shown.")
-	mc.register("showstyleopts", "Show all options a specific style permits", genparser, action = ActionShowStyleOpts)
+	mc.register("showstyleopts", "Show all options a specific template style supports", genparser, action = ActionShowStyleOpts)
 
 	def genparser(parser):
 		parser.add_argument("-b", "--bind-addr", metavar = "addr", type = str, default = "127.0.0.1", help = "Address to bind to. Defaults to %(default)s.")
