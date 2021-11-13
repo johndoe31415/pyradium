@@ -47,7 +47,7 @@ def _resource_dir(text):
 	return (text[0], text[1])
 
 def main():
-	mc = MultiCommand(description = "HTML presentation/slide show generator", trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
+	mc = MultiCommand(description = "HTML presentation renderer", trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
 
 	def genparser(parser):
 		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1920, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")
@@ -67,9 +67,9 @@ def main():
 		parser.add_argument("--re-render-watch", metavar = "path", action = "append", default = [ ], help = "By default, all include files and the template directory is being watched for changes. This option gives additional files or directories upon change of which the presentation should be re-rendered.")
 		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
-		parser.add_argument("infile", help = "Input XML file of the slide show.")
+		parser.add_argument("infile", help = "Input XML file of the presentation.")
 		parser.add_argument("outdir", help = "Output directory the presentation is put into.")
-	mc.register("render", "Render a slide show", genparser, action = ActionRender)
+	mc.register("render", "Render a presentation", genparser, action = ActionRender)
 
 	def genparser(parser):
 		parser.add_argument("--template-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional template directories in which template style files are located. Can be issued multiple times.")
@@ -82,7 +82,7 @@ def main():
 		parser.add_argument("-p", "--port", metavar = "port", type = int, default = 8123, help = "Port to serve directory under. Defaults to %(default)s.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("dirname", help = "Directory that should be served.")
-	mc.register("serve", "Serve a slide show as HTTP", genparser, action = ActionServe)
+	mc.register("serve", "Serve a rendered presentation over HTTP", genparser, action = ActionServe)
 
 	def genparser(parser):
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
@@ -96,7 +96,7 @@ def main():
 	def genparser(parser):
 		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
-		parser.add_argument("infile", help = "Input XML file of the slide show.")
+		parser.add_argument("infile", help = "Input XML file of the presentation.")
 	mc.register("hash", "Create a hash of a presentation and all dependencies to detect modifications", genparser, action = ActionHashPresentation)
 
 	def genparser(parser):
@@ -104,7 +104,7 @@ def main():
 		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
 		parser.add_argument("-j", "--inject-metadata", metavar = "filename", help = "Gives the option to inject metadata into the presentation. Must point to a JSON filename and will override the respective metadata fields of the presentation. Useful for changing things like the presentation date on the command line.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
-		parser.add_argument("infile", help = "Input XML file of the slide show.")
+		parser.add_argument("infile", help = "Input XML file of the presentation.")
 	mc.register("dumpmeta", "Dump the metadata dictionary in JSON format", genparser, action = ActionDumpMetadata)
 
 	def genparser(parser):
