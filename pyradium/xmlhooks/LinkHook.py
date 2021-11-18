@@ -19,18 +19,16 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .AcronymHook import AcronymHook
-from .TimeHook import TimeHook
-from .ExecHook import ExecHook
-from .MonospaceHook import MonospaceHook
-from .DebugHook import DebugHook
-from .NthHook import NthHook
-from .LinkHook import LinkHook
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+
+@XMLHookRegistry.register_hook
+class LinkHook(BaseHook):
+	_TAG_NAME = "link"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		href = node.getAttribute("href")
+		replacement_node = node.ownerDocument.createElement("a")
+		replacement_node.setAttribute("href", href)
+		replacement_node.appendChild(node.ownerDocument.createTextNode(href))
+		return replacement_node
