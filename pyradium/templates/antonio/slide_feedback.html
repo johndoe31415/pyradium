@@ -18,10 +18,10 @@
 
 		<div class="form-label">Rating:</div>
 		<div class="form-input button-checkbox-group" name="rating" lid="rating">
-%for (rating, emoji) in zip([ "puke-0", "bad-1", "good-2", "great-3" ], "🤮🙁🙂😁"):
+%for emoji in [ "0-puke", "1-bad", "2-good", "3-great" ]:
 			<label class="button-checkbox">
-				<input type="checkbox" value="${rating}">
-				<span>${emoji}</span>
+				<input type="checkbox" value="${emoji}">
+				<img src="${preuri}template/antonio/emojis/${emoji}.svg" class="emoji-button" />
 			</label>
 %endfor
 		</div>

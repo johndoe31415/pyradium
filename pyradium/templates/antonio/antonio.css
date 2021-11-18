@@ -241,3 +241,7 @@ div.slide.quote img.quotationmark {
 div.slide.feedback {
 	font-family: "Fira Sans";
 }
+
+div.slide.feedback img.emoji-button {
+	width: 48px;
+}

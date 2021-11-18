@@ -38,8 +38,8 @@ label.button-checkbox input {
 	pointer-events: none;
 }
 
-label.button-checkbox span {
-	padding: 11px 21px;
+label.button-checkbox img {
+	padding: 15px;
 	border: 1px solid #ccc;
 	display: inline-block;
 	border-radius: 6px;
@@ -48,13 +48,13 @@ label.button-checkbox span {
 	user-select: none;
 }
 
-label.button-checkbox input:checked + span {
+label.button-checkbox input:checked + img {
 	box-shadow: inset 1px 2px 5px #777;
 	transform: translate(2px 2px);
 	background: #e5e5e5;
 }
 
-label.button-checkbox input:disabled + span {
+label.button-checkbox input:disabled + img {
 	filter: grayscale(100%);
 	background: #efefef;
 }

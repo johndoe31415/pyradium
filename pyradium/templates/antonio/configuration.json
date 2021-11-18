@@ -25,6 +25,13 @@
 			"uri": "http://www.gust.org.pl/projects/e-foundry/latin-modern",
 			"license": "GUST Font License (GFL); LaTeX Project Public License (LPPL) v1.3c or later",
 			"license_uri": "http://www.gust.org.pl/projects/e-foundry/licenses/GUST-FONT-SOURCE-LICENSE.txt/view"
+		},
+		{
+			"author": "Google Fonts",
+			"contribution": "Emoji SVGs",
+			"uri": "https://github.com/googlefonts/noto-emoji",
+			"license": "Apache license, version 2.0",
+			"license_uri": "http://www.apache.org/licenses/LICENSE-2.0.txt"
 		}
 	],
 	"parameters": {
@@ -94,7 +101,11 @@
 				"static": [
 					"base/pyradium_forms.js",
 					"base/pyradium_modal.js",
-					"base/pyradium_feedback.js"
+					"base/pyradium_feedback.js",
+					"antonio/emojis/0-puke.svg",
+					"antonio/emojis/1-bad.svg",
+					"antonio/emojis/2-good.svg",
+					"antonio/emojis/3-great.svg"
 				]
 			}
 		},
