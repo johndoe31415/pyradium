@@ -19,19 +19,12 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .AcronymHook import AcronymHook
-from .TimeHook import TimeHook
-from .ExecHook import ExecHook
-from .MonospaceHook import MonospaceHook
-from .DebugHook import DebugHook
-from .NthHook import NthHook
-from .LinkHook import LinkHook
-from .NoSpellcheckHook import NoSpellcheckHook
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+
+@XMLHookRegistry.register_hook
+class NoSpellcheckHook(BaseHook):
+	_TAG_NAME = "nsc"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		return list(node.childNodes)
