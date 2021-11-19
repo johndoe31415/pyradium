@@ -14,10 +14,9 @@ a {
 }
 
 div.slide {
-%if styleopt["font-style"] == "light":
-	font-family: "Fira Sans Light";
-%else:
 	font-family: "Fira Sans";
+%if styleopt["font-style"] == "light":
+	font-weight: 300;
 %endif
 }
 
