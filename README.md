@@ -33,6 +33,20 @@ pyradium is available on PyPi, so installation is as easy as
 $ pip3 install pyradium
 ```
 
+For usage of LaTeX style presentations, you need pdflatex:
+
+```
+# apt-get install texlive texlive-latex-extra
+```
+
+You also need to tell ImageMagick to permit PDF to raster image conversion by removing (or commenting out) the line
+
+```xml
+<policy domain="coder" rights="none" pattern="PDF" />
+```
+
+in the file `/etc/ImageMagick-6/policy.xml`.
+
 ## History
 pyradium has been previously known as pybeamer (in reference to LaTeX-beamer),
 but has been renamed because a different project under that name exists on
