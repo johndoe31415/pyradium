@@ -33,10 +33,11 @@ pyradium is available on PyPi, so installation is as easy as
 $ pip3 install pyradium
 ```
 
-For usage of LaTeX style presentations, you need pdflatex:
+For usage of LaTeX style presentations, you need pdflatex and ImageMagick. To
+use continuous building, pyradium relies on the inotifytools.:
 
 ```
-# apt-get install texlive texlive-latex-extra
+# apt-get install texlive texlive-latex-extra imagemagick inotify-tools
 ```
 
 You also need to tell ImageMagick to permit PDF to raster image conversion by removing (or commenting out) the line
