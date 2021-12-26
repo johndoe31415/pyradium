@@ -27,6 +27,7 @@ from .TexHook import TexHook
 from .TerminalHook import TerminalHook
 from .CodeHook import CodeHook
 from .ImgHook import ImgHook
+from .PlotHook import PlotHook
 from .AcronymHook import AcronymHook
 from .TimeHook import TimeHook
 from .ExecHook import ExecHook

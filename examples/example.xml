@@ -228,6 +228,11 @@
 		<s:var name="filename" value="animation.svg" />
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Plot Rendering" />
+		<s:plot src="histo.gnuplot" />
+	</slide>
+
 	<subsection>Esc&lt;&gt;ping</subsection>
 	<slide>
 		<s:var name="heading" value="Escaped &lt;&gt; Characters" />

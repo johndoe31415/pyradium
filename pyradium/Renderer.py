@@ -28,6 +28,7 @@ from pyradium.Controller import ControllerManager
 from pyradium.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pyradium.renderer.ImageRenderer import ImageRenderer
 from pyradium.renderer.ExecRenderer import ExecRenderer
+from pyradium.renderer.PlotRenderer import PlotRenderer
 from .Acronyms import Acronyms
 from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
@@ -48,6 +49,7 @@ class Renderer():
 			"latex":	RendererCache(LatexFormulaRenderer()),
 			"img":		RendererCache(ImageRenderer()),
 			"exec":		RendererCache(ExecRenderer()),
+			"plot":		RendererCache(PlotRenderer()),
 			"acronym":	Acronyms(),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])
