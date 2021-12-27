@@ -48,6 +48,9 @@ You also need to tell ImageMagick to permit PDF to raster image conversion by re
 
 in the file `/etc/ImageMagick-6/policy.xml`.
 
+If you want to use spellchecking of your presentations, you need to install
+[LanguageTool](https://languagetool.org/download/) as well.
+
 ## History
 pyradium has been previously known as pybeamer (in reference to LaTeX-beamer),
 but has been renamed because a different project under that name exists on
@@ -222,6 +225,67 @@ optional arguments:
   --help                Show this help page.
 ```
 
+
+## Spellchecking slides
+You can easily spellcheck slides when you have LanguageTool installed. It can
+either start the Java server itself (then, pyradium needs the path to the
+`languagetool-server.jar` binary) or you can start the server yourself and just
+pass a pointer to the URI to pyradium.
+
+Since the former case is easier, we'll show it here:
+
+```
+$ pyradium spellcheck -j ~/lt/languagetool-server.jar presentation.xml
+Slide 4 content [line 46, col 53] "each": Possible typo: you repeated a word (suggest each)
+Slide 4 content [line 49, col 75] "cURL": Possible spelling mistake found. (suggest curl or Carl or cure)
+Slide 4 content [line 49, col 81] "Botan": Possible spelling mistake found. (suggest Botany or Wotan or OTAN)
+Slide 5 content [line 56, col 64] "gz": Possible spelling mistake found. (suggest go or GB or GHz)
+Slide 6 content [line 66, col 90] "testcases": Possible spelling mistake found. (suggest test cases)
+Slide 13 content [line 166, col 32] "monoalphabetic": Possible spelling mistake found.
+Slide 17 content [line 205, col 51] "undesireable": Possible spelling mistake found. (suggest undesirable)
+```
+
+You can also generate a vim errorfile so that you can easily go through all the
+mistakes in vi:
+
+```
+$ pyradium spellcheck -j ~/lt/languagetool-server.jar -m vim -o errfile.vim presentation.xml
+```
+
+Then you can start vi to correct mistakes:
+
+```
+$ vi -q errfile.vim
+```
+
+There is also a more powerful variant of errorfile, but that is incompatible
+with the default patterns in vi; you'll have to create a custom errorfile
+format for it to work with vi. However, it contains additional metadata that
+allows you to later on also add false positives to a dictionary.
+
+To create such an extended vi errorfile, use:
+
+```
+$ pyradium spellcheck -j ~/lt/languagetool-server.jar -m evim -o errfile.evim presentation.xml
+```
+
+TODO Write the correct format pattern TODO
+
+If false positives remain, you can edit the errorfile itself and remove all entries that were not legit (i.e., so that the errorfile only contains false positives). Then you can simply
+
+```
+$ pyradium dictadd errfile.evim
+"Vigenère": Possible spelling mistake found.
+Offense: > Vigenère <
+   [A]dd word to dictionary
+   Add word to [g]lobal dictionary (all languages, e.g., names)
+   Add specific [c]ontext to dictionary
+   Do [n]othing with this match
+Your choice: 
+```
+
+It then asks for each offense to which dictionary it should be added. The
+dictionary file is `~/.config/pyradium/dictionary.json`.
 
 ## License
 pyradium is licensed under the GNU GPL-3.

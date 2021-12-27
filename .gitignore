@@ -1,3 +1,5 @@
 .*.swp
 __pycache__
 rendered
+dist
+pyradium.egg-info/
