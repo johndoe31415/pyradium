@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -26,6 +26,7 @@ import logging
 import collections
 from pyradium.RendererCache import BaseRenderer
 from pyradium.CmdlineEscape import CmdlineEscape
+from pyradium.Exceptions import InvalidTeXException
 
 _log = logging.getLogger(__spec__.name)
 
@@ -94,7 +95,10 @@ class LatexFormulaRenderer(BaseRenderer):
 			with open(tex_filename, "w") as tex_file:
 				tex_file.write(_TEX_TEMPLATE % { "content": content })
 			_log.debug("Rendering LaTeX formula: %s in directory %s", content, tex_dir)
-			subprocess.check_call([ "pdflatex", "-output-directory=%s" % (tex_dir), tex_filename ], stdout = _log.subproc_target, stderr = _log.subproc_target)
+			try:
+				subprocess.check_call([ "pdflatex", "-interaction=nonstopmode", "-output-directory=%s" % (tex_dir), tex_filename ], stdout = _log.subproc_target, stderr = _log.subproc_target)
+			except subprocess.CalledProcessError as e:
+				raise InvalidTeXException("Invalid TeX in source: %s" % property_dict["formula"]) from e
 
 			# Then render the PDF to PNG
 			cmd = [ "convert", "-define", "profile:skip=ICC", "-density", str(self._rendering_dpi), "-trim", "+repage", pdf_filename, png_filename ]
