@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -27,23 +27,35 @@ from .BaseAction import BaseAction
 from .SpellcheckDictionary import SpellcheckDictionary, SpellcheckExceptionType
 
 class ActionDictAdd(BaseAction):
-	_EVIM_REGEX = re.compile("^(?P<base64>[A-Za-z0-9/+=]+):(?P<filename>[^:]+):(?P<line>\d+):(?P<col>\d+):(?P<msg>.*)")
+	_EVIM_REGEX = re.compile("^(?P<base64>[A-Za-z0-9/+=]+)::(?P<filename>[^:]+)::(?P<line>\d+)::(?P<col>\d+)::(?P<msg>.*)$")
 
-	def _choice(self, prompt, valid_answers):
+	def _choice(self, prompt, valid_answers, default_answer = None):
 		while True:
 			answer = input(prompt)
+			if (answer == "") and (default_answer is not None):
+				answer = default_answer
 			if answer in valid_answers:
 				return answer
 
-	def _add(self, match, data):
-		print
+	def _handle_current_finding(self):
+		if self._current_finding < 0:
+			self._current_finding = 0
+		(match, data) = self._findings[self._current_finding]
+		if self._dictionary.has_exception(offense = data["offense"], context = data["ctx"], rule_id = data["rule"]):
+			# Already handeled the same finding in this session, do not handle it again
+			self._current_finding += 1
+			return
+
+		print()
+		print("Finding %d of %d:" % (self._current_finding + 1, len(self._findings)))
 		print("%s" % (match["msg"]))
 		print("Offense: > %s <" % (data["offense"]))
 		print("   [A]dd word to dictionary")
-		print("   Add word to [g]lobal dictionary (all languages, e.g., names)")
+		print("   Add word to [g]lobal dictionary (for all languages, e.g., names)")
 		print("   Add specific [c]ontext to dictionary")
-		print("   Do [n]othing with this match")
-		answer = self._choice("Your choice: ", [ "a", "g", "c", "n" ])
+		print("   Jump to [p]previous finding")
+		print("   Do [n]othing with this match (default)")
+		answer = self._choice("Your choice: ", [ "a", "g", "c", "p", "n" ], default_answer = "n")
 		if answer in [ "a", "g", "c" ]:
 			exception_type = {
 				"a": SpellcheckExceptionType.RuleWord,
@@ -51,14 +63,22 @@ class ActionDictAdd(BaseAction):
 				"c": SpellcheckExceptionType.RuleContext,
 			}[answer]
 			self._dictionary.add_exception(offense = data["offense"], context = data["ctx"], rule_id = data["rule"], exception_type = exception_type)
+			self._current_finding += 1
 		elif answer == "n":
-			pass
+			self._current_finding += 1
+		elif answer == "p":
+			self._current_finding -= 1
 		else:
 			raise NotImplementedError(answer)
-		print()
+
+	def _handle_findings(self):
+		while self._current_finding < len(self._findings):
+			self._handle_current_finding()
 
 	def run(self):
 		self._dictionary = SpellcheckDictionary.open_global_dict()
+		self._current_finding = 0
+		self._findings = [ ]
 
 		try:
 			with open(self._args.infile) as f:
@@ -69,6 +89,7 @@ class ActionDictAdd(BaseAction):
 						match = match.groupdict()
 						data = json.loads(zlib.decompress(base64.b64decode(match["base64"])))
 						if not self._dictionary.has_exception(offense = data["offense"], context = data["ctx"], rule_id = data["rule"]):
-							self._add(match, data)
+							self._findings.append((match, data))
+			self._handle_findings()
 		finally:
 			self._dictionary.write_if_modified()

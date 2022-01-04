@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -24,12 +24,18 @@ import sys
 import json
 import base64
 import zlib
+import logging
 import subprocess
 from .BaseAction import BaseAction
 from .Spellcheck import XMLSpellchecker, SpellcheckerAPI, LanguageToolProcess, LanguageToolConfig
 from .SpellcheckDictionary import SpellcheckDictionary
+from .CmdlineEscape import CmdlineEscape
+
+_log = logging.getLogger(__spec__.name)
 
 class ActionSpellcheck(BaseAction):
+	_EVIM_SEPARATOR = "::"
+
 	def _add_finding_print(self, spellcheck_result):
 		msg = [ ]
 		msg.append("%s " % (spellcheck_result.group.description))
@@ -53,7 +59,7 @@ class ActionSpellcheck(BaseAction):
 		}
 		bin_data = zlib.compress(json.dumps(data, sort_keys = True, separators = (",", ":")).encode("ascii"))
 		encoded_data = base64.b64encode(bin_data).decode("ascii")
-		print("%s:%s:%d:%d:%s" % (encoded_data, self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
+		print(self._EVIM_SEPARATOR.join([ encoded_data, self._args.infile, str(spellcheck_result.row), str(spellcheck_result.column), msg ]), file = self._f)
 
 	def _add_finding_fulljson(self, spellcheck_result):
 		finding = {
@@ -117,7 +123,8 @@ class ActionSpellcheck(BaseAction):
 		if self._args.vim:
 			vim_errorformat = {
 				"vim":		r"%f:%l:%c:%m",
-				"evim":		r"%[A-Za-z0-9/+=]%\\\\+:%f:%l:%c:%m",
+				"evim":		self._EVIM_SEPARATOR.join([ r"%[A-Za-z0-9/+=]%\\\\+", r"%f", r"%l", r"%c", r"%m" ]),
 			}[self._args.mode]
 			cmd = [ "vi", "-c", ":set errorformat=%s" % (vim_errorformat), "-c", ":cf %s" % (self._args.outfile) ]
+			_log.info("Running: %s", CmdlineEscape().cmdline(cmd))
 			subprocess.check_call(cmd)

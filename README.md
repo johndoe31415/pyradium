@@ -269,18 +269,31 @@ To create such an extended vi errorfile, use:
 $ pyradium spellcheck -j ~/lt/languagetool-server.jar -m evim -o errfile.evim presentation.xml
 ```
 
-TODO Write the correct format pattern TODO
+You can also specify that automatically vi should be opened on that errorfile
+with the correct parameters:
+
+```
+$ pyradium spellcheck -j ~/lt/languagetool-server.jar -m evim --vim -o errfile.evim presentation.xml
+```
+
+Alternatively, you can specify the pattern yourself on the command line:
+
+```
+$ vi -c ':set errorformat=%[A-Za-z0-9/+=]%\\\\+::%f::%l::%c::%m' -c ':cf errfile.evim'
+```
 
 If false positives remain, you can edit the errorfile itself and remove all entries that were not legit (i.e., so that the errorfile only contains false positives). Then you can simply
 
 ```
 $ pyradium dictadd errfile.evim
+Finding 13 of 17:
 "Vigenère": Possible spelling mistake found.
 Offense: > Vigenère <
    [A]dd word to dictionary
-   Add word to [g]lobal dictionary (all languages, e.g., names)
+   Add word to [g]lobal dictionary (for all languages, e.g., names)
    Add specific [c]ontext to dictionary
-   Do [n]othing with this match
+   Jump to [p]previous finding
+   Do [n]othing with this match (default)
 Your choice: 
 ```
 
