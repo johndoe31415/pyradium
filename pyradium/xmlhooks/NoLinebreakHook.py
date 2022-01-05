@@ -19,21 +19,17 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .PlotHook import PlotHook
-from .AcronymHook import AcronymHook
-from .TimeHook import TimeHook
-from .ExecHook import ExecHook
-from .MonospaceHook import MonospaceHook
-from .DebugHook import DebugHook
-from .NthHook import NthHook
-from .LinkHook import LinkHook
-from .NoSpellcheckHook import NoSpellcheckHook
-from .NoLinebreakHook import NoLinebreakHook
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.Tools import XMLTools
+
+@XMLHookRegistry.register_hook
+class NoLinebreakHook(BaseHook):
+	_TAG_NAME = "nlb"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		def callback(inner_node):
+			text = inner_node.wholeText.replace(" ", "\u00a0")
+			inner_node.replaceWholeText(text)
+		XMLTools.walk(node, callback, predicate = lambda node: (node.nodeType == node.TEXT_NODE))
+		return list(node.childNodes)
