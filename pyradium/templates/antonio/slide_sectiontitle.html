@@ -1,0 +1,17 @@
+<%inherit file="base/slide.html" />
+<%block name="slide_classes">sectiontitle</%block>
+
+<div class="headpiece">
+	%if (slide.var("toc_entry") is not None) and (len(slide.var("toc_entry").full_text) >= 1):
+		<div class="section">${slide.var("toc_entry").full_text[0]}</div>
+	%endif
+	%if (slide.var("toc_entry") is not None) and (len(slide.var("toc_entry").full_text) >= 2):
+		<div class="subsection">${slide.var("toc_entry").full_text[1]}</div>
+	%endif
+	<img src="${preuri}template/antonio/tribar.svg" class="bar">
+</div>
+<div class="bottompiece">
+	<div class="pageno">
+		${slide.var("current_slide_number")}
+	</div>
+</div>

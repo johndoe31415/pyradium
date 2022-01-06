@@ -85,6 +85,11 @@
 	},
 	"dependencies": {
 		"slidetype": {
+			"sectiontitle": {
+				"static": [
+					"antonio/tribar.svg"
+				]
+			},
 			"quote": {
 				"static": [
 					"antonio/quote.svg"

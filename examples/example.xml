@@ -78,6 +78,8 @@
 
 	<section>Finalization</section>
 	<subsection>After Include Subsection</subsection>
+	<slide type="sectiontitle" />
+
 	<slide>
 		<s:var name="heading" value="After include" />
 		<ul>
