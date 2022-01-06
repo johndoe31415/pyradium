@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -22,6 +22,7 @@
 import json
 import logging
 import mako.lookup
+import mako.exceptions
 import markupsafe
 import pyradium
 from pyradium.Controller import ControllerManager
@@ -32,7 +33,7 @@ from pyradium.renderer.PlotRenderer import PlotRenderer
 from .Acronyms import Acronyms
 from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
-from .Exceptions import TemplateErrorException, MalformedStyleConfigurationException
+from .Exceptions import TemplateErrorException, MalformedStyleConfigurationException, UnknownSlideTypeException
 from .Slide import RenderSlideDirective
 from .Enums import PresentationFeature
 from .Tools import JSONTools
@@ -144,7 +145,10 @@ class Renderer():
 		if additional_template_args is not None:
 			template_args.update(additional_template_args)
 
-		template = self._lookup.get_template(template_filename)
+		try:
+			template = self._lookup.get_template(template_filename)
+		except mako.exceptions.MakoException as e:
+			raise UnknownSlideTypeException("Could not retrieve template necessary to render slide type %s (searched in: %s)." % (template_filename, ":".join(self._get_mako_lookup_directories()))) from e
 		result = template.render(**template_args)
 		return result
 

@@ -38,6 +38,7 @@ class DuplicateOrderException(PyRadiumException): pass
 class InvalidBooleanValueException(PyRadiumException): pass
 class FailedToLookupFileException(PyRadiumException): pass
 class InvalidTeXException(PyRadiumException): pass
+class UnknownSlideTypeException(PyRadiumException): pass
 
 class FailedToExecuteSubprocessException(PyRadiumException): pass
 
