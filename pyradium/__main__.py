@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -25,6 +25,7 @@ import pyradium
 from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
 from .ActionServe import ActionServe
+from .ActionAcroAdd import ActionAcroAdd
 from .ActionAcroSort import ActionAcroSort
 from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
@@ -87,7 +88,12 @@ def main():
 	def genparser(parser):
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("acrofile", help = "Acronym database JSON file.")
-	mc.register("acrosort", "Sort an acryonym database", genparser, action = ActionAcroSort)
+	mc.register("acroadd", "Add an acryonym to the acronym database", genparser, action = ActionAcroAdd, aliases = [ "aadd" ])
+
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("acrofile", help = "Acronym database JSON file.")
+	mc.register("acrosort", "Sort an acryonym database", genparser, action = ActionAcroSort, aliases = [ "asort" ])
 
 	def genparser(parser):
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")

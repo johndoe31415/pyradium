@@ -40,6 +40,10 @@ class FailedToLookupFileException(PyRadiumException): pass
 class InvalidTeXException(PyRadiumException): pass
 class UnknownSlideTypeException(PyRadiumException): pass
 
+class AcronymException(PyRadiumException): pass
+class InvalidAcronymFileException(AcronymException): pass
+class DuplicateAcronymException(AcronymException): pass
+
 class FailedToExecuteSubprocessException(PyRadiumException): pass
 
 class SpellcheckerException(PyRadiumException): pass

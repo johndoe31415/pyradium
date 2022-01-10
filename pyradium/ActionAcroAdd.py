@@ -22,7 +22,38 @@
 from .Acrofile import Acrofile
 from .BaseAction import BaseAction
 
-class ActionAcroSort(BaseAction):
+class ActionAcroAdd(BaseAction):
 	def run(self):
 		acrofile = Acrofile.load_from_file(self._args.acrofile)
+		while True:
+			acronym = input("Acronym: ")
+			if acrofile.has(acronym):
+				acro_data = acrofile.get(acronym)
+				print("Acronym '%s' already in database." % (acronym))
+				for i in range(1, 100):
+					suggestion = "%s-%d" % (acronym, i)
+					if not acrofile.has(suggestion):
+						print("Suggest to use: %s" % (suggestion))
+						break
+				if "text" in acro_data:
+					print("Text   : %s" % (acro_data["text"]))
+				if "acronym" in acro_data:
+					print("Acronym: %s" % (acro_data["acronym"]))
+				if "uri" in acro_data:
+					print("URI    : %s" % (acro_data["uri"]))
+			else:
+				break
+
+		text = input("Text   : ")
+		actual_acronym = input("Acronym: ")
+		uri = input("URI    : ")
+		acro_data = { }
+		if text != "":
+			acro_data["text"] = text
+		if actual_acronym != "":
+			acro_data["acronym"] = actual_acronym
+		if uri != "":
+			acro_data["uri"] = uri
+
+		acrofile.add_entry(acronym, acro_data)
 		acrofile.write_to_file(self._args.acrofile)
