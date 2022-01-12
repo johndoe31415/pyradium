@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -24,6 +24,8 @@ from pyradium.Exceptions import UsageException
 from pyradium.SVGTransformation import SVGTransformation
 
 class AnimationController(BaseController):
+	_VALID_ANIMATION_MODES = [ "compose", "replace" ]
+
 	def render(self):
 		filename = self.slide.get_xml_slide_var("filename")
 		if filename is None:
@@ -31,11 +33,22 @@ class AnimationController(BaseController):
 		if not filename.lower().endswith(".svg"):
 			raise UsageException("Any 'animation' type slide requires an SVG input filename, but found: %s" % (filename))
 
+		animation_mode = self.slide.get_xml_slide_var("mode")
+		if animation_mode is None:
+			animation_mode = "compose"
+		if animation_mode not in self._VALID_ANIMATION_MODES:
+			raise UsageException("An 'animation' type slide needs to have a mode set to any of %s, but found: %s" % (", ".join(self._VALID_ANIMATION_MODES), animation_mode))
+
 		full_filename = self.rendered_presentation.renderer.lookup_include(filename)
 
 		# Determine the number of layers the SVG has first
 		svg = SVGTransformation(full_filename)
-		considered_layers = list(svg.visible_layer_ids)
+		if animation_mode == "compose":
+			considered_layers = list(svg.visible_layer_ids)
+		elif animation_mode == "replace":
+			considered_layers = list(svg.layer_ids)
+		else:
+			raise NotImplementedError(animation_mode)
 		svg_transforms = [ ]
 
 		# Store commands to hide all layers first
@@ -47,12 +60,18 @@ class AnimationController(BaseController):
 
 		# Then show them one-by-one and render each
 		additional_slide_var_list = [ ]
+		previous_layer_id = None
 		renderer = self.rendered_presentation.renderer.get_custom_renderer("img")
 		for layer_id in considered_layers:
 			svg_transforms.append({
 				"cmd":			"show_layer",
 				"layer_id":		layer_id,
 			})
+			if (animation_mode == "replace") and (previous_layer_id is not None):
+				svg_transforms.append({
+					"cmd":			"hide_layer",
+					"layer_id":		previous_layer_id,
+				})
 			rendered_image = renderer.render({
 				"src":				full_filename,
 				"max_dimension":	self.rendered_presentation.renderer.rendering_params.image_max_dimension,
@@ -63,6 +82,7 @@ class AnimationController(BaseController):
 			additional_slide_var_list.append({
 				"image": local_filename,
 			})
+			previous_layer_id = layer_id
 
 		if not self.rendered_presentation.renderer.rendering_params.collapse_animation:
 			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_var_list)
