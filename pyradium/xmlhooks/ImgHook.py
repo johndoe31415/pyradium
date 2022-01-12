@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -26,11 +26,35 @@ class ImgHook(BaseHook):
 	_TAG_NAME = "img"
 
 	@classmethod
+	def _parse_transformation(self, node):
+		if not node.hasAttribute("cmd"):
+			raise InvalidTransformationException("A 'transform' node needs at least a 'cmd' attribute.")
+		cmd = node.getAttribute("cmd")
+		transform_dict = { "cmd": cmd }
+		if cmd == "replace_text":
+			if not (node.hasAttribute("search") and node.hasAttribute("replace")):
+				raise InvalidTransformationException("A transform command '%s' needs a 'search' and 'replace' attribute." % (cmd))
+			transform_dict.update({
+				"search":	node.getAttribute("search"),
+				"replace":	node.getAttribute("replace"),
+			})
+		else:
+			raise InvalidTransformationException("Unknown command '%s' supplied to 'transform' node." % (cmd))
+		return transform_dict
+
+	@classmethod
 	def handle(cls, rendered_presentation, node):
+		transformations = [ ]
+		for child_node in node.childNodes:
+			if (child_node.nodeType == child_node.ELEMENT_NODE) and (child_node.tagName == "transform"):
+				transformations.append(cls._parse_transformation(child_node))
+
 		properties = {
 			"src":				rendered_presentation.renderer.lookup_include(node.getAttribute("src")),
 			"max_dimension":	rendered_presentation.renderer.rendering_params.image_max_dimension,
 		}
+		if len(transformations) > 0:
+			properties["svg_transform"] = transformations
 		img_renderer = rendered_presentation.renderer.get_custom_renderer("img")
 		rendered_image = img_renderer.render(properties)
 		local_filename = "imgs/img/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])

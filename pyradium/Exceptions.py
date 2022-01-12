@@ -34,6 +34,8 @@ class UsageException(SlideException): pass
 
 class XMLHookRegistryException(PyRadiumException): pass
 
+class InvalidTransformationException(PyRadiumException): pass
+
 class DuplicateOrderException(PyRadiumException): pass
 class InvalidBooleanValueException(PyRadiumException): pass
 class FailedToLookupFileException(PyRadiumException): pass

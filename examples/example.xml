@@ -233,6 +233,13 @@
 		<s:img src="3dbox.svg" />
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Image Rendering with substitution" />
+		<s:img src="3dbox.svg">
+			<transform cmd="replace_text" search="${foo}" replace="Works!" />
+		</s:img>
+	</slide>
+
 	<slide type="animation">
 		<s:var name="heading" value="Image Animation" />
 		<s:var name="filename" value="animation.svg" />
