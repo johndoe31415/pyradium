@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -46,13 +46,24 @@ class TexHook(BaseHook):
 		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
 		#print(properties["formula"], rendered_formula.data["info"], width_px)
 
-		replacement_node = node.ownerDocument.createElement("img")
-		replacement_node.setAttribute("src", uri)
+		# For now, always wrap in div for long formulae. Could easily add an
+		# option to override this if it's useful.
+		wrap_in_div = properties["long"]
+
+		img_node = node.ownerDocument.createElement("img")
+		img_node.setAttribute("src", uri)
 		if properties["long"]:
-			replacement_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
+			img_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
 		else:
-			replacement_node.setAttribute("style", "width: %dpx; margin-bottom: %dpx; margin-top: 5px" % (width_px, -baseline_px + 1))
-		replacement_node.setAttribute("alt", properties["formula"])
+			img_node.setAttribute("style", "width: %dpx; margin-bottom: %dpx; margin-top: 5px" % (width_px, -baseline_px + 1))
+		img_node.setAttribute("alt", properties["formula"])
+
+		if not wrap_in_div:
+			replacement_node = img_node
+		else:
+			replacement_node = node.ownerDocument.createElement("div")
+			replacement_node.setAttribute("class", "texformula")
+			replacement_node.appendChild(img_node)
 
 		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])
 		return replacement_node

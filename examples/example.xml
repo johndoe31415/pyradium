@@ -140,9 +140,9 @@
 	<slide>
 		<s:var name="heading" value="Long Formula" />
 		<p>This is the long form:</p>
-		<div><s:tex long="1">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></div>
+		<s:tex long="1">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
 		<p>While this is the short one for comparison:</p>
-		<div><s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></div>
+		<s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
 	</slide>
 
 	<subsection>Code Highlighting</subsection>
