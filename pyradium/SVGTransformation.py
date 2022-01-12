@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -112,7 +112,6 @@ class SVGTransformation():
 			if layer.is_visible:
 				yield layer.layer_id
 
-
 	@property
 	def layer_ids(self):
 		for layer in self._layers:
@@ -122,15 +121,22 @@ class SVGTransformation():
 	def layers(self):
 		return iter(self._layers)
 
-
 	def get_layer(self, layer_id):
 		return self._layers_by_id[layer_id]
+
+	def _search_replace_text(self, search, replace):
+		for text_node in XMLTools.findall_recurse(self._xml, "text"):
+			for tspan_node in XMLTools.findall(text_node, "tspan"):
+				for cdata_node in XMLTools.findall_text(tspan_node, recursive = True):
+					cdata_node.replaceWholeText(cdata_node.wholeText.replace(search, replace))
 
 	def apply(self, transformation_dict):
 		if transformation_dict["cmd"] == "show_layer":
 			self.get_layer(transformation_dict["layer_id"]).show()
 		elif transformation_dict["cmd"] == "hide_layer":
 			self.get_layer(transformation_dict["layer_id"]).hide()
+		elif transformation_dict["cmd"] == "replace_text":
+			self._search_replace_text(transformation_dict["search"], transformation_dict["replace"])
 		else:
 			raise NotImplementedError(transformation_dict["cmd"])
 
@@ -153,4 +159,14 @@ if __name__ == "__main__":
 	for layer_id in layer_ids:
 		svg.get_layer(layer_id).hide()
 	svg.get_layer(layer_ids[0]).show()
+	svg.apply({
+		"cmd": "replace_text",
+		"search": "MUH TEXT",
+		"replace": "This was Muh.",
+	})
+	svg.apply({
+		"cmd": "replace_text",
+		"search": "FOO TEXT",
+		"replace": "This was Foo.",
+	})
 	svg.write_file("/tmp/x.svg")

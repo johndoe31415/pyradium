@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -102,6 +102,14 @@ class XMLTools():
 	@classmethod
 	def findall_recurse(cls, root_node, name):
 		return cls.findall_recurse_predicate(root_node, predicate = lambda node: (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name))
+
+	@classmethod
+	def findall_text(cls, root_node, recursive = False):
+		for node in root_node.childNodes:
+			if node.nodeType in [ node.TEXT_NODE, node.CDATA_SECTION_NODE ]:
+				yield node
+			elif recursive:
+				yield from cls.findall_text(node, recursive = True)
 
 	@classmethod
 	def findall(cls, root_node, name, namespace_uri = "*"):
