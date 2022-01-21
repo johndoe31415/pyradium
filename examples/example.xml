@@ -211,6 +211,14 @@
 	</slide>
 
 	<slide>
+		<s:var name="heading" value="Dashes" />
+		<ul>
+			<li>By default dashes are replaced by endash and emdash, -- and ---</li>
+			<li>But they can be verbatim as well: <s:verb>-- and ---</s:verb></li>
+		</ul>
+	</slide>
+
+	<slide>
 		<s:var name="heading" value="Symbols" />
 		<ul>
 			<li><s:sym>xor</s:sym> XOR and <s:sym>xmul</s:sym> XMUL</li>

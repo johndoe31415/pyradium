@@ -19,22 +19,12 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .EmoHook import EmoHook
-from .SymbolHook import SymbolHook
-from .ArrowHook import ArrowHook
-from .QuoteHook import QuoteHook
-from .TexHook import TexHook
-from .TerminalHook import TerminalHook
-from .CodeHook import CodeHook
-from .ImgHook import ImgHook
-from .PlotHook import PlotHook
-from .AcronymHook import AcronymHook
-from .TimeHook import TimeHook
-from .ExecHook import ExecHook
-from .MonospaceHook import MonospaceHook
-from .DebugHook import DebugHook
-from .NthHook import NthHook
-from .LinkHook import LinkHook
-from .NoSpellcheckHook import NoSpellcheckHook
-from .NoLinebreakHook import NoLinebreakHook
-from .VerbatimHook import VerbatimHook
+from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
+
+@XMLHookRegistry.register_hook
+class VerbatimHook(InnerTextHook):
+	_TAG_NAME = "verb"
+
+	@classmethod
+	def handle_text(cls, text, rendered_presentation, node):
+		return list(node.childNodes)
