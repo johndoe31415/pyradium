@@ -29,6 +29,7 @@ _log = logging.getLogger(__spec__.name)
 class XMLHookRegistry():
 	_HOOKS = { }
 	_SPECIAL = set([ "var", "pause", "content" ])
+	_BREAK_DESCENT_ON = set([ "s:verb", "s:term", "s:code" ])
 
 	@classmethod
 	def register_hook(cls, hook_class):
@@ -62,7 +63,7 @@ class XMLHookRegistry():
 							pass
 						else:
 							XMLTools.replace_node(node, replace_by)
-							continue_descent_with_replaced_elements = node.nodeName != "s:verb"
+							continue_descent_with_replaced_elements = node.nodeName not in cls._BREAK_DESCENT_ON
 							if continue_descent_with_replaced_elements:
 								if not isinstance(replace_by, list):
 									XMLTools.walk(replace_by, callback)
