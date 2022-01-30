@@ -136,3 +136,15 @@ div.fillimg img {
 	max-height: 100%;
 	display: block;
 }
+
+
+table {
+	border-spacing: 0px;
+	border-collapse: separate;
+}
+
+th, td {
+	padding: 5px 15px 5px 15px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+}
