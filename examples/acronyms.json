@@ -7,5 +7,7 @@
 	"AB": { "text": "Alpha Bravo" },
 	"ABC": { "text": "Alpha Bravo Charlie" },
 	"ABCD": { "text": "Alpha Bravo Charlie Delta" },
-	"ABCDE": { "text": "Alpha Bravo Charlie Delta Echo" }
+	"ABCDE": { "text": "Alpha Bravo Charlie Delta Echo" },
+	"MAC1": { "text": "Message Authentication Code", "acronym": "MAC" },
+	"MAC2": { "text": "Media Access Control", "acronym": "MAC" }
 }

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -55,7 +55,7 @@ class Acronyms():
 		with open(filename) as f:
 			acronyms = json.load(f)
 		for (acronym_id, acronym_data) in acronyms.items():
-			resolved_acronym = ResolvedAcronym(acronym_id = acronym_id, acronym = acronym_data.get("ac", acronym_id), text = acronym_data["text"], uri = acronym_data.get("uri"))
+			resolved_acronym = ResolvedAcronym(acronym_id = acronym_id, acronym = acronym_data.get("acronym", acronym_id), text = acronym_data["text"], uri = acronym_data.get("uri"))
 			self._acronyms[acronym_id] = resolved_acronym
 
 	def resolve(self, acronym_id):

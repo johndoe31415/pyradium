@@ -60,6 +60,7 @@
 			<s:pause />
 			<li>This is after the second pause! Explaining <s:ac>AES</s:ac>-<s:ac>CBC</s:ac></li>
 			<li><s:ac>A</s:ac> <s:ac>AB</s:ac> <s:ac>ABC</s:ac> <s:ac>ABCD</s:ac> <s:ac>ABCDE</s:ac></li>
+			<li>Don't confuse <s:ac>MAC1</s:ac> and <s:ac>MAC2</s:ac></li>
 		</ul>
 	</slide>
 
