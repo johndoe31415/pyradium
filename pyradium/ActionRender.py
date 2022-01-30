@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -29,7 +29,7 @@ from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
 from .Renderer import Renderer
-from .Exceptions import CallingProcessException, PyRadiumException
+from .Exceptions import XMLFileNotFoundException, CallingProcessException, PyRadiumException
 from .Enums import PresentationFeature
 
 _log = logging.getLogger(__spec__.name)
@@ -99,6 +99,7 @@ class ActionRender(BaseAction):
 		renderer = None
 		render_success = True
 		while True:
+			force_wait_secs = None
 			try:
 				t0 = time.time()
 				rendering_parameters = RenderingParameters(
@@ -119,13 +120,20 @@ class ActionRender(BaseAction):
 				rendered_presentation = renderer.render(resource_directory = resource_dir, deploy_directory = self._args.outdir)
 				t1 = time.time()
 				_log.info("Successfully rendered presentation into directory \"%s\", took %.1f seconds", self._args.outdir, t1 - t0)
+			except XMLFileNotFoundException as e:
+				# This can happen when we save an XML file in VIM and inotify
+				# notifies pyradium too quickly (while the file is still not
+				# existent). Then we want to re-render quickly to remedy the issue.
+				render_success = False
+				_log.error("Rendering failed: [%s] %s", e.__class__.__name__, str(e))
+				force_wait_secs = 1
 			except PyRadiumException as e:
 				render_success = False
 				_log.error("Rendering failed: [%s] %s", e.__class__.__name__, str(e))
 			if not self._args.re_render_loop:
 				break
-			if renderer is None:
-				sleep_duration_secs = 5
+			if (renderer is None) or (force_wait_secs is not None):
+				sleep_duration_secs = force_wait_secs or 5
 				_log.warning("Unable to watch files for change since parsing the source was impossible; sleeping for %d seconds instead.", sleep_duration_secs)
 				time.sleep(sleep_duration_secs)
 			else:

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -28,7 +28,7 @@ from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
-from .Exceptions import MalformedXMLInputException
+from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException
 
 _log = logging.getLogger(__spec__.name)
 
@@ -67,6 +67,8 @@ class Presentation():
 	def load_from_file(cls, filename, rendering_parameters = None):
 		try:
 			dom = xml.dom.minidom.parse(filename)
+		except FileNotFoundError as e:
+			raise XMLFileNotFoundException("Cannot parse %s: %s" % (filename, str(e))) from e
 		except xml.parsers.expat.ExpatError as e:
 			raise MalformedXMLInputException("Cannot parse %s: %s" % (filename, str(e))) from e
 		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))

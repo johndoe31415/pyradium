@@ -23,6 +23,7 @@ class PyRadiumException(Exception): pass
 
 class CallingProcessException(PyRadiumException): pass
 
+class XMLFileNotFoundException(PyRadiumException): pass
 class MalformedXMLInputException(PyRadiumException): pass
 class MalformedStyleConfigurationException(PyRadiumException): pass
 
