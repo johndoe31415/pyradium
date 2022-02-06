@@ -357,8 +357,9 @@ export class PresentationTimer {
 		const elapsed_time_secs = (now.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
 		const position_based_on_time = elapsed_time_secs / this._active_timer.presentation_duration_secs * 100;
 		const remaining_slide_count = this._active_timer.slide_subset.slide_count - (this._current_slide - this._active_timer.slide_subset.begin_slide + 1);
+		const presentation_end_hh_mm_str = this._active_timer.presentation_end.getHours() + ":" + this._active_timer.presentation_end.getMinutes().toString().padStart(2, "0");
 
-		this._ui_elements.presentation_time_display.innerText = TimeTools.format_hms(this._active_timer.presentation_duration_secs);
+		this._ui_elements.presentation_time_display.innerHTML = TimeTools.format_hms(this._active_timer.presentation_duration_secs) + "<br />until " + presentation_end_hh_mm_str;
 		this._ui_elements.elapsed_time_display.innerHTML = TimeTools.format_hms(elapsed_time_secs) + "<br />" + position_based_on_time.toFixed(0) + "%";
 		this._ui_elements.remaining_display.innerHTML = TimeTools.format_hms(remaining_presentation_time_secs) + "<br />" + remaining_slide_count + " slides";
 
