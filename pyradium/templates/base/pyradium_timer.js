@@ -354,15 +354,16 @@ export class PresentationTimer {
 		const now = new Date();
 		const remaining_presentation_time_secs = (this._active_timer.presentation_end.getTime() - now.getTime()) / 1000;
 		const elapsed_time_secs = (now.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
+		const position_based_on_time = elapsed_time_secs / this._active_timer.presentation_duration_secs * 100;
+		const remaining_slide_count = this._active_timer.slide_subset.slide_count - (this._current_slide - this._active_timer.slide_subset.begin_slide + 1);
 
 		this._ui_elements.presentation_time_display.innerText = TimeTools.format_hms(this._active_timer.presentation_duration_secs);
-		this._ui_elements.elapsed_time_display.innerText = TimeTools.format_hms(elapsed_time_secs);
-		this._ui_elements.remaining_time_display.innerText = TimeTools.format_hms(remaining_presentation_time_secs);
+		this._ui_elements.elapsed_time_display.innerHTML = TimeTools.format_hms(elapsed_time_secs) + "<br />" + position_based_on_time.toFixed(0) + "%";
+		this._ui_elements.remaining_display.innerHTML = TimeTools.format_hms(remaining_presentation_time_secs) + "<br />" + remaining_slide_count + " slides";
 
 		const current_slide_ratio = this._slide_subset_selector.get_ratio_of(this._current_slide);
 		const current_slide_nominal_duration_secs = current_slide_ratio / this._active_timer.subset_ratio * this._active_timer.presentation_duration_secs;
 		this._ui_elements.slide_time_display.innerText = TimeTools.format_hms(current_slide_nominal_duration_secs);
-
 
 		const subset_begin_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._active_timer.slide_subset.begin_slide);
 		const cumulative_current_slide_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._current_slide);
@@ -371,6 +372,10 @@ export class PresentationTimer {
 
 		const delta_time_secs = nominal_elapsed_time_secs - elapsed_time_secs + current_slide_nominal_duration_secs;
 		this._ui_elements.delta_time_display.innerText = TimeTools.format_hms(delta_time_secs);
+
+		const current_slide_no_within_subset = this._current_slide - this._active_timer.slide_subset.begin_slide + 1;
+		const position_based_on_slides = (this._current_slide - this._active_timer.slide_subset.begin_slide + 1) / this._active_timer.slide_subset.slide_count * 100;
+		this._ui_elements.slide_position_display.innerHTML = current_slide_no_within_subset + "/" + this._active_timer.slide_subset.slide_count + "<br />" + position_based_on_slides.toFixed(0) + "%";
 
 		let speed_error_secs = 0;
 		if (delta_time_secs > current_slide_nominal_duration_secs) {
