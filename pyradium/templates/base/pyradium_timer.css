@@ -18,6 +18,11 @@ div.main_indicator {
 	border-radius: 10px;
 }
 
+div.main_indicator div.sub_indicator {
+	font-size: 30%;
+	padding: 5px;
+}
+
 div.menugrid {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;

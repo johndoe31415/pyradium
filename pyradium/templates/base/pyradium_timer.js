@@ -227,6 +227,7 @@ export class PresentationTimer {
 		this._timeout_handle = null;
 		this._have_connection = false;
 		this._active_timer = null;
+		this._dynamic_timer = null;
 		this._reset_timeout();
 		this._initialize_ui();
 		setInterval(() => this._ui_update_display(), 1000);
@@ -352,40 +353,49 @@ export class PresentationTimer {
 			return;
 		}
 
-		const now = new Date();
-		const remaining_presentation_time_secs = (this._active_timer.presentation_end.getTime() - now.getTime()) / 1000;
-		const elapsed_time_secs = (now.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
-		const position_based_on_time = elapsed_time_secs / this._active_timer.presentation_duration_secs * 100;
+		const now = new Date().getTime();
+		const remaining_presentation_time_secs = (this._active_timer.presentation_end.getTime() - now) / 1000;
+		const nominal_elapsed_time_secs = (now - this._active_timer.presentation_start.getTime()) / 1000;
+		const dynamic_elapsed_time_secs = (now - this._dynamic_timer.presentation_start.getTime()) / 1000;
+		const position_based_on_time_percent = nominal_elapsed_time_secs / this._active_timer.presentation_duration_secs * 100;
 		const remaining_slide_count = this._active_timer.slide_subset.slide_count - (this._current_slide - this._active_timer.slide_subset.begin_slide + 1);
 		const presentation_end_hh_mm_str = this._active_timer.presentation_end.getHours() + ":" + this._active_timer.presentation_end.getMinutes().toString().padStart(2, "0");
 
 		this._ui_elements.presentation_time_display.innerHTML = TimeTools.format_hms(this._active_timer.presentation_duration_secs) + "<br />until " + presentation_end_hh_mm_str;
-		this._ui_elements.elapsed_time_display.innerHTML = TimeTools.format_hms(elapsed_time_secs) + "<br />" + position_based_on_time.toFixed(0) + "%";
+		this._ui_elements.elapsed_time_display.innerHTML = TimeTools.format_hms(nominal_elapsed_time_secs) + "<br />" + position_based_on_time_percent.toFixed(0) + "%";
 		this._ui_elements.remaining_display.innerHTML = TimeTools.format_hms(remaining_presentation_time_secs) + "<br />" + remaining_slide_count + " slides";
 
 		const current_slide_ratio = this._slide_subset_selector.get_ratio_of(this._current_slide);
 		const current_slide_nominal_duration_secs = current_slide_ratio / this._active_timer.subset_ratio * this._active_timer.presentation_duration_secs;
-		this._ui_elements.slide_time_display.innerText = TimeTools.format_hms(current_slide_nominal_duration_secs);
+		const current_slide_dynamic_duration_secs = current_slide_ratio / this._dynamic_timer.subset_ratio * this._dynamic_timer.presentation_duration_secs;
+		this._ui_elements.slide_time_display.innerHTML = "nominal " + TimeTools.format_hms(current_slide_nominal_duration_secs) + "<br />dynamic " + TimeTools.format_hms(current_slide_dynamic_duration_secs);
 
-		const subset_begin_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._active_timer.slide_subset.begin_slide);
 		const cumulative_current_slide_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._current_slide);
-		const current_completion_ratio = (cumulative_current_slide_ratio - subset_begin_ratio) / this._active_timer.subset_ratio;
-		const nominal_elapsed_time_secs = current_completion_ratio * this._active_timer.presentation_duration_secs;
 
-		const delta_time_secs = nominal_elapsed_time_secs - elapsed_time_secs + current_slide_nominal_duration_secs;
-		this._ui_elements.delta_time_display.innerText = TimeTools.format_hms(delta_time_secs);
+		const nominal_subset_begin_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._active_timer.slide_subset.begin_slide);
+		const nominal_current_completion_ratio = (cumulative_current_slide_ratio - nominal_subset_begin_ratio) / this._active_timer.subset_ratio;
+		const ideal_nominal_elapsed_time_secs = nominal_current_completion_ratio * this._active_timer.presentation_duration_secs;
+
+		const dynamic_subset_begin_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._dynamic_timer.slide_subset.begin_slide);
+		const dynamic_current_completion_ratio = (cumulative_current_slide_ratio - dynamic_subset_begin_ratio) / this._dynamic_timer.subset_ratio;
+		const ideal_dynamic_elapsed_time_secs = dynamic_current_completion_ratio * this._dynamic_timer.presentation_duration_secs;
+
+		const nominal_delta_time_secs = ideal_nominal_elapsed_time_secs - nominal_elapsed_time_secs + current_slide_nominal_duration_secs;
+		const dynamic_delta_time_secs = ideal_dynamic_elapsed_time_secs - dynamic_elapsed_time_secs + current_slide_dynamic_duration_secs;
+		this._ui_elements.dynamic_delta_time_display.innerText = TimeTools.format_hms(dynamic_delta_time_secs);
+		this._ui_elements.nominal_delta_time_display.innerText = TimeTools.format_hms(nominal_delta_time_secs);
 
 		const current_slide_no_within_subset = this._current_slide - this._active_timer.slide_subset.begin_slide + 1;
 		const position_based_on_slides = (this._current_slide - this._active_timer.slide_subset.begin_slide + 1) / this._active_timer.slide_subset.slide_count * 100;
 		this._ui_elements.slide_position_display.innerHTML = current_slide_no_within_subset + "/" + this._active_timer.slide_subset.slide_count + "<br />" + position_based_on_slides.toFixed(0) + "%";
 
 		let speed_error_secs = 0;
-		if (delta_time_secs > current_slide_nominal_duration_secs) {
+		if (nominal_delta_time_secs > current_slide_nominal_duration_secs) {
 			/* We're too fast. Speed error is positive. */
-			speed_error_secs = delta_time_secs - current_slide_nominal_duration_secs;
-		} else if (delta_time_secs < 0) {
+			speed_error_secs = nominal_delta_time_secs - current_slide_nominal_duration_secs;
+		} else if (nominal_delta_time_secs < 0) {
 			/* We're too slow. Speed error is negative. */
-			speed_error_secs = delta_time_secs;
+			speed_error_secs = nominal_delta_time_secs;
 		}
 
 		this._ui_elements.main_indicator.className = "main_indicator";
@@ -466,6 +476,7 @@ export class PresentationTimer {
 			this._current_slide = data.data.current_slide;
 			if (slide_change) {
 				this.start_timer_if_armed();
+				this._recompute_dynamic_timer();
 			}
 			if (update_ui) {
 				this._ui_update_display();
@@ -478,6 +489,26 @@ export class PresentationTimer {
 				this._update_meta();
 			}
 		}
+	}
+
+	_create_timer_object(is_dynamic_timer = false) {
+		let timer_object = {
+			presentation_start: new Date(),
+		};
+		if (!is_dynamic_timer) {
+			timer_object.presentation_end = TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value).compute(this._nominal_presentation_duration_secs);
+			timer_object.slide_subset = this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count);
+		} else {
+			timer_object.presentation_end = this._active_timer.presentation_end;
+			timer_object.slide_subset = new SlideSubset((this._current_slide <= this._active_timer.slide_subset.end_slide) ? this._current_slide : this._active_timer.slide_subset.end_slide, this._active_timer.slide_subset.end_slide);
+		}
+		timer_object.presentation_duration_secs = (timer_object.presentation_end.getTime() - timer_object.presentation_start.getTime()) / 1000;
+		timer_object.subset_ratio = this._slide_subset_selector.get_ratio_of_subset(timer_object.slide_subset);
+		return timer_object;
+	}
+
+	_recompute_dynamic_timer() {
+		this._dynamic_timer = this._create_timer_object(true);
 	}
 
 	start_timer_if_armed() {
@@ -507,14 +538,8 @@ export class PresentationTimer {
 
 		console.log("Start timer.");
 		this._timer_mode = TimerMode.STARTED;
-		this._active_timer = {
-			presentation_start: new Date(),
-			presentation_end: TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value).compute(this._nominal_presentation_duration_secs),
-			slide_subset: this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count),
-		};
-
-		this._active_timer.presentation_duration_secs = (this._active_timer.presentation_end.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
-		this._active_timer.subset_ratio = this._slide_subset_selector.get_ratio_of_subset(this._active_timer.slide_subset);
+		this._active_timer = this._create_timer_object();
+		this._dynamic_timer = this._active_timer;
 		this._ui_update_everything();
 	}
 
@@ -523,6 +548,7 @@ export class PresentationTimer {
 		this._timer_mode = TimerMode.STOPPED;
 		this._current_slide = null;
 		this._active_timer = null;
+		this._dynamic_timer = null;
 		this._ui_update_everything();
 	}
 }
