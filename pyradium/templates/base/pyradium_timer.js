@@ -42,6 +42,10 @@ class SlideSubset {
 	get end_slide() {
 		return this._end_slide;
 	}
+
+	get slide_count() {
+		return this.end_slide - this.begin_slide + 1;
+	}
 }
 
 class SlideSubsetSelector {
@@ -213,6 +217,7 @@ export class PresentationTimer {
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
 		this._nominal_presentation_duration_secs = null;
+		this._presentation_duration_secs = null;
 		this._slide_subset_selector = null;
 		this._current_slide = null;
 		this._meta = null;
@@ -253,32 +258,33 @@ export class PresentationTimer {
 			}
 		}
 
-		let duration_secs = null;
 		if (this._presentation_end_time != null) {
 			const end_ts = this._presentation_end_time.compute(this._nominal_presentation_duration_secs);
 			const hh_mm_str = end_ts.getHours() + ":" + end_ts.getMinutes().toString().padStart(2, "0");
 			const now = new Date();
-			duration_secs = (end_ts.getTime() - now.getTime()) / 1000;
+			this._presentation_duration_secs = (end_ts.getTime() - now.getTime()) / 1000;
 			this._ui_elements.presentation_end_time_display.innerText = hh_mm_str;
-			this._ui_elements.presentation_duration_display.innerText = TimeTools.format_hm(duration_secs);
+			this._ui_elements.presentation_duration_display.innerText = TimeTools.format_hm(this._presentation_duration_secs);
 		} else {
 			this._ui_elements.presentation_end_time_display.innerText = "-";
 			this._ui_elements.presentation_duration_display.innerText = "-";
+			this._presentation_duration_secs = null;
 		}
 
-		let nominal_slide_duration_secs = null;
-		if (this._slide_subset != null) {
-			nominal_slide_duration_secs = this._compute_nominal_slide_duration_secs();
+		let nominal_subset_duration_secs = this._compute_nominal_subset_duration_secs();
+		if (nominal_subset_duration_secs != null) {
+			const average_slide_duration_secs = nominal_subset_duration_secs / this._slide_subset.slide_count;
 			this._ui_elements.slide_subset_display.innerText = this._slide_subset.begin_slide + " - " + this._slide_subset.end_slide;
 			this._ui_elements.slide_count_display.innerText = this._slide_subset.end_slide - this._slide_subset.begin_slide + 1;
-			this._ui_elements.nominal_slide_duration_display.innerText = TimeTools.format_hm(nominal_slide_duration_secs);
+			this._ui_elements.average_slide_duration_display.innerText = TimeTools.format_ms(average_slide_duration_secs);
 		} else {
 			this._ui_elements.slide_subset_display.innerText = "-";
 			this._ui_elements.slide_count_display.innerText = "-";
-			this._ui_elements.nominal_slide_duration_display.innerText = "-";
+			this._ui_elements.average_slide_duration_display.innerText = "-";
 		}
+
 		if ((this._presentation_end_time != null) && (this._slide_subset != null)) {
-			const pace_percent = nominal_slide_duration_secs / duration_secs * 100;
+			const pace_percent = nominal_subset_duration_secs / this._presentation_duration_secs * 100;
 			this._ui_elements.presentation_pace_display.innerText = pace_percent.toFixed(0) + "%";
 		} else {
 			this._ui_elements.presentation_pace_display.innerText = "-";
@@ -397,12 +403,13 @@ export class PresentationTimer {
 		this._ui_update_display();
 	}
 
-	_compute_nominal_slide_duration_secs() {
-		if (this._slide_subset == null) {
+	_compute_nominal_subset_duration_secs() {
+		if ((this._slide_subset == null) || (this._presentation_duration_secs == null)) {
 			return null;
 		}
-		const ratio = this._slide_subset_selector.get_ratio_of_subset(this._slide_subset);
-		return ratio * this._nominal_presentation_duration_secs;
+		const subset_ratio = this._slide_subset_selector.get_ratio_of_subset(this._slide_subset);
+		const nominal_subset_duration_secs = subset_ratio * this._nominal_presentation_duration_secs;
+		return nominal_subset_duration_secs;
 	}
 
 	_reset_timeout() {

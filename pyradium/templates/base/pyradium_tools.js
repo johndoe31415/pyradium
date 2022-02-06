@@ -158,6 +158,10 @@ export class TimeTools {
 		const minutes = Math.floor(total_seconds % 3600 / 60);
 		return String(hours) + ":" + String(minutes).padStart(2, "0");
 	}
+
+	static format_ms(total_seconds) {
+		return TimeTools.format_hm(total_seconds * 60);
+	}
 }
 
 export class MathTools {
