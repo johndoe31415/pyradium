@@ -237,7 +237,8 @@ export class PresentationTimer {
 		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._ui_update_everything());
 		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_update_everything());
 		this._ui_elements.btn_arm_timer.addEventListener("click", (event) => this.arm_timer());
-		this._ui_elements.btn_start_stop_timer.addEventListener("click", (event) => this.start_stop_timer());
+		this._ui_elements.btn_start_timer.addEventListener("click", (event) => this.start_timer());
+		this._ui_elements.btn_stop_timer.addEventListener("click", (event) => this.stop_timer());
 		this._ui_update_everything();
 	}
 
@@ -296,30 +297,30 @@ export class PresentationTimer {
 		switch (this._timer_mode) {
 			case TimerMode.STOPPED:
 				this._ui_elements.btn_arm_timer.innerText = "Arm Timer";
-				this._ui_elements.btn_start_stop_timer.innerText = "Start Timer";
 				this._ui_elements.btn_arm_timer.disabled = !time_and_slides_set;
-				this._ui_elements.btn_start_stop_timer.disabled = !time_and_slides_set;
 				this._ui_elements.presentation_end_time.disabled = false;
 				this._ui_elements.slide_subset.disabled = false;
+				this._ui_elements.timer_inactive_menu.style.display = "";
+				this._ui_elements.timer_active_menu.style.display = "none";
 				break;
 
 			case TimerMode.ARMED:
 				this._ui_elements.btn_arm_timer.disabled = false;
 				this._ui_elements.btn_arm_timer.innerText = "Disarm Timer";
-				this._ui_elements.btn_start_stop_timer.innerText = "Start Timer";
 				this._ui_elements.btn_arm_timer.disabled = false;
-				this._ui_elements.btn_start_stop_timer.disabled = false;
 				this._ui_elements.presentation_end_time.disabled = true;
 				this._ui_elements.slide_subset.disabled = true;
+				this._ui_elements.timer_inactive_menu.style.display = "";
+				this._ui_elements.timer_active_menu.style.display = "none";
 				break;
 
 			case TimerMode.STARTED:
 				this._ui_elements.btn_arm_timer.innerText = "Arm Timer";
-				this._ui_elements.btn_start_stop_timer.innerText = "Stop Timer";
 				this._ui_elements.btn_arm_timer.disabled = true;
-				this._ui_elements.btn_start_stop_timer.disabled = false;
 				this._ui_elements.presentation_end_time.disabled = true;
 				this._ui_elements.slide_subset.disabled = true;
+				this._ui_elements.timer_inactive_menu.style.display = "none";
+				this._ui_elements.timer_active_menu.style.display = "";
 				break;
 		}
 	}
@@ -478,22 +479,6 @@ export class PresentationTimer {
 		}
 	}
 
-	start_timer() {
-		if (this._timer_mode == TimerMode.STARTED) {
-			return;
-		}
-
-		this._timer_mode = TimerMode.STARTED;
-		this._active_timer = {
-			presentation_start: new Date(),
-			presentation_end: TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value).compute(this._nominal_presentation_duration_secs),
-			slide_subset: this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count),
-		};
-
-		this._active_timer.presentation_duration_secs = (this._active_timer.presentation_end.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
-		this._active_timer.subset_ratio = this._slide_subset_selector.get_ratio_of_subset(this._active_timer.slide_subset);
-	}
-
 	start_timer_if_armed() {
 		if (this._timer_mode == TimerMode.ARMED) {
 			this.start_timer();
@@ -514,18 +499,29 @@ export class PresentationTimer {
 		this._ui_update_everything();
 	}
 
-	start_stop_timer() {
-		console.log("Start timer.");
-
-		if ((this._timer_mode == TimerMode.STOPPED) || (this._timer_mode == TimerMode.ARMED)) {
-			/* Starting timer */
-			this.start_timer();
-		} else if (this._timer_mode == TimerMode.STARTED) {
-			/* Stopping timer */
-			this._timer_mode = TimerMode.STOPPED;
-			this._current_slide = null;
-			this._active_timer = null;
+	start_timer() {
+		if (this._timer_mode == TimerMode.STARTED) {
+			return;
 		}
+
+		console.log("Start timer.");
+		this._timer_mode = TimerMode.STARTED;
+		this._active_timer = {
+			presentation_start: new Date(),
+			presentation_end: TimeTools.parse_timestamp(this._ui_elements.presentation_end_time.value).compute(this._nominal_presentation_duration_secs),
+			slide_subset: this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count),
+		};
+
+		this._active_timer.presentation_duration_secs = (this._active_timer.presentation_end.getTime() - this._active_timer.presentation_start.getTime()) / 1000;
+		this._active_timer.subset_ratio = this._slide_subset_selector.get_ratio_of_subset(this._active_timer.slide_subset);
+		this._ui_update_everything();
+	}
+
+	stop_timer() {
+		console.log("Stop timer.");
+		this._timer_mode = TimerMode.STOPPED;
+		this._current_slide = null;
+		this._active_timer = null;
 		this._ui_update_everything();
 	}
 }
