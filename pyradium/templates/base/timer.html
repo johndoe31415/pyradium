@@ -8,8 +8,8 @@
 		<link rel="stylesheet" href="pyradium_timer.css" />
 	</head>
 	<body>
-		<div class="timermenu">
-			<div class="menugrid ui-element" id="timer_inactive_menu">
+		<div class="timermenu ui-element" id="timer_inactive_menu">
+			<div class="menugrid">
 				<div class="menucell">
 					<label for="presentation_end_time">End of presentation:</label>
 					<input type="text" value="" id="presentation_end_time" class="control ui-element" style="width: 150px" title="Can be in the following example forms: '14:30', '+0:45', '1/3', '125%'" />
@@ -33,11 +33,6 @@
 				</div>
 				<div class="menucell">
 					<button id="btn_start_timer" class="control ui-element">Start Timer</button>
-				</div>
-			</div>
-			<div class="menugrid ui-element" id="timer_active_menu">
-				<div class="menucell">
-					<button id="btn_stop_timer" class="control ui-element">Stop Timer</button>
 				</div>
 			</div>
 		</div>

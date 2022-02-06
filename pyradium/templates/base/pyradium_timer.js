@@ -239,7 +239,7 @@ export class PresentationTimer {
 		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_update_everything());
 		this._ui_elements.btn_arm_timer.addEventListener("click", (event) => this.arm_timer());
 		this._ui_elements.btn_start_timer.addEventListener("click", (event) => this.start_timer());
-		this._ui_elements.btn_stop_timer.addEventListener("click", (event) => this.stop_timer());
+		this._ui_elements.main_indicator.addEventListener("click", (event) => this.stop_timer());
 		this._ui_update_everything();
 	}
 
@@ -302,7 +302,6 @@ export class PresentationTimer {
 				this._ui_elements.presentation_end_time.disabled = false;
 				this._ui_elements.slide_subset.disabled = false;
 				this._ui_elements.timer_inactive_menu.style.display = "";
-				this._ui_elements.timer_active_menu.style.display = "none";
 				break;
 
 			case TimerMode.ARMED:
@@ -312,7 +311,6 @@ export class PresentationTimer {
 				this._ui_elements.presentation_end_time.disabled = true;
 				this._ui_elements.slide_subset.disabled = true;
 				this._ui_elements.timer_inactive_menu.style.display = "";
-				this._ui_elements.timer_active_menu.style.display = "none";
 				break;
 
 			case TimerMode.STARTED:
@@ -321,7 +319,6 @@ export class PresentationTimer {
 				this._ui_elements.presentation_end_time.disabled = true;
 				this._ui_elements.slide_subset.disabled = true;
 				this._ui_elements.timer_inactive_menu.style.display = "none";
-				this._ui_elements.timer_active_menu.style.display = "";
 				break;
 		}
 	}
@@ -382,7 +379,12 @@ export class PresentationTimer {
 
 		const nominal_delta_time_secs = ideal_nominal_elapsed_time_secs - nominal_elapsed_time_secs + current_slide_nominal_duration_secs;
 		const dynamic_delta_time_secs = ideal_dynamic_elapsed_time_secs - dynamic_elapsed_time_secs + current_slide_dynamic_duration_secs;
-		this._ui_elements.dynamic_delta_time_display.innerText = TimeTools.format_hms(dynamic_delta_time_secs);
+		if (this._current_slide <= this._dynamic_timer.slide_subset.end_slide) {
+			this._ui_elements.dynamic_delta_time_display.innerText = TimeTools.format_hms(dynamic_delta_time_secs);
+		} else {
+			/* Dynamic timings do not make sense when exceeding the subset, so default to the nominal timing then */
+			this._ui_elements.dynamic_delta_time_display.innerText = TimeTools.format_hms(nominal_delta_time_secs);
+		}
 		this._ui_elements.nominal_delta_time_display.innerText = TimeTools.format_hms(nominal_delta_time_secs);
 
 		const current_slide_no_within_subset = this._current_slide - this._active_timer.slide_subset.begin_slide + 1;
