@@ -60,12 +60,23 @@ class ImgHook(BaseHook):
 		local_filename = "imgs/img/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
 		uri = "%simgs/img/%s.%s" % (rendered_presentation.renderer.rendering_params.resource_uri, rendered_image.keyhash, rendered_image.data["extension"])
 
+		img_style = [ ]
+		if node.hasAttribute("width"):
+			img_style.append(("width", node.getAttribute("width")))
+		if node.hasAttribute("height"):
+			img_style.append(("height", node.getAttribute("height")))
+		if node.hasAttribute("render"):
+			img_style.append(("image-rendering", node.getAttribute("render")))
+
 		replacement_node = node.ownerDocument.createElement("div")
 		replacement_node.setAttribute("class", "fillimg")
 
 		img_node = node.ownerDocument.createElement("img")
 		img_node.setAttribute("src", uri)
 		img_node.setAttribute("class", "fill")
+		if len(img_style) > 0:
+			img_node.setAttribute("style", ";".join("%s:%s" %  (key, value) for (key, value) in img_style))
+
 		replacement_node.appendChild(img_node)
 
 		rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
