@@ -40,18 +40,28 @@ class ActionSpellcheck(BaseAction):
 		msg = [ ]
 		msg.append("%s " % (spellcheck_result.group.description))
 		msg.append("[line %d, col %d] " % (spellcheck_result.row, spellcheck_result.column))
-		msg.append("\"%s\": " % (spellcheck_result.offense))
+		if spellcheck_result.offense is not None:
+			msg.append("\"%s\": " % (spellcheck_result.offense))
+		else:
+			msg.append(": ")
 		msg.append("%s" % (spellcheck_result.match["message"]))
 		if len(spellcheck_result.match["replacements"]) > 0:
 			msg.append(" (suggest %s)" % (" or ".join(replacement["value"] for replacement in spellcheck_result.match["replacements"][:3])))
 		print("".join(msg), file = self._f)
 
+	def _get_vim_msg(self, spellcheck_result):
+		if spellcheck_result.offense is not None:
+			msg = [ "\"%s\": %s" % (spellcheck_result.offense, spellcheck_result.match["message"]) ]
+		else:
+			msg = [ spellcheck_result.match["message"] ]
+		if len(spellcheck_result.match["replacements"]) > 0:
+			msg.append(" (suggest %s)" % (" or ".join(replacement["value"] for replacement in spellcheck_result.match["replacements"][:3])))
+		return "".join(msg)
+
 	def _add_finding_vim(self, spellcheck_result):
-		msg = "\"%s\": %s" % (spellcheck_result.offense, spellcheck_result.match["message"])
-		print("%s:%d:%d:%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, msg), file = self._f)
+		print("%s:%d:%d:%s" % (self._args.infile, spellcheck_result.row, spellcheck_result.column, self._get_vim_msg(spellcheck_result)), file = self._f)
 
 	def _add_finding_evim(self, spellcheck_result):
-		msg = "\"%s\": %s" % (spellcheck_result.offense, spellcheck_result.match["message"])
 		data = {
 			"offense":	spellcheck_result.offense,
 			"ctx":		spellcheck_result.match["context"]["text"],
@@ -59,7 +69,7 @@ class ActionSpellcheck(BaseAction):
 		}
 		bin_data = zlib.compress(json.dumps(data, sort_keys = True, separators = (",", ":")).encode("ascii"))
 		encoded_data = base64.b64encode(bin_data).decode("ascii")
-		print(self._EVIM_SEPARATOR.join([ encoded_data, self._args.infile, str(spellcheck_result.row), str(spellcheck_result.column), msg ]), file = self._f)
+		print(self._EVIM_SEPARATOR.join([ encoded_data, self._args.infile, str(spellcheck_result.row), str(spellcheck_result.column), self._get_vim_msg(spellcheck_result) ]), file = self._f)
 
 	def _add_finding_fulljson(self, spellcheck_result):
 		finding = {

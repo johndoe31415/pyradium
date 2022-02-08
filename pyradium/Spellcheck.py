@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -245,8 +245,11 @@ class XMLSpellchecker():
 		# ignores those. Useful for acronyms
 		Markup = 2
 
-	_SpellcheckGroup = collections.namedtuple("SpellcheckGroup", [ "description", "chunks" ])
+	_SpellcheckGroup = collections.namedtuple("SpellcheckGroup", [ "description", "identifier", "row", "column", "chunks" ])
 	_SpellcheckResult = collections.namedtuple("SpellcheckResult", [ "offense", "chunk", "chunk_offset", "group", "group_offset", "match", "row", "column" ])
+	class _GroupIdentifier(enum.IntEnum):
+		Slide = 1
+
 
 	def __init__(self):
 		self._parser = xml.parsers.expat.ParserCreate()
@@ -255,7 +258,7 @@ class XMLSpellchecker():
 		self._parser.CharacterDataHandler = self._handle_character_data
 		self._path = [ ]
 		self._mode = [ self.ParserMode.Normal ]
-		self._slides = [ ]
+		self._slides = { }
 		self._slide_no = 0
 		self._metadata = { }
 		self._current_group_path = None
@@ -266,8 +269,9 @@ class XMLSpellchecker():
 	def current_mode(self):
 		return self._mode[-1]
 
-	def _add_group(self, group_description):
-		group = self._SpellcheckGroup(description = group_description, chunks = TextChunks())
+	def _add_group(self, group_description, group_identifier):
+		(_, column, row) = self._whereami()
+		group = self._SpellcheckGroup(description = group_description, identifier = group_identifier, row = row, column = column, chunks = TextChunks())
 		self._groups.append(group)
 		return group
 
@@ -277,14 +281,14 @@ class XMLSpellchecker():
 		row = self._parser.CurrentLineNumber
 		return (byte_position, column, row)
 
-	def _record_group(self, group_description, text):
+	def _record_group(self, group_description, text, group_identifier = None):
 		(byte_position, column, row) = self._whereami()
-		group = self._add_group(group_description)
+		group = self._add_group(group_description, group_identifier)
 		group.chunks.append(TextChunk("text", text, group = group, column = column, row = row))
 
-	def _activate_group(self, group_description):
+	def _activate_group(self, group_description, group_identifier = None):
 		assert(self._current_group is None)
-		group = self._add_group(group_description)
+		group = self._add_group(group_description, group_identifier)
 		self._current_group = group
 		self._current_group_path = list(self._path)
 
@@ -293,7 +297,7 @@ class XMLSpellchecker():
 		next_mode = self.current_mode
 		if self._path == [ "presentation", "slide" ]:
 			self._slide_no += 1
-			self._activate_group("Slide %d content" % (self._slide_no))
+			self._activate_group("Slide %d content" % (self._slide_no), group_identifier = self._GroupIdentifier.Slide)
 		elif (self._path == [ "presentation", "slide", "s:var" ]) and (attributes.get("name") == "heading"):
 			self._record_group("Slide %d heading" % (self._slide_no), text = attributes.get("value", ""))
 		elif self._path == [ "presentation", "meta", "title" ]:
@@ -328,9 +332,15 @@ class XMLSpellchecker():
 			elif self.current_mode == self.ParserMode.Markup:
 				self._current_group.chunks.append(TextChunk("markup", text, group = self._current_group, row = row, column = column))
 
+			if self._current_group.identifier == self._GroupIdentifier.Slide:
+				if self._slide_no not in self._slides:
+					self._slides[self._slide_no] = { "group": self._current_group, "content": [ ] }
+				self._slides[self._slide_no]["content"].append(text)
+
 	def parse(self, xml_filename):
 		with open(xml_filename, "rb") as f:
 			self._parser.ParseFile(f)
+		list(self._internal_spellcheck()) # TODO
 
 	def dump(self):
 		for group in self._groups:
@@ -339,7 +349,36 @@ class XMLSpellchecker():
 				print(chunk)
 			print("-" * 120)
 
+	def _internal_spellcheck(self):
+		stripped_content = { }
+		for (slide_no, content) in self._slides.items():
+			stripped = "".join(content["content"])
+			stripped = stripped.replace("\n", "").replace("\t", "").replace(" ", "")
+			if stripped != "":
+				stripped_content[slide_no] = { "group": content["group"], "text": stripped }
+
+		for (slide_no, content) in sorted(stripped_content.items()):
+			next_slide_no = slide_no + 1
+			if next_slide_no in stripped_content:
+				text = content["text"]
+				next_text = stripped_content[next_slide_no]["text"]
+				if text == next_text:
+					match = {
+						"message": "Possible duplicate slide %d / %d" % (slide_no, next_slide_no),
+						"replacements": [ ],
+						"context": {
+							"text": "N/A",
+						},
+						"rule": {
+							"id": "pyradium-duplicate-slide-%d-%d" % (slide_no, next_slide_no)
+						}
+					}
+					spellcheck_result = self._SpellcheckResult(offense = None, chunk = None, chunk_offset = None, group = content["group"], group_offset = None, match = match, row = content["group"].row, column = content["group"].column)
+					yield spellcheck_result
+
 	def spellcheck(self, spellcheck_api):
+		yield from self._internal_spellcheck()
+
 		separator = "\n\n"
 
 		all_chunks = TextChunks()
