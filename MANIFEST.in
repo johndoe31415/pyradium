@@ -2,3 +2,8 @@ recursive-include pyradium/templates *
 
 recursive-exclude pyradium *.pyc
 recursive-exclude pyradium .*.swp
+
+recursive-exclude docs *
+recursive-exclude examples *
+exclude rerender
+exclude autorender
