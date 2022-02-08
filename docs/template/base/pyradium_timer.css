@@ -1,0 +1,86 @@
+div.timermenu {
+	padding: 20px 10px;
+	border-bottom: 1px solid black;
+}
+
+div.sub_indicator {
+	padding: 20px;
+}
+
+div.main_indicator {
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 30px;
+	width: 25%;
+	font-size: 5em;
+	text-align: center;
+	border-radius: 10px;
+}
+
+div.main_indicator div.sub_indicator {
+	font-size: 30%;
+	padding: 5px;
+}
+
+div.menugrid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	width: 1200px;
+}
+
+div.menucell {
+	padding: 8px;
+}
+
+div.topgrid {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	grid-column-gap: 10px;
+	justify-items: center;
+}
+
+div.topgrid div.top {
+	grid-row: 1;
+	font-weight: bold;
+}
+
+div.topgrid div.bottom {
+	grid-row: 2;
+}
+
+div.gradient_test {
+	background: linear-gradient(to right, green, yellow, red);
+	background-size: 10000px 1px;
+	background-position-x: 10px;
+	background-repeat-x: no-repeat;
+}
+
+div.main_indicator.largely_ahead {
+	background: #339900;
+	color: white;
+}
+
+div.main_indicator.slightly_ahead {
+	background: #99cc33;
+	color: black;
+}
+
+div.main_indicator.caught_up {
+	background: #ecf0f1;
+	color: black;
+}
+
+div.main_indicator.slightly_behind {
+	background: #ff9966;
+	color: black;
+}
+
+div.main_indicator.largely_behind {
+	background: #cc3300;
+	color: white;
+}
+
+img.media {
+	width: 48px;
+}

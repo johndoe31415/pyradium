@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="author" content="Jean-Luc Picard" />
-		<meta name="generator" content="https://github.com/johndoe31415/pyradium v0.0.6rc0" />
+		<meta name="generator" content="https://github.com/johndoe31415/pyradium v0.0.12rc0" />
 		<title>Battle of Wolf 359</title>
 		<link rel="stylesheet" href="template/base/pyradium.css" />
 		<link rel="stylesheet" href="template/antonio/antonio.css" />
@@ -11,22 +11,54 @@
 		<link rel="stylesheet" href="template/antonio/font_latinmodernmono.css" />
 		<link rel="stylesheet" href="template/base/pyradium_forms.css" />
 		<link rel="stylesheet" href="template/base/pyradium_modal.css" />
+		<link rel="stylesheet" href="template/base/pyradium_menu.css" />
+		<link rel="stylesheet" href="template/base/pyradium_timer.css" />
 		<link rel="stylesheet" href="template/base/pyradium_tooltip.css" />
 		<link rel="stylesheet" href="template/base/pygments.css" />
-		<link rel="stylesheet" href="template/base/pyradium_menu.css" />
 		<link rel="stylesheet" href="template/base/pyradium_print.css" />
 	</head>
 
 	<body>
+		<script type="module">
+			globalThis.pyradium = {
+				"format":		1,
+				"presentation":	{ },
+			};
+			globalThis.pyradium.presentation["info"] = {"renderer":"0.0.12rc0","source_versions":[{"filename":"examples/example.xml","version":{"git":"25914a556c72ffb0073087c9afbd8aacab5cd812","sha256":"2b1b1ea410759c30da015faaa3897aa31c948dea1586b4457fdc22863ab88b89"}},{"filename":"examples/sub/example_sub.xml","version":{"git":"df90ff86b1705eeb7c63a73140d5c072859bc319","sha256":"76d4e4f887f27f15f318f069f85923f53a905d402a85d2b34b4807529902a6fc"}}]};
+			globalThis.pyradium.presentation["interactive"] = {"presentation_time":"0:30","slide_ratios":[0.0181,0.0181,0.0181,0.0181,0.0181,0.0272,0.0333,0.0181,0.0181,0.0181,0.0181,0.0181,0.0083,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.3333,0.0181,0.0,0.0,0.0]};
+		</script>
+
+
+
 		<div class="menu">
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
 			<button id="btn_goto_slide" class="control">Goto</button>
+			<button id="btn_timer" class="control">Timer</button>
+			<button id="btn_present" class="control">Start Presentation</button>
 		</div>
 
 		<div class="belowmenu">
+			<div class="modal type-info" id="pyradium_info_popup">
+				<div class="content">
+					<span class="close">×</span>
+					<div class="msg">
+						Main presentation file: <span id="info_git_revision"></span>
+					</div>
+				</div>
+			</div>
+
+			<script type="module">
+				import {ModalWindow} from "./template/base/pyradium_modal.js";
+				const modal_div = document.querySelector("#pyradium_info_popup");
+				modal_div.pyradium_modal = new ModalWindow(modal_div, {
+					close_on_popup_click:	false,
+				});
+				document.querySelector("#info_git_revision").innerText = globalThis.pyradium.presentation.info.source_versions[0].filename + " / git " + globalThis.pyradium.presentation.info.source_versions[0].version.git;
+			</script>
+
 		<a class="slideanchor" name="slide1"></a>
 <div class="size_container ">
-	<div class="slide title" slide_no="1" sub_slide_index="0" begin_ratio="0" end_ratio="0.017241379310344827">
+	<div class="slide title" slide_no="1" sub_slide_index="0">
 		
 
 <img src="template/antonio/bar.svg" class="bar">
@@ -42,7 +74,7 @@
 
 		<a class="slideanchor" name="slide2"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="2" sub_slide_index="0" begin_ratio="0.017241379310344827" end_ratio="0.034482758620689655">
+	<div class="slide headerfooter" slide_no="2" sub_slide_index="0">
 		
 
 
@@ -71,7 +103,7 @@
 				</div>
 				<div class="flexchild center">
 				</div>
-				<div class="flexchild right">2 / 34</div>
+				<div class="flexchild right">2 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -83,7 +115,7 @@
 
 		<a class="slideanchor" name="slide3"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="3" sub_slide_index="0" begin_ratio="0.034482758620689655" end_ratio="0.05172413793103448">
+	<div class="slide headerfooter" slide_no="3" sub_slide_index="0">
 		
 
 
@@ -115,7 +147,7 @@
 				<div class="flexchild center">
 						Bar
 				</div>
-				<div class="flexchild right">3 / 34</div>
+				<div class="flexchild right">3 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -127,7 +159,7 @@
 
 		<a class="slideanchor" name="slide4"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="4" sub_slide_index="0" begin_ratio="0.05172413793103448" end_ratio="0.06896551724137931">
+	<div class="slide headerfooter" slide_no="4" sub_slide_index="0">
 		
 
 
@@ -158,7 +190,7 @@
 				</div>
 				<div class="flexchild center">
 				</div>
-				<div class="flexchild right">4 / 34</div>
+				<div class="flexchild right">4 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -170,7 +202,7 @@
 
 		<a class="slideanchor" name="slide5"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="5" sub_slide_index="0" begin_ratio="0.06896551724137931" end_ratio="0.09482758620689655">
+	<div class="slide headerfooter" slide_no="5" sub_slide_index="0">
 		
 
 
@@ -215,19 +247,19 @@
 </li>
 </ul>
 <li>
-<a href="#slide9">
+<a href="#slide8">
 4 Included Topic
 </a>
 </li>
 <ul class="bare">
 <li>
-<a href="#slide9">
+<a href="#slide8">
 4.1 Introduction to included topic
 </a>
 </li>
 </ul>
 <li>
-<a href="#slide10">
+<a href="#slide9">
 5 Finalization
 </a>
 </li>
@@ -244,7 +276,7 @@
 				<div class="flexchild center">
 						Nomenclature
 				</div>
-				<div class="flexchild right">5 / 34</div>
+				<div class="flexchild right">5 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -254,9 +286,8 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide6"></a>
-<div class="size_container ">
-	<div class="slide headerfooter" slide_no="6" sub_slide_index="0" begin_ratio="0.09482758620689655" end_ratio="0.29482758620689653">
+		<div class="size_container ">
+	<div class="slide headerfooter" slide_no="5" sub_slide_index="1">
 		
 
 
@@ -273,17 +304,17 @@
 <ul class="bare">
 <ul class="bare">
 <li>
-<a href="#slide10">
+<a href="#slide9">
 5.1 After Include Subsection
 </a>
 </li>
 <li>
-<a href="#slide16">
+<a href="#slide17">
 5.2 Code Highlighting
 </a>
 </li>
 <li>
-<a href="#slide27">
+<a href="#slide31">
 5.3 Esc&lt;&gt;ping
 </a>
 </li>
@@ -301,7 +332,7 @@
 				<div class="flexchild center">
 						Nomenclature
 				</div>
-				<div class="flexchild right">6 / 34</div>
+				<div class="flexchild right">5 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -311,9 +342,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide7"></a>
+		<a class="slideanchor" name="slide6"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="7" sub_slide_index="0" begin_ratio="0.29482758620689653" end_ratio="0.32068965517241377">
+	<div class="slide headerfooter" slide_no="6" sub_slide_index="0">
 		
 
 
@@ -326,10 +357,10 @@
 		<div class="content">
 			
 
-		
+		<s:time rel="1.5"/>
 		
 		<ul>
-			<li>Pausing slides is easy! Acronyms too: <span class="tooltip">WEP<span class="text">Wired Equivalent Privacy</span></span></li>
+			<li>Pausing slides is easy! Acronyms too: <span><a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" class="tooltip">WEP<span class="text">Wired Equivalent Privacy</span></a></span></li>
 			</ul>
 	
 
@@ -344,7 +375,7 @@
 				<div class="flexchild center">
 						Nomenclature
 				</div>
-				<div class="flexchild right">7 / 34</div>
+				<div class="flexchild right">6 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -355,7 +386,7 @@
 </div>
 
 		<div class="size_container ">
-	<div class="slide headerfooter" slide_no="7" sub_slide_index="1" begin_ratio="0.29482758620689653" end_ratio="0.32068965517241377">
+	<div class="slide headerfooter" slide_no="6" sub_slide_index="1">
 		
 
 
@@ -368,12 +399,12 @@
 		<div class="content">
 			
 
-		
+		<s:time rel="1.5"/>
 		
 		<ul>
-			<li>Pausing slides is easy! Acronyms too: <span class="tooltip">WEP<span class="text">Wired Equivalent Privacy</span></span></li>
+			<li>Pausing slides is easy! Acronyms too: <span><a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" class="tooltip">WEP<span class="text">Wired Equivalent Privacy</span></a></span></li>
 			
-			<li>After the first pause! Another acronym: <span class="tooltip">DES<span class="text">Data Encryption Standard</span></span></li>
+			<li>After the first pause! Another acronym: <span><a href="https://en.wikipedia.org/wiki/Data_Encryption_Standard" class="tooltip">DES<span class="text">Data Encryption Standard</span></a></span></li>
 			</ul>
 	
 
@@ -388,7 +419,7 @@
 				<div class="flexchild center">
 						Nomenclature
 				</div>
-				<div class="flexchild right">7 / 34</div>
+				<div class="flexchild right">6 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -399,7 +430,7 @@
 </div>
 
 		<div class="size_container ">
-	<div class="slide headerfooter" slide_no="7" sub_slide_index="2" begin_ratio="0.29482758620689653" end_ratio="0.32068965517241377">
+	<div class="slide headerfooter" slide_no="6" sub_slide_index="2">
 		
 
 
@@ -412,14 +443,16 @@
 		<div class="content">
 			
 
-		
+		<s:time rel="1.5"/>
 		
 		<ul>
-			<li>Pausing slides is easy! Acronyms too: <span class="tooltip">WEP<span class="text">Wired Equivalent Privacy</span></span></li>
+			<li>Pausing slides is easy! Acronyms too: <span><a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" class="tooltip">WEP<span class="text">Wired Equivalent Privacy</span></a></span></li>
 			
-			<li>After the first pause! Another acronym: <span class="tooltip">DES<span class="text">Data Encryption Standard</span></span></li>
+			<li>After the first pause! Another acronym: <span><a href="https://en.wikipedia.org/wiki/Data_Encryption_Standard" class="tooltip">DES<span class="text">Data Encryption Standard</span></a></span></li>
 			
-			<li>This is after the second pause! Explaining <span class="tooltip">AES<span class="text">Advanced Encryption Standard</span></span>-<span class="tooltip">CBC<span class="text">Cipher Block Chaining</span></span></li>
+			<li>This is after the second pause! Explaining <span><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard" class="tooltip">AES<span class="text">Advanced Encryption Standard</span></a></span>-<span><a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)" class="tooltip">CBC<span class="text">Cipher Block Chaining</span></a></span></li>
+			<li><span class="tooltip">A<span class="text">Alpha</span></span> <span class="tooltip">AB<span class="text">Alpha Bravo</span></span> <span class="tooltip">ABC<span class="text">Alpha Bravo Charlie</span></span> <span class="tooltip">ABCD<span class="text">Alpha Bravo Charlie Delta</span></span> <span class="tooltip">ABCDE<span class="text">Alpha Bravo Charlie Delta Echo</span></span></li>
+			<li>Don't confuse <span class="tooltip">MAC<span class="text">Message Authentication Code</span></span> and <span class="tooltip">MAC<span class="text">Media Access Control</span></span></li>
 		</ul>
 	
 
@@ -434,7 +467,7 @@
 				<div class="flexchild center">
 						Nomenclature
 				</div>
-				<div class="flexchild right">7 / 34</div>
+				<div class="flexchild right">6 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -444,9 +477,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide8"></a>
+		<a class="slideanchor" name="slide7"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="8" sub_slide_index="0" begin_ratio="0.32068965517241377" end_ratio="0.5206896551724138">
+	<div class="slide headerfooter" slide_no="7" sub_slide_index="0">
 		
 
 
@@ -459,7 +492,7 @@
 		<div class="content">
 			
 
-		
+		<s:time abs="1 min"/>
 		
 		<ul>
 			<li>This is a test!</li>
@@ -480,7 +513,7 @@
 				<div class="flexchild center">
 						Nomenclature
 				</div>
-				<div class="flexchild right">8 / 34</div>
+				<div class="flexchild right">7 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -490,9 +523,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide9"></a>
+		<a class="slideanchor" name="slide8"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="9" sub_slide_index="0" begin_ratio="0.5206896551724138" end_ratio="0.5379310344827587">
+	<div class="slide headerfooter" slide_no="8" sub_slide_index="0">
 		
 
 
@@ -522,7 +555,7 @@
 				<div class="flexchild center">
 						Introduction to included topic
 				</div>
-				<div class="flexchild right">9 / 34</div>
+				<div class="flexchild right">8 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -533,7 +566,7 @@
 </div>
 
 		<div class="size_container ">
-	<div class="slide headerfooter" slide_no="9" sub_slide_index="1" begin_ratio="0.5206896551724138" end_ratio="0.5379310344827587">
+	<div class="slide headerfooter" slide_no="8" sub_slide_index="1">
 		
 
 
@@ -565,7 +598,7 @@
 				<div class="flexchild center">
 						Introduction to included topic
 				</div>
-				<div class="flexchild right">9 / 34</div>
+				<div class="flexchild right">8 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -575,9 +608,29 @@
 	</div>
 </div>
 
+		<a class="slideanchor" name="slide9"></a>
+<div class="size_container ">
+	<div class="slide sectiontitle" slide_no="9" sub_slide_index="0">
+		
+
+
+<div class="headpiece">
+		<div class="section">Finalization</div>
+		<div class="subsection">After Include Subsection</div>
+	<img src="template/antonio/tribar.svg" class="bar">
+</div>
+<div class="bottompiece">
+	<div class="pageno">
+		9
+	</div>
+</div>
+
+	</div>
+</div>
+
 		<a class="slideanchor" name="slide10"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="10" sub_slide_index="0" begin_ratio="0.5379310344827587" end_ratio="0.5879310344827587">
+	<div class="slide headerfooter" slide_no="10" sub_slide_index="0">
 		
 
 
@@ -609,7 +662,7 @@
 				<div class="flexchild center">
 						After Include Subsection
 				</div>
-				<div class="flexchild right">10 / 34</div>
+				<div class="flexchild right">10 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -621,7 +674,49 @@
 
 		<a class="slideanchor" name="slide11"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="11" sub_slide_index="0" begin_ratio="0.5879310344827587" end_ratio="0.6051724137931036">
+	<div class="slide headerfooter" slide_no="11" sub_slide_index="0">
+		
+
+
+	<div class="header">
+		
+			<div class="heading">Non-breaking space</div>
+		
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+		
+		<ul>
+			<li>This is a very long sentence but it should not break between between &quot;break&quot; and &quot;between&quot;.</li>
+		</ul>
+	
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						After Include Subsection
+				</div>
+				<div class="flexchild right">11 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<a class="slideanchor" name="slide12"></a>
+<div class="size_container ">
+	<div class="slide headerfooter" slide_no="12" sub_slide_index="0">
 		
 
 
@@ -657,7 +752,7 @@
 				<div class="flexchild center">
 						After Include Subsection
 				</div>
-				<div class="flexchild right">11 / 34</div>
+				<div class="flexchild right">12 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -667,9 +762,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide12"></a>
+		<a class="slideanchor" name="slide13"></a>
 <div class="size_container ">
-	<div class="slide quote" slide_no="12" sub_slide_index="0" begin_ratio="0.6051724137931036" end_ratio="0.6551724137931036">
+	<div class="slide quote" slide_no="13" sub_slide_index="0">
 		
 
 <div class="body">
@@ -677,7 +772,7 @@
 	<div class="flex">
 		<div class="quote_text">
 		
-		
+		<s:time abs="15 sec"/>
 		Even the best blade will rust and grow dull unless it is cared for.
 		
 	
@@ -689,9 +784,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide13"></a>
+		<a class="slideanchor" name="slide14"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="13" sub_slide_index="0" begin_ratio="0.6551724137931036" end_ratio="0.6724137931034485">
+	<div class="slide headerfooter" slide_no="14" sub_slide_index="0">
 		
 
 
@@ -727,7 +822,7 @@
 				<div class="flexchild center">
 						After Include Subsection
 				</div>
-				<div class="flexchild right">13 / 34</div>
+				<div class="flexchild right">14 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -737,9 +832,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide14"></a>
+		<a class="slideanchor" name="slide15"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="14" sub_slide_index="0" begin_ratio="0.6724137931034485" end_ratio="0.6896551724137934">
+	<div class="slide headerfooter" slide_no="15" sub_slide_index="0">
 		
 
 
@@ -756,6 +851,7 @@
 		<ul>
 			<li>Short Weierstrass: <img src="imgs/latex/a28a8ba6d3dd046c7e3dfc4e80c1e76e.png" style="width: 378px; margin-bottom: -10px; margin-top: 5px" alt="y^2 = x^3 + ax + b"/></li>
 			<li>Some Sum: <img src="imgs/latex/6f86f5675c6bdba9e0f5d8e317fda102.png" style="width: 172px; margin-bottom: -18px; margin-top: 5px" alt="\sum_{i = 0}^{10} \frac{i^2}{\pi}"/></li>
+			<!--<li>Invalid TeX: <s:tex>\foobar</s:tex></li>-->
 		</ul>
 		<p>
 			In general, the short Weierstrass form is given as the formula <img src="imgs/latex/a28a8ba6d3dd046c7e3dfc4e80c1e76e.png" style="width: 378px; margin-bottom: -10px; margin-top: 5px" alt="y^2 = x^3 + ax + b"/> and that's just great.
@@ -773,7 +869,7 @@
 				<div class="flexchild center">
 						After Include Subsection
 				</div>
-				<div class="flexchild right">14 / 34</div>
+				<div class="flexchild right">15 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -783,9 +879,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide15"></a>
+		<a class="slideanchor" name="slide16"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="15" sub_slide_index="0" begin_ratio="0.6896551724137934" end_ratio="0.7068965517241382">
+	<div class="slide headerfooter" slide_no="16" sub_slide_index="0">
 		
 
 
@@ -800,9 +896,9 @@
 
 		
 		<p>This is the long form:</p>
-		<div><img src="imgs/latex/7c191ca8017c318fa68b68357c1ac979.png" style="width: 129px; margin-top: 5px" alt="\sum_{i = 0}^{10} \frac{i^2}{\pi}"/></div>
+		<div class="texformula"><img src="imgs/latex/7c191ca8017c318fa68b68357c1ac979.png" style="width: 129px; margin-top: 5px" alt="\sum_{i = 0}^{10} \frac{i^2}{\pi}"/></div>
 		<p>While this is the short one for comparison:</p>
-		<div><img src="imgs/latex/6f86f5675c6bdba9e0f5d8e317fda102.png" style="width: 172px; margin-bottom: -18px; margin-top: 5px" alt="\sum_{i = 0}^{10} \frac{i^2}{\pi}"/></div>
+		<img src="imgs/latex/6f86f5675c6bdba9e0f5d8e317fda102.png" style="width: 172px; margin-bottom: -18px; margin-top: 5px" alt="\sum_{i = 0}^{10} \frac{i^2}{\pi}"/>
 	
 
 		</div>
@@ -816,7 +912,7 @@
 				<div class="flexchild center">
 						After Include Subsection
 				</div>
-				<div class="flexchild right">15 / 34</div>
+				<div class="flexchild right">16 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -826,9 +922,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide16"></a>
+		<a class="slideanchor" name="slide17"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="16" sub_slide_index="0" begin_ratio="0.7068965517241382" end_ratio="0.7241379310344831">
+	<div class="slide headerfooter" slide_no="17" sub_slide_index="0">
 		
 
 
@@ -862,7 +958,7 @@
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">16 / 34</div>
+				<div class="flexchild right">17 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -872,9 +968,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide17"></a>
+		<a class="slideanchor" name="slide18"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="17" sub_slide_index="0" begin_ratio="0.7241379310344831" end_ratio="0.741379310344828">
+	<div class="slide headerfooter" slide_no="18" sub_slide_index="0">
 		
 
 
@@ -906,7 +1002,7 @@
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">17 / 34</div>
+				<div class="flexchild right">18 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -916,9 +1012,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide18"></a>
+		<a class="slideanchor" name="slide19"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="18" sub_slide_index="0" begin_ratio="0.741379310344828" end_ratio="0.7586206896551728">
+	<div class="slide headerfooter" slide_no="19" sub_slide_index="0">
 		
 
 
@@ -954,7 +1050,7 @@
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">18 / 34</div>
+				<div class="flexchild right">19 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -964,9 +1060,9 @@
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide19"></a>
+		<a class="slideanchor" name="slide20"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="19" sub_slide_index="0" begin_ratio="0.7586206896551728" end_ratio="0.7758620689655177">
+	<div class="slide headerfooter" slide_no="20" sub_slide_index="0">
 		
 
 
@@ -996,7 +1092,7 @@ sbin</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">19 / 34</div>
+				<div class="flexchild right">20 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1006,9 +1102,9 @@ sbin</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide20"></a>
+		<a class="slideanchor" name="slide21"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="20" sub_slide_index="0" begin_ratio="0.7758620689655177" end_ratio="0.7931034482758625">
+	<div class="slide headerfooter" slide_no="21" sub_slide_index="0">
 		
 
 
@@ -1038,7 +1134,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">20 / 34</div>
+				<div class="flexchild right">21 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1048,9 +1144,9 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide21"></a>
+		<a class="slideanchor" name="slide22"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="21" sub_slide_index="0" begin_ratio="0.7931034482758625" end_ratio="0.8103448275862074">
+	<div class="slide headerfooter" slide_no="22" sub_slide_index="0">
 		
 
 
@@ -1083,7 +1179,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">21 / 34</div>
+				<div class="flexchild right">22 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1093,9 +1189,9 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide22"></a>
+		<a class="slideanchor" name="slide23"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="22" sub_slide_index="0" begin_ratio="0.8103448275862074" end_ratio="0.8275862068965523">
+	<div class="slide headerfooter" slide_no="23" sub_slide_index="0">
 		
 
 
@@ -1131,7 +1227,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">22 / 34</div>
+				<div class="flexchild right">23 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1141,9 +1237,52 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide23"></a>
+		<a class="slideanchor" name="slide24"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="23" sub_slide_index="0" begin_ratio="0.8275862068965523" end_ratio="0.8448275862068971">
+	<div class="slide headerfooter" slide_no="24" sub_slide_index="0">
+		
+
+
+	<div class="header">
+		
+			<div class="heading">Dashes</div>
+		
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+		
+		<ul>
+			<li>By default dashes are replaced by endash and emdash, – and —</li>
+			<li>But they can be verbatim as well: -- and ---</li>
+		</ul>
+	
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						Code Highlighting
+				</div>
+				<div class="flexchild right">24 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<a class="slideanchor" name="slide25"></a>
+<div class="size_container ">
+	<div class="slide headerfooter" slide_no="25" sub_slide_index="0">
 		
 
 
@@ -1175,7 +1314,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">23 / 34</div>
+				<div class="flexchild right">25 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1185,9 +1324,9 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide24"></a>
+		<a class="slideanchor" name="slide26"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="24" sub_slide_index="0" begin_ratio="0.8448275862068971" end_ratio="0.862068965517242">
+	<div class="slide headerfooter" slide_no="26" sub_slide_index="0">
 		
 
 
@@ -1219,7 +1358,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">24 / 34</div>
+				<div class="flexchild right">26 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1229,9 +1368,9 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide25"></a>
+		<a class="slideanchor" name="slide27"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="25" sub_slide_index="0" begin_ratio="0.862068965517242" end_ratio="0.8793103448275869">
+	<div class="slide headerfooter" slide_no="27" sub_slide_index="0">
 		
 
 
@@ -1245,7 +1384,7 @@ It comes from a file!</pre>
 			
 
 		
-		<div class="fillimg"><img src="imgs/img/2a58e4b31d16431abd7c4746e55fb701.png" class="fill"/></div>
+		<div class="fillimg"><img src="imgs/img/861ae1c7b135d9bfa30c658e461f2882.png" class="fill"/></div>
 	
 
 		</div>
@@ -1259,7 +1398,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">25 / 34</div>
+				<div class="flexchild right">27 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1269,9 +1408,49 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide26"></a>
+		<a class="slideanchor" name="slide28"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="26" sub_slide_index="0" begin_ratio="0.8793103448275869" end_ratio="0.8965517241379317">
+	<div class="slide headerfooter" slide_no="28" sub_slide_index="0">
+		
+
+
+	<div class="header">
+		
+			<div class="heading">Image Rendering with substitution</div>
+		
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+		
+		<div class="fillimg"><img src="imgs/img/4306e606a6360387054eb59ee8af02f3.png" class="fill"/></div>
+	
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						Code Highlighting
+				</div>
+				<div class="flexchild right">28 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<a class="slideanchor" name="slide29"></a>
+<div class="size_container ">
+	<div class="slide headerfooter" slide_no="29" sub_slide_index="0">
 		
 
 
@@ -1298,7 +1477,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">26 / 34</div>
+				<div class="flexchild right">29 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1309,7 +1488,7 @@ It comes from a file!</pre>
 </div>
 
 		<div class="size_container ">
-	<div class="slide headerfooter" slide_no="26" sub_slide_index="1" begin_ratio="0.8793103448275869" end_ratio="0.8965517241379317">
+	<div class="slide headerfooter" slide_no="29" sub_slide_index="1">
 		
 
 
@@ -1336,7 +1515,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">26 / 34</div>
+				<div class="flexchild right">29 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1347,7 +1526,7 @@ It comes from a file!</pre>
 </div>
 
 		<div class="size_container ">
-	<div class="slide headerfooter" slide_no="26" sub_slide_index="2" begin_ratio="0.8793103448275869" end_ratio="0.8965517241379317">
+	<div class="slide headerfooter" slide_no="29" sub_slide_index="2">
 		
 
 
@@ -1374,7 +1553,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Code Highlighting
 				</div>
-				<div class="flexchild right">26 / 34</div>
+				<div class="flexchild right">29 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1384,9 +1563,49 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide27"></a>
+		<a class="slideanchor" name="slide30"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="27" sub_slide_index="0" begin_ratio="0.8965517241379317" end_ratio="0.9137931034482766">
+	<div class="slide headerfooter" slide_no="30" sub_slide_index="0">
+		
+
+
+	<div class="header">
+		
+			<div class="heading">Plot Rendering</div>
+		
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+		
+		<div class="fillimg"><img src="imgs/plot/1650ccf5fb871cf590b8b9a728c2b91d.png" class="fill"/></div>
+	
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						Code Highlighting
+				</div>
+				<div class="flexchild right">30 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<a class="slideanchor" name="slide31"></a>
+<div class="size_container ">
+	<div class="slide headerfooter" slide_no="31" sub_slide_index="0">
 		
 
 
@@ -1416,7 +1635,7 @@ It comes from a file!</pre>
 				<div class="flexchild center">
 						Esc&lt;&gt;ping
 				</div>
-				<div class="flexchild right">27 / 34</div>
+				<div class="flexchild right">31 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1426,9 +1645,9 @@ It comes from a file!</pre>
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide28"></a>
+		<a class="slideanchor" name="slide32"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="28" sub_slide_index="0" begin_ratio="0.9137931034482766" end_ratio="0.9310344827586214">
+	<div class="slide headerfooter" slide_no="32" sub_slide_index="0">
 		
 
 
@@ -1458,7 +1677,7 @@ Hello. <b>This is a test! foo</b> Fin.
 				<div class="flexchild center">
 						Esc&lt;&gt;ping
 				</div>
-				<div class="flexchild right">28 / 34</div>
+				<div class="flexchild right">32 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1468,9 +1687,9 @@ Hello. <b>This is a test! foo</b> Fin.
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide29"></a>
+		<a class="slideanchor" name="slide33"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="29" sub_slide_index="0" begin_ratio="0.9310344827586214" end_ratio="0.9482758620689663">
+	<div class="slide headerfooter" slide_no="33" sub_slide_index="0">
 		
 
 
@@ -1500,7 +1719,7 @@ Hello. <b>This is a test! bar</b> Fin.
 				<div class="flexchild center">
 						Esc&lt;&gt;ping
 				</div>
-				<div class="flexchild right">29 / 34</div>
+				<div class="flexchild right">33 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1510,9 +1729,9 @@ Hello. <b>This is a test! bar</b> Fin.
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide30"></a>
+		<a class="slideanchor" name="slide34"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="30" sub_slide_index="0" begin_ratio="0.9482758620689663" end_ratio="0.9482758620689663">
+	<div class="slide headerfooter" slide_no="34" sub_slide_index="0">
 		
 
 
@@ -1542,7 +1761,7 @@ Hello. <b>This is a test! tt</b> Fin.
 				<div class="flexchild center">
 						Esc&lt;&gt;ping
 				</div>
-				<div class="flexchild right">30 / 34</div>
+				<div class="flexchild right">34 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1552,9 +1771,9 @@ Hello. <b>This is a test! tt</b> Fin.
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide31"></a>
+		<a class="slideanchor" name="slide35"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="31" sub_slide_index="0" begin_ratio="0.9482758620689663" end_ratio="0.9655172413793112">
+	<div class="slide headerfooter" slide_no="35" sub_slide_index="0">
 		
 
 
@@ -1582,7 +1801,7 @@ Hello. <b>This is a test! tt</b> Fin.
 				<div class="flexchild center">
 						Esc&lt;&gt;ping
 				</div>
-				<div class="flexchild right">31 / 34</div>
+				<div class="flexchild right">35 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1592,9 +1811,97 @@ Hello. <b>This is a test! tt</b> Fin.
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide32"></a>
+		<a class="slideanchor" name="slide36"></a>
 <div class="size_container ">
-	<div class="slide final" slide_no="32" sub_slide_index="0" begin_ratio="0.9655172413793112" end_ratio="0.9655172413793112">
+	<div class="slide headerfooter" slide_no="36" sub_slide_index="0">
+		
+
+
+	<div class="header">
+		
+			<div class="heading">Demo Slide!</div>
+		
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+		<s:time abs="10 min"/>
+		
+		<ul>
+			<li>Demo time! This will take 10 minutes!</li>
+		</ul>
+	
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						Esc&lt;&gt;ping
+				</div>
+				<div class="flexchild right">36 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<a class="slideanchor" name="slide37"></a>
+<div class="size_container ">
+	<div class="slide headerfooter" slide_no="37" sub_slide_index="0">
+		
+
+
+	<div class="header">
+		
+			<div class="heading">Nth</div>
+		
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+		
+		<ul>
+			<li>This is the 1<sup>st</sup> line.</li>
+			<li>This is the 2<sup>nd</sup> line.</li>
+			<li>This is the 3<sup>rd</sup> line.</li>
+			<li>This is the 4<sup>th</sup> line.</li>
+		</ul>
+	
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						Esc&lt;&gt;ping
+				</div>
+				<div class="flexchild right">37 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<a class="slideanchor" name="slide38"></a>
+<div class="size_container ">
+	<div class="slide final" slide_no="38" sub_slide_index="0">
 		
 
 <div class="body">
@@ -1610,9 +1917,9 @@ Hello. <b>This is a test! tt</b> Fin.
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide33"></a>
+		<a class="slideanchor" name="slide39"></a>
 <div class="size_container ">
-	<div class="slide headerfooter" slide_no="33" sub_slide_index="0" begin_ratio="0.9655172413793112" end_ratio="0.982758620689656">
+	<div class="slide headerfooter" slide_no="39" sub_slide_index="0">
 		
 
 
@@ -1627,6 +1934,21 @@ Hello. <b>This is a test! tt</b> Fin.
 
 
 <ul>
+	<li>A:
+	Alpha
+	</li>
+	<li>AB:
+	Alpha Bravo
+	</li>
+	<li>ABC:
+	Alpha Bravo Charlie
+	</li>
+	<li>ABCD:
+	Alpha Bravo Charlie Delta
+	</li>
+	<li>ABCDE:
+	Alpha Bravo Charlie Delta Echo
+	</li>
 	<li>AES:
 	<a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">Advanced Encryption Standard</a>
 	</li>
@@ -1635,6 +1957,51 @@ Hello. <b>This is a test! tt</b> Fin.
 	</li>
 	<li>DES:
 	<a href="https://en.wikipedia.org/wiki/Data_Encryption_Standard">Data Encryption Standard</a>
+	</li>
+</ul>
+
+		</div>
+	</div>
+	<div class="footer">
+		
+			<div class="flex">
+				<div class="flexchild left">
+						Finalization
+				</div>
+				<div class="flexchild center">
+						Esc&lt;&gt;ping
+				</div>
+				<div class="flexchild right">39 / 40</div>
+			</div>
+			<img src="template/antonio/bar.svg" class="bar" />
+		
+	</div>
+
+
+	</div>
+</div>
+
+		<div class="size_container ">
+	<div class="slide headerfooter" slide_no="39" sub_slide_index="1">
+		
+
+
+	<div class="header">
+		
+	<div class="heading">Acronyms</div>
+
+	</div>
+	<div class="body">
+		<div class="content">
+			
+
+
+<ul>
+	<li>MAC:
+	Message Authentication Code
+	</li>
+	<li>MAC:
+	Media Access Control
 	</li>
 	<li>WEP:
 	<a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy">Wired Equivalent Privacy</a>
@@ -1652,7 +2019,7 @@ Hello. <b>This is a test! tt</b> Fin.
 				<div class="flexchild center">
 						Esc&lt;&gt;ping
 				</div>
-				<div class="flexchild right">33 / 34</div>
+				<div class="flexchild right">39 / 40</div>
 			</div>
 			<img src="template/antonio/bar.svg" class="bar" />
 		
@@ -1662,9 +2029,9 @@ Hello. <b>This is a test! tt</b> Fin.
 	</div>
 </div>
 
-		<a class="slideanchor" name="slide34"></a>
+		<a class="slideanchor" name="slide40"></a>
 <div class="size_container noprint">
-	<div class="slide feedback" slide_no="34" sub_slide_index="0" begin_ratio="0.982758620689656" end_ratio="1.0000000000000009">
+	<div class="slide feedback" slide_no="40" sub_slide_index="0">
 		
 
 
@@ -1686,20 +2053,20 @@ Hello. <b>This is a test! tt</b> Fin.
 		<div class="form-label">Rating:</div>
 		<div class="form-input button-checkbox-group" name="rating" lid="rating">
 			<label class="button-checkbox">
-				<input type="checkbox" value="puke-0">
-				<span>🤮</span>
+				<input type="checkbox" value="0-puke">
+				<img src="template/antonio/emojis/0-puke.svg" draggable="false" class="emoji-button" />
 			</label>
 			<label class="button-checkbox">
-				<input type="checkbox" value="bad-1">
-				<span>🙁</span>
+				<input type="checkbox" value="1-bad">
+				<img src="template/antonio/emojis/1-bad.svg" draggable="false" class="emoji-button" />
 			</label>
 			<label class="button-checkbox">
-				<input type="checkbox" value="good-2">
-				<span>🙂</span>
+				<input type="checkbox" value="2-good">
+				<img src="template/antonio/emojis/2-good.svg" draggable="false" class="emoji-button" />
 			</label>
 			<label class="button-checkbox">
-				<input type="checkbox" value="great-3">
-				<span>😁</span>
+				<input type="checkbox" value="3-great">
+				<img src="template/antonio/emojis/3-great.svg" draggable="false" class="emoji-button" />
 			</label>
 		</div>
 
@@ -1729,18 +2096,23 @@ Hello. <b>This is a test! tt</b> Fin.
 	import {FeedbackSender} from "./template/base/pyradium_feedback.js";
 	import {ModalWindow} from "./template/base/pyradium_modal.js";
 
-	let slide_info = {"source": {"examples/example.xml": {"sha256": "c9ba8627446b03269ff655c90deccf0385447147dd42aac7a86a7e4c3db3809e", "git": "73da01e3d723629754ce75233a70ffdea10674aa"}, "examples/sub//example_sub.xml": {"sha256": "76d4e4f887f27f15f318f069f85923f53a905d402a85d2b34b4807529902a6fc", "git": "df90ff86b1705eeb7c63a73140d5c072859bc319"}}, "renderer": "0.0.6rc0"};
-	slide_info["uri"] = location.href;
+	const static_info = {
+		"version":	1,
+		"uri":		location.href,
+		"info":		globalThis.pyradium.presentation.info,
+	};
 	const parent_div = document.querySelector("#uid_1");
 	const checkbox_group = parent_div.querySelector("[lid=\"rating\"]");
 	const button_checkbox = new ButtonCheckbox(checkbox_group);
 
 	const modal_div = parent_div.querySelector(".modal");
-	const modal = new ModalWindow(modal_div);
+	const modal = new ModalWindow(modal_div, {
+		close_on_popup_click: true,
+	});
 	const submit_button = parent_div.querySelector("[lid=\"submit\"]");
 
 	const feedback_sender = new FeedbackSender("https://myserver.com/feedback-api", {
-		"static_info":		slide_info,
+		"static_info":		static_info,
 		"on_success":		() => { modal.show("success", "Thank you for submitting your feedback!"); feedback_sender.clear_form(); },
 		"on_error":			() => modal.show("error", "<b>Error</b>: There was an error during network transmission. Your data has not been submitted. Please try again later."),
 		"on_form_empty":	() => modal.show("error", "<b>Error</b>: You need to enter at least some feedback. The form may not be completely empty."),
@@ -1762,19 +2134,20 @@ Hello. <b>This is a test! tt</b> Fin.
 
 		<script type="module">
 			import {Presentation} from "./template/base/pyradium.js";
-			const presentation_meta = {"total_presentation_time": "14:00-14:05", "pause_minutes": "2"};
 			const ui_elements = {
 				"slides":			document.querySelectorAll("div.slide"),
 				"slideno_text":		document.querySelector("#current_slideno"),
 				"full_screen_div":	document.querySelector("#full_screen_div"),
+				"info_modal":		document.querySelector("#pyradium_info_popup"),
 			};
-			const presentation = new Presentation(ui_elements, presentation_meta);
+			const presentation = new Presentation(ui_elements, globalThis.pyradium.presentation.interactive);
 			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
 			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start_presentation());
 			document.addEventListener("wheel", (event) => presentation.event_wheel(event));
 			document.addEventListener("fullscreenchange", (event) => presentation.event_fullscreen(event));
 			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
 			document.addEventListener("keydown", (event) => presentation.event_keydown(event));
+			document.querySelector("#btn_timer").addEventListener("click", (event) => window.open("template/base/timer.html#" + presentation.session_id));
 		</script>
 	</body>
 </html>

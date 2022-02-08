@@ -22,10 +22,15 @@
 */
 
 export class ModalWindow {
-	constructor(modal_div) {
+	constructor(modal_div, options) {
 		this._modal_div = modal_div;
 		this._msg_div = modal_div.querySelector("div.msg");
-		this._modal_div.addEventListener("click", (event) => this.close());
+		this._options = options || { };
+		if (this._options.close_on_popup_click) {
+			this._modal_div.addEventListener("click", (event) => this.close());
+		} else {
+			this._modal_div.querySelector("span.close").addEventListener("click", (event) => this.close());
+		}
 	}
 
 	close() {
@@ -36,7 +41,9 @@ export class ModalWindow {
 		this._modal_div.classList.remove("type-error");
 		this._modal_div.classList.remove("type-success");
 		this._modal_div.classList.add("type-" + modal_type);
-		this._msg_div.innerHTML = message;
+		if (message != null) {
+			this._msg_div.innerHTML = message;
+		}
 		this._modal_div.classList.add("active");
 	}
 }

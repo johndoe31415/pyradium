@@ -1,3 +1,5 @@
+.code_highlight .n { color: #000 }
+.code_highlight .p { color: #222 }
 .code_highlight .hll { background-color: #ffffcc }
 .code_highlight .c { color: #60a0b0; font-style: italic } /* Comment */
 /* .code_highlight .err { border: 1px solid #FF0000 } */

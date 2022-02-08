@@ -1,0 +1,2 @@
+#!/bin/bash
+./pyradium.py render -l -f -I examples/sub examples/example.xml -R rendered/foobar:foobar/ rendered -vvv

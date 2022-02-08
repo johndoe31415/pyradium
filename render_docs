@@ -1,0 +1,4 @@
+#!/bin/bash
+rm -fr docs
+./pyradium.py render -I examples/sub examples/example.xml docs -vvv
+git add docs

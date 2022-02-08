@@ -1,9 +1,14 @@
+
 .tooltip {
     position: relative;
 	background-image: linear-gradient(to right, #97abbc 50%, transparent 50%);
 	background-position: 0 1.04em;
 	background-repeat: repeat-x;
 	background-size: 5px 2px;
+}
+
+a.tooltip {
+	color: inherit;
 }
 
 .tooltip .text {
@@ -23,6 +28,7 @@
     border: 1px solid #97abbc;
 	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
 	display: none;
+	user-select: none;
 }
 
 .tooltip:hover .text {

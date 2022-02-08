@@ -66,6 +66,50 @@ div.slide.title div.date {
 	color: #97abbc;
 }
 
+
+div.slide.sectiontitle div.headpiece {
+	position: relative;
+	height: 79%;
+	background: #2185c5;
+	color: white;
+}
+
+div.slide.sectiontitle div.bottompiece {
+	position: relative;
+	height: 21%;
+}
+
+div.slide.sectiontitle div.section {
+	text-align: center;
+	width: 100%;
+	font-variant: small-caps;
+	font-size: 200%;
+	position: absolute;
+	top: 35%;
+}
+
+div.slide.sectiontitle div.subsection {
+	text-align: center;
+	width: 100%;
+	position: absolute;
+	top: 60%;
+}
+
+div.slide.sectiontitle div.pageno {
+	position: absolute;
+	text-align: center;
+	width: 100%;
+	bottom: 15px;
+	font-weight: 100;
+	color: #97abbc;
+}
+
+div.slide.sectiontitle img.bar {
+	position: absolute;
+	width: 100%;
+	bottom: 0px;
+}
+
 div.slide div.body {
 	position: relative;
 	height: 100%;
@@ -117,6 +161,7 @@ div.footer div.flex {
 div.flex div.flexchild {
 	flex: 1;
 	display: flex;
+	white-space: nowrap;
 }
 
 div.flexchild.left {
@@ -201,6 +246,10 @@ div.final_flex div.final_sub {
 	color: #677480;
 }
 
+div.texformula {
+	margin-top: 25px;
+	margin-left: 50px;
+}
 
 div.slide.quote div.flex {
 	position: relative;
@@ -231,4 +280,12 @@ div.slide.quote img.quotationmark {
 	position: relative;
 	top: 25%;
 	width: 100%;
+}
+
+div.slide.feedback {
+	font-family: "Fira Sans";
+}
+
+div.slide.feedback img.emoji-button {
+	width: 48px;
 }

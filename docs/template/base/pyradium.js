@@ -21,8 +21,6 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-import {TimeKeeper} from "./pyradium_timekeeper.js";
-
 const CursorStyle = {
 	CURSOR_OFF: 0,
 	CURSOR_DEFAULT: 1,
@@ -45,16 +43,25 @@ export class Presentation {
 		this._ui_elements.slides.forEach((slide) => {
 			this._intersect_obs.observe(slide);
 		});
-		this._timekeeper = new TimeKeeper();
-		this._session_id = Math.random();
-		this._presentation_mode = "stopped";
+		this._session_id = Math.random().toString(36).substr(2);
 		this._bc = new BroadcastChannel("presentation");
 		this._bc.addEventListener("message", (msg) => this._rx_message(msg));
-		setInterval(() => this._tx_status(), 1000);
+		this._debugging = false;
+		setInterval(() => this._tx_slide_info(), 3000);
+	}
+
+	_log(...args) {
+		if (this._debugging) {
+			console.log(...args);
+		}
+	}
+
+	get session_id() {
+		return this._session_id;
 	}
 
 	get presentation_meta() {
-		return this._presentation_meta;
+		return this._presentation_meta
 	}
 
 	get slide_count() {
@@ -69,38 +76,26 @@ export class Presentation {
 		return document.fullscreenElement != null;
 	}
 
-	set presentation_mode(value) {
-		const changed = (this._presentation_mode != value);
-		this._presentation_mode = value;
-		this._timekeeper.mode = value;
-		if (changed) {
-			this._tx_status();
-		}
-	}
-
-	get presentation_mode() {
-		return this._presentation_mode;
-	}
-
-	_tx_status() {
-
+	_tx_start_presentation() {
 		const msg = {
-			"type":						"status",
+			"type":						"start_presentation",
+			"session_id":				this._session_id,
+		};
+		this._bc.postMessage(msg);
+	}
+
+	_tx_slide_info() {
+		const msg = {
+			"type":						"slide_info",
 			"session_id":				this._session_id,
 			"data": {
-				"presentation_mode":	this.presentation_mode,
-				"begin_ratio":			this.current_slide.getAttribute("begin_ratio") * 1,
-				"end_ratio":			this.current_slide.getAttribute("end_ratio") * 1,
-				"timekeeper": {
-					"started":			this._timekeeper.time_spent_in("started"),
-					"paused":			this._timekeeper.time_spent_in("paused"),
-				},
+				"current_slide":		this.current_slide.getAttribute("slide_no") | 0,
 			},
 		};
 		this._bc.postMessage(msg);
 	}
 
-	_tx_presentation_info() {
+	_tx_presentation_meta() {
 		const msg = {
 			"type":					"presentation_meta",
 			"session_id":			this._session_id,
@@ -111,10 +106,10 @@ export class Presentation {
 
 	_rx_message(msg) {
 		const data = msg.data;
-		if (data["type"] == "query_status") {
-			this._tx_status();
+		if (data["type"] == "query_slide_info") {
+			this._tx_slide_info();
 		} else if (data["type"] == "query_presentation_meta") {
-			this._tx_presentation_info();
+			this._tx_presentation_meta();
 		}
 	}
 
@@ -153,12 +148,12 @@ export class Presentation {
 	}
 
 	start_presentation() {
+		this._log("Presentation started.");
 		if (this.fullscreen_mode) {
-			/* Second press on fullscreen starts the presentation automatically */
-			this.presentation_mode = "started";
-			return;
+			/* If armed and presentation is duplicate started, this means start
+			 * timer. */
+			this._tx_start_presentation();
 		}
-		console.log("Presentation started.");
 		this._cursor_style = 0;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
@@ -192,15 +187,26 @@ export class Presentation {
 			return;
 		}
 		if (event.key == "g") {
+			this._log("Keypress: 'g' -> goto");
 			this.goto_slide();
 		} else if (event.key == "f") {
+			this._log("Keypress: 'f' -> full screen presentation");
 			this.start_presentation();
 		} else if (event.key == "c") {
+			this._log("Keypress: 'c' -> toggle cursor");
 			this.toggle_cursor();
-		} else if (event.key == "s") {
-			this.toggle_presentation_mode();
+		} else if ((event.key == "X") && (event.ctrlKey) && (event.shiftKey)) {
+			this._debugging = true;
+			this._log("Debugging mode enabled.");
+		} else if ((event.key == "i") && (event.ctrlKey)) {
+			if (this._ui_elements.info_modal != null) {
+				this._log("Show info window.");
+				this._ui_elements.info_modal.pyradium_modal.show();
+			} else {
+				this._log("Info window functionality not implemented.");
+			}
 		} else {
-//			console.log("keypress event", event);
+			this._log("Keypress other: ", event);
 		}
 	}
 
@@ -209,33 +215,48 @@ export class Presentation {
 			return;
 		}
 		if (event.key == "PageDown") {
-			this.next_slide();
+			this._log("Keydown: 'PageDown' -> next slide");
+			this.goto_next_slide();
 			event.preventDefault();
 		} else if (event.key == "PageUp") {
-			this.prev_slide();
+			this._log("Keydown: 'PageUp' -> previous slide");
+			this.goto_prev_slide();
+			event.preventDefault();
+		} else if (event.key == "Home") {
+			this._log("Keydown: 'Home' -> first slide");
+			this.goto_first_slide();
+			event.preventDefault();
+		} else if (event.key == "End") {
+			this._log("Keydown: 'End' -> last slide");
+			this.goto_last_slide();
 			event.preventDefault();
 		} else {
-//			console.log("keydown event", event);
+			this._log("Keydown other: ", event);
 		}
 	}
 
 	event_wheel(event) {
-//		console.log("wheel event", event);
-		const scroll_up = event.deltaY > 0;
+		const scroll_up = event.deltaY < 0;
 		if (this.fullscreen_mode) {
 			if (scroll_up) {
-				this.next_slide();
+				this._log("Wheel: 'ScrollUp' -> previous slide");
+				this.goto_prev_slide();
 			} else {
-				this.prev_slide();
+				this._log("Wheel: 'ScrollDown' -> next slide");
+				this.goto_next_slide();
 			}
 		}
 	}
 
 	event_scroll_in_viewport(events) {
+		if (this.fullscreen_mode) {
+			return;
+		}
 		events.forEach((event) => {
 			if (event.isIntersecting) {
 				const slide = event.target;
 				const internal_slide_index = slide.getAttribute("internal_slide_index") | 0;
+				this._log("Viewport event -> goto index " + internal_slide_index);
 				this._goto_slide(internal_slide_index, false);
 			}
 		});
@@ -258,15 +279,8 @@ export class Presentation {
 			const zoom_y = screen_height / slide_height;
 			const zoom = (zoom_x < zoom_y) ? zoom_x : zoom_y;
 
-			console.log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
+			this._log("Determined full screen to be " + screen_width + " x " + screen_height + ", slides " + slide_width + " x " + slide_height + "; zoom is " + zoom);
 			this._ui_elements.full_screen_div.style.zoom = zoom;
-
-			if (this._internal_slide_index > 0) {
-				/* If we start a presentation at the very beginning we don't
-				 * actually automatically count it as started until the first
-				 * slide has been advanced. */
-				this.presentation_mode = "started";
-			}
 		}
 	}
 
@@ -276,14 +290,6 @@ export class Presentation {
 			this._cursor_style = 0;
 		}
 		this._set_cursor_style();
-	}
-
-	toggle_presentation_mode() {
-		if (this.presentation_mode == "started") {
-			this.presentation_mode = "stopped";
-		} else if (this.presentation_mode == "stopped") {
-			this.presentation_mode = "started";
-		}
 	}
 
 	goto_slide() {
@@ -310,17 +316,24 @@ export class Presentation {
 			this._internal_slide_index = slide_index;
 			this._update(scroll_to_slide);
 			if (this.fullscreen_mode) {
-				this.presentation_mode = "started";
-				this._tx_status();
+				this._tx_slide_info();
 			}
 		}
 	}
 
-	next_slide() {
+	goto_first_slide() {
+		this._goto_slide(0, true);
+	}
+
+	goto_last_slide() {
+		this._goto_slide(this.slide_count - 1, true);
+	}
+
+	goto_next_slide() {
 		this._goto_slide(this._internal_slide_index + 1, true);
 	}
 
-	prev_slide() {
+	goto_prev_slide() {
 		this._goto_slide(this._internal_slide_index - 1, true);
 	}
 

@@ -109,6 +109,7 @@ pre.terminal {
 	margin-left: 3%;
 	margin-right: 3%;
 	padding: 10px;
+	overflow-x: auto;
 }
 
 div.code_highlight {
@@ -117,6 +118,7 @@ div.code_highlight {
 	margin-left: 3%;
 	margin-right: 3%;
 	padding: 10px;
+	overflow-x: auto;
 }
 
 div.fillimg {
@@ -131,4 +133,16 @@ div.fillimg img {
 	max-width: 100%;
 	max-height: 100%;
 	display: block;
+}
+
+
+table {
+	border-spacing: 0px;
+	border-collapse: separate;
+}
+
+th, td {
+	padding: 5px 15px 5px 15px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
 }
