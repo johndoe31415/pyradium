@@ -70,6 +70,10 @@ class SVGLayer():
 		self._node = group_node
 
 	@property
+	def label(self):
+		return self._node.getAttribute("inkscape:label")
+
+	@property
 	def layer_id(self):
 		return self._node.getAttribute("id")
 

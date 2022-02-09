@@ -24,7 +24,7 @@ from pyradium.Exceptions import UsageException
 from pyradium.SVGTransformation import SVGTransformation
 
 class AnimationController(BaseController):
-	_VALID_ANIMATION_MODES = [ "compose", "replace" ]
+	_VALID_ANIMATION_MODES = [ "compose", "compose-all", "replace" ]
 
 	def render(self):
 		filename = self.slide.get_xml_slide_var("filename")
@@ -41,14 +41,31 @@ class AnimationController(BaseController):
 
 		full_filename = self.rendered_presentation.renderer.lookup_include(filename)
 
-		# Determine the number of layers the SVG has first
+		# Determine the number of layers the we should consider first
 		svg = SVGTransformation(full_filename)
 		if animation_mode == "compose":
 			considered_layers = list(svg.visible_layer_ids)
-		elif animation_mode == "replace":
+		elif animation_mode in [ "replace", "compose-all" ]:
 			considered_layers = list(svg.layer_ids)
 		else:
 			raise NotImplementedError(animation_mode)
+
+
+		# Then look at all these layers and determine their special handling
+		layer_tags = { }
+		for layer_id in considered_layers:
+			layer = svg.get_layer(layer_id)
+			label = layer.label
+			if ":" in label:
+				(tags, _) = label.split(":", maxsplit = 1)
+				layer_tags[layer_id] = set(tags.split(","))
+
+		# Find out which layers are protected
+		protected_layer_ids = set()
+		for (layer_id, tags) in layer_tags.items():
+			if "protect" in tags:
+				protected_layer_ids.add(layer_id)
+
 		svg_transforms = [ ]
 
 		# Store commands to hide all layers first
@@ -63,6 +80,18 @@ class AnimationController(BaseController):
 		previous_layer_id = None
 		renderer = self.rendered_presentation.renderer.get_custom_renderer("img")
 		for layer_id in considered_layers:
+			tags = layer_tags.get(layer_id, set())
+			if "reset" in tags:
+				# Hide all below layers but those which are protected
+				for below_layer_id in considered_layers:
+					if below_layer_id == layer_id:
+						break
+					elif below_layer_id not in protected_layer_ids:
+						svg_transforms.append({
+							"cmd":			"hide_layer",
+							"layer_id":		below_layer_id,
+						})
+
 			svg_transforms.append({
 				"cmd":			"show_layer",
 				"layer_id":		layer_id,
