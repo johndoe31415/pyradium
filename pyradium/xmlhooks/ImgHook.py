@@ -20,6 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
 class ImgHook(BaseHook):
@@ -68,8 +69,7 @@ class ImgHook(BaseHook):
 		if node.hasAttribute("render"):
 			img_style.append(("image-rendering", node.getAttribute("render")))
 
-		replacement_node = node.ownerDocument.createElement("div")
-		replacement_node.setAttribute("class", "fillimg")
+		create_filldiv = XMLTools.get_bool_attr(node, "fill", default_value = True)
 
 		img_node = node.ownerDocument.createElement("img")
 		img_node.setAttribute("src", uri)
@@ -77,7 +77,12 @@ class ImgHook(BaseHook):
 		if len(img_style) > 0:
 			img_node.setAttribute("style", ";".join("%s:%s" %  (key, value) for (key, value) in img_style))
 
-		replacement_node.appendChild(img_node)
+		if create_filldiv:
+			replacement_node = node.ownerDocument.createElement("div")
+			replacement_node.setAttribute("class", "fillimg")
+			replacement_node.appendChild(img_node)
+		else:
+			replacement_node = img_node
 
 		rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
 		return replacement_node
