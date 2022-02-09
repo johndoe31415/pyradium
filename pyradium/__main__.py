@@ -33,6 +33,7 @@ from .ActionDumpMetadata import ActionDumpMetadata
 from .ActionSpellcheck import ActionSpellcheck
 from .ActionDictAdd import ActionDictAdd
 from .ActionShowStyleOpts import ActionShowStyleOpts
+from .ActionTemplateHelper import ActionTemplateHelper
 from .Enums import PresentationFeature
 
 def _geometry(text):
@@ -130,6 +131,11 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input file, needs to be a quickfix file in evim format.")
 	mc.register("dictadd", "Add false-positive spellcheck errors to the dictionary", genparser, action = ActionDictAdd)
+
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("template_name", help = "Name of the template to insert.")
+	mc.register("template-helper", "Show different templates on stdout; used in conjunction with vim plugins", genparser, action = ActionTemplateHelper)
 
 	return mc.run(sys.argv[1:])
 
