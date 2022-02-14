@@ -1,0 +1,8 @@
+{
+	"__comment": "~/.config/pyradium/configuration.json",
+
+	"spellcheck": {
+		"jar": "/opt/LanguageTool-5.5/languagetool-server.jar",
+		"mode": "evim"
+	}
+}

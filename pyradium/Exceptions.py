@@ -21,6 +21,8 @@
 
 class PyRadiumException(Exception): pass
 
+class ConfigurationException(PyRadiumException): pass
+
 class CallingProcessException(PyRadiumException): pass
 
 class XMLFileNotFoundException(PyRadiumException): pass

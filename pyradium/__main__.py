@@ -35,6 +35,7 @@ from .ActionDictAdd import ActionDictAdd
 from .ActionShowStyleOpts import ActionShowStyleOpts
 from .ActionTemplateHelper import ActionTemplateHelper
 from .Enums import PresentationFeature
+from .GlobalConfig import GlobalConfig
 
 def _geometry(text):
 	text = text.split("x", maxsplit = 1)
@@ -49,6 +50,7 @@ def _resource_dir(text):
 	return (text[0], text[1])
 
 def main():
+	gc = GlobalConfig.read()
 	mc = MultiCommand(description = "HTML presentation renderer", trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
 
 	def genparser(parser):
@@ -115,11 +117,12 @@ def main():
 	mc.register("dumpmeta", "Dump the metadata dictionary in JSON format", genparser, action = ActionDumpMetadata)
 
 	def genparser(parser):
-		group = parser.add_mutually_exclusive_group(required = True)
-		group.add_argument("-u", "--uri", metavar = "uri", help = "Connect to this running LanguageTool server URI.")
-		group.add_argument("-j", "--jar", metavar = "jarfile", help = "Start a LanguageTool server using this languagetool-server.jar JAR, automatically connect to it and shut it down after use.")
+		have_default_spellchecker = gc.has("spellcheck", "uri") or gc.has("spellcheck", "jar")
+		group = parser.add_mutually_exclusive_group(required = not have_default_spellchecker)
+		group.add_argument("-u", "--uri", metavar = "uri", default = gc.get("spellcheck", "uri"), help = "Connect to this running LanguageTool server URI.")
+		group.add_argument("-j", "--jar", metavar = "jarfile", default = gc.get("spellcheck", "jar"), help = "Start a LanguageTool server using this languagetool-server.jar JAR, automatically connect to it and shut it down after use.")
 		parser.add_argument("-l", "--language", metavar = "lang", default = "en-US", help = "Spellcheck in this language. Defaults to %(default)s.")
-		parser.add_argument("-m", "--mode", choices = [ "print", "vim", "evim", "fulljson" ], default = "print", help = "Mode in which spellchecking is performed. Can be one of %(choices)s, defaults to %(default)s.")
+		parser.add_argument("-m", "--mode", choices = [ "print", "vim", "evim", "fulljson" ], default = gc.get("spellcheck", "mode") or "print", help = "Mode in which spellchecking is performed. Can be one of %(choices)s, defaults to %(default)s.")
 		parser.add_argument("-o", "--outfile", metavar = "filename", help = "Write output to this file. By default, outputs to stdout.")
 		parser.add_argument("--vim", action = "store_true", help = "Run vim to actually spellcheck the file in question.")
 		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
