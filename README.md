@@ -300,5 +300,12 @@ Your choice:
 It then asks for each offense to which dictionary it should be added. The
 dictionary file is `~/.config/pyradium/dictionary.json`.
 
+## vim Integration
+By copying the file `xml_pyradium.xml` to
+`~/.vim/after/ftplugin/xml_pyradium.vim` vim gains a pyradium menu (when
+editing pyradium XML files) over which templates can be easily inserted and
+specific keybdindings (e.g., Ctrl-Shift-B for bold, Ctrl-Shift-I for italics,
+Ctrl-Shift-A for links, etc.).
+
 ## License
 pyradium is licensed under the GNU GPL-3.
