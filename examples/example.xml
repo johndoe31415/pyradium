@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<presentation xmlns:s="https://github.com/johndoe31415/pyradium">
+<?xml version="1.0" ?><presentation xmlns:s="https://github.com/johndoe31415/pyradium">
 	<meta>
 		<title>Battle of Wolf 359</title>
 		<subtitle>A Recap of Events</subtitle>
@@ -13,12 +12,12 @@
 		</format>
 	</meta>
 
-	<acronyms src="acronyms.json" />
+	<acronyms src="acronyms.json"/>
 
-	<slide type="title" />
+	<slide type="title"/>
 
 	<slide>
-		<s:var name="heading" value="No section at all" />
+		<s:var name="heading" value="No section at all"/>
 		<ul>
 			<li>There is no section or no subsection set for this slide.</li>
 			<li>In the status line, there should be nothing.</li>
@@ -28,17 +27,17 @@
 	<section>Foo</section>
 	<subsection>Bar</subsection>
 	<slide>
-		<s:var name="heading" value="Now we do have them" />
+		<s:var name="heading" value="Now we do have them"/>
 		<ul>
 			<li>Now it's section <s:enq>Foo</s:enq></li>
 			<li>And subsection <s:enq>Bar</s:enq></li>
-			<li>This should show "Foo" / "Bar" below.</li>
+			<li>This should show &quot;Foo&quot; / &quot;Bar&quot; below.</li>
 		</ul>
 	</slide>
 
 	<section>Moo</section>
 	<slide>
-		<s:var name="heading" value="Resetting subsection" />
+		<s:var name="heading" value="Resetting subsection"/>
 		<ul>
 			<li>Now it's section <s:enq>Moo</s:enq></li>
 			<li>But no subsection</li>
@@ -48,16 +47,16 @@
 
 	<section>Introduction</section>
 	<subsection>Nomenclature</subsection>
-	<slide type="toc" />
+	<slide type="toc"/>
 
 	<slide>
-		<s:time rel="1.5" />
-		<s:var name="heading" value="Pausing Slides" />
+		<s:time rel="1.5"/>
+		<s:var name="heading" value="Pausing Slides"/>
 		<ul>
 			<li>Pausing slides is easy! Acronyms too: <s:ac>WEP</s:ac></li>
-			<s:pause />
+			<s:pause/>
 			<li>After the first pause! Another acronym: <s:ac>DES</s:ac></li>
-			<s:pause />
+			<s:pause/>
 			<li>This is after the second pause! Explaining <s:ac>AES</s:ac>-<s:ac>CBC</s:ac></li>
 			<li><s:ac>A</s:ac> <s:ac>AB</s:ac> <s:ac>ABC</s:ac> <s:ac>ABCD</s:ac> <s:ac>ABCDE</s:ac></li>
 			<li>Don't confuse <s:ac>MAC1</s:ac> and <s:ac>MAC2</s:ac></li>
@@ -65,8 +64,8 @@
 	</slide>
 
 	<slide>
-		<s:time abs="1 min" />
-		<s:var name="heading" value="That's the second slide" />
+		<s:time abs="1 min"/>
+		<s:var name="heading" value="That's the second slide"/>
 		<ul>
 			<li>This is a test!</li>
 			<s:debug>This is debugging text.</s:debug>
@@ -75,14 +74,14 @@
 		</ul>
 	</slide>
 
-	<include src="example_sub.xml" />
+	<include src="example_sub.xml"/>
 
 	<section>Finalization</section>
 	<subsection>After Include Subsection</subsection>
-	<slide type="sectiontitle" />
+	<slide type="sectiontitle"/>
 
 	<slide>
-		<s:var name="heading" value="After include" />
+		<s:var name="heading" value="After include"/>
 		<ul>
 			<li>We just included a sub-document</li>
 			<li>This is the slide which directly follows an include.</li>
@@ -91,14 +90,14 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Non-breaking space" />
+		<s:var name="heading" value="Non-breaking space"/>
 		<ul>
-			<li>This is a very long sentence but it should not <s:nlb>break between</s:nlb> between "break" and "between".</li>
+			<li>This is a very long sentence but it should not <s:nlb>break between</s:nlb> between &quot;break&quot; and &quot;between&quot;.</li>
 		</ul>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Nested ULs" />
+		<s:var name="heading" value="Nested ULs"/>
 		<ul>
 			<li>Level 1 Moo</li>
 			<li>Level 1 Koo
@@ -111,13 +110,13 @@
 	</slide>
 
 	<slide type="quote">
-		<s:time abs="15 sec" />
+		<s:time abs="15 sec"/>
 		Even the best blade will rust and grow dull unless it is cared for.
-		<s:var name="author" value="Klingon Proverb" />
+		<s:var name="author" value="Klingon Proverb"/>
 	</slide>
 
 	<slide type="leftright">
-		<s:var name="heading" value="Left/Right slide" />
+		<s:var name="heading" value="Left/Right slide"/>
 		<s:content name="left">
 			This is on the left side. It's a long text, so it gets wrapped. You get a nice feeling as to how wide it is.
 		</s:content>
@@ -127,7 +126,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Formula in Text" />
+		<s:var name="heading" value="Formula in Text"/>
 		<ul>
 			<li>Short Weierstrass: <s:tex>y^2 = x^3 + ax + b</s:tex></li>
 			<li>Some Sum: <s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex></li>
@@ -139,7 +138,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Long Formula" />
+		<s:var name="heading" value="Long Formula"/>
 		<p>This is the long form:</p>
 		<s:tex long="1">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
 		<p>While this is the short one for comparison:</p>
@@ -148,7 +147,7 @@
 
 	<subsection>Code Highlighting</subsection>
 	<slide>
-		<s:var name="heading" value="Some Python Code" />
+		<s:var name="heading" value="Some Python Code"/>
 		<s:code lang="python3"><![CDATA[
 			if foo == "bar":
 				print("foo was 'bar'")
@@ -160,7 +159,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Some C Code" />
+		<s:var name="heading" value="Some C Code"/>
 		<s:code lang="c"><![CDATA[
 			int main(int argc, char **argv) {
 				printf("Foo: %d -> %p\n", argc, argv);
@@ -170,12 +169,12 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Some Python Code from a File" />
-		<s:code lang="python3" src="my_data.py" />
+		<s:var name="heading" value="Some Python Code from a File"/>
+		<s:code lang="python3" src="my_data.py"/>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Some Terminal" />
+		<s:var name="heading" value="Some Terminal"/>
 		<s:term><![CDATA[
 			$ ls /
 			bin
@@ -184,12 +183,12 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Some Terminal from a File" />
-		<s:term src="terminal_output.txt" />
+		<s:var name="heading" value="Some Terminal from a File"/>
+		<s:term src="terminal_output.txt"/>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Quotation Marks" />
+		<s:var name="heading" value="Quotation Marks"/>
 		<ul>
 			<li><s:enq>US style</s:enq></li>
 			<li><s:enq type="fr">French style</s:enq></li>
@@ -199,7 +198,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Arrows" />
+		<s:var name="heading" value="Arrows"/>
 		<ul>
 			<li><s:ar>-)</s:ar> Right and long right <s:ar>--)</s:ar></li>
 			<li><s:ar>(-</s:ar> Left and long left <s:ar>(--</s:ar></li>
@@ -212,7 +211,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Dashes" />
+		<s:var name="heading" value="Dashes"/>
 		<ul>
 			<li>By default dashes are replaced by endash and emdash, -- and ---</li>
 			<li>But they can be verbatim as well: <s:verb>-- and ---</s:verb></li>
@@ -220,7 +219,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Symbols" />
+		<s:var name="heading" value="Symbols"/>
 		<ul>
 			<li><s:sym>xor</s:sym> XOR and <s:sym>xmul</s:sym> XMUL</li>
 			<li>Operators <s:sym>le</s:sym> <s:sym>lt</s:sym> <s:sym>eq</s:sym> <s:sym>neq</s:sym> <s:sym>gt</s:sym><s:sym>ge</s:sym></li>
@@ -229,7 +228,7 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Emojis" />
+		<s:var name="heading" value="Emojis"/>
 		<ul>
 			<li><s:emo>:)</s:emo> <s:emo>:))</s:emo> <s:emo>;)</s:emo></li>
 			<li><s:emo>:(</s:emo> <s:emo>:((</s:emo> <s:emo>;(</s:emo></li>
@@ -238,65 +237,65 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Image Rendering" />
-		<s:img src="3dbox.svg" />
+		<s:var name="heading" value="Image Rendering"/>
+		<s:img src="3dbox.svg"/>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Image Rendering with substitution" />
+		<s:var name="heading" value="Image Rendering with substitution"/>
 		<s:img src="3dbox.svg">
-			<transform cmd="replace_text" search="${foo}" replace="Works!" />
+			<transform cmd="replace_text" search="${foo}" replace="Works!"/>
 		</s:img>
 	</slide>
 
 	<slide type="animation">
-		<s:var name="heading" value="Image Animation" />
-		<s:var name="filename" value="animation.svg" />
+		<s:var name="heading" value="Image Animation"/>
+		<s:var name="filename" value="animation.svg"/>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Plot Rendering" />
-		<s:plot src="histo.gnuplot" />
+		<s:var name="heading" value="Plot Rendering"/>
+		<s:plot src="histo.gnuplot"/>
 	</slide>
 
 	<subsection>Esc&lt;&gt;ping</subsection>
 	<slide>
-		<s:var name="heading" value="Escaped &lt;&gt; Characters" />
+		<s:var name="heading" value="Escaped &lt;&gt; Characters"/>
 		<ul>
 			<li>This is verbatim: &lt; &gt;</li>
 		</ul>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Execution of scripts 1" />
-		<s:exec cmd="my_script foo" />
+		<s:var name="heading" value="Execution of scripts 1"/>
+		<s:exec cmd="my_script foo"/>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Execution of scripts 2" />
-		<s:exec cmd="my_script bar" />
+		<s:var name="heading" value="Execution of scripts 2"/>
+		<s:exec cmd="my_script bar"/>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Execution of scripts 3" />
-		<s:tt><s:exec cmd="my_script tt" /></s:tt>
+		<s:var name="heading" value="Execution of scripts 3"/>
+		<s:tt><s:exec cmd="my_script tt"/></s:tt>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Nested Tags" />
+		<s:var name="heading" value="Nested Tags"/>
 		<s:tt>first <b>bold <i>bolditalics</i></b> last</s:tt>
 	</slide>
 
 	<slide>
-		<s:time abs="10 min" />
-		<s:var name="heading" value="Demo Slide!" />
+		<s:time abs="10 min"/>
+		<s:var name="heading" value="Demo Slide!"/>
 		<ul>
 			<li>Demo time! This will take 10 minutes!</li>
 		</ul>
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Nth" />
+		<s:var name="heading" value="Nth"/>
 		<ul>
 			<li>This is the <s:nth>1</s:nth> line.</li>
 			<li>This is the <s:nth>2</s:nth> line.</li>
@@ -306,14 +305,14 @@
 	</slide>
 
 	<slide type="final">
-		<s:time rel="0" />
+		<s:time rel="0"/>
 	</slide>
 	<slide type="acronyms">
-		<s:time rel="0" />
+		<s:time rel="0"/>
 	</slide>
 
 	<slide type="feedback">
-		<s:var name="endpoint" value="https://myserver.com/feedback-api" />
-		<s:time rel="0" />
+		<s:var name="endpoint" value="https://myserver.com/feedback-api"/>
+		<s:time rel="0"/>
 	</slide>
 </presentation>

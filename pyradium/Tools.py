@@ -80,11 +80,13 @@ class XMLTools():
 			return (None, node.tagName)
 
 	@classmethod
-	def walk(cls, node, callback, predicate = None):
+	def walk(cls, node, callback, predicate = None, cancel_descent_predicate = None):
+		if (cancel_descent_predicate is not None) and cancel_descent_predicate(node):
+			return
 		if (predicate is None) or predicate(node):
 			callback(node)
 		for child in node.childNodes:
-			cls.walk(child, callback, predicate)
+			cls.walk(child, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
 
 	@classmethod
 	def walk_elements(cls, node, callback):

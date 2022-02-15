@@ -26,6 +26,7 @@ from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
 from .ActionServe import ActionServe
 from .ActionAcroAdd import ActionAcroAdd
+from .ActionAcroScan import ActionAcroScan
 from .ActionAcroSort import ActionAcroSort
 from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
@@ -92,6 +93,12 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("acrofile", help = "Acronym database JSON file.")
 	mc.register("acroadd", "Add an acryonym to the acronym database", genparser, action = ActionAcroAdd, aliases = [ "aadd" ])
+
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("acrofile", help = "Acronym database JSON file.")
+		parser.add_argument("infile", help = "Input XML file of the presentation.")
+	mc.register("acroscan", "Scans a presentation and suggests acronyms that can be added", genparser, action = ActionAcroScan, aliases = [ "ascan" ])
 
 	def genparser(parser):
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")

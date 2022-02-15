@@ -1,13 +1,13 @@
 {
-	"AES": { "text": "Advanced Encryption Standard", "uri": "https://en.wikipedia.org/wiki/Advanced_Encryption_Standard" },
-	"DES": { "text": "Data Encryption Standard", "uri": "https://en.wikipedia.org/wiki/Data_Encryption_Standard" },
-	"WEP": { "text": "Wired Equivalent Privacy", "uri": "https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" },
-	"CBC": { "text": "Cipher Block Chaining", "uri": "https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)" },
-	"A": { "text": "Alpha" },
-	"AB": { "text": "Alpha Bravo" },
-	"ABC": { "text": "Alpha Bravo Charlie" },
-	"ABCD": { "text": "Alpha Bravo Charlie Delta" },
+	"A":     { "text": "Alpha" },
+	"AB":    { "text": "Alpha Bravo" },
+	"ABC":   { "text": "Alpha Bravo Charlie" },
+	"ABCD":  { "text": "Alpha Bravo Charlie Delta" },
 	"ABCDE": { "text": "Alpha Bravo Charlie Delta Echo" },
-	"MAC1": { "text": "Message Authentication Code", "acronym": "MAC" },
-	"MAC2": { "text": "Media Access Control", "acronym": "MAC" }
+	"AES":   { "text": "Advanced Encryption Standard",                     "uri": "https://en.wikipedia.org/wiki/Advanced_Encryption_Standard" },
+	"CBC":   { "text": "Cipher Block Chaining",                            "uri": "https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)" },
+	"DES":   { "text": "Data Encryption Standard",                         "uri": "https://en.wikipedia.org/wiki/Data_Encryption_Standard" },
+	"MAC1":  { "text": "Message Authentication Code",    "acronym": "MAC" },
+	"MAC2":  { "text": "Media Access Control",           "acronym": "MAC" },
+	"WEP":   { "text": "Wired Equivalent Privacy",                         "uri": "https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" }
 }
