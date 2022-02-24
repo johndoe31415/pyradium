@@ -65,7 +65,7 @@ class ActionAcroScan(BaseAction):
 				XMLTools.replace_node(node, replacement_nodes)
 
 	def _process_slide(self, slide):
-		XMLTools.walk(slide, self._slide_callback, cancel_descent_predicate = lambda node: (node.nodeType == node.ELEMENT_NODE) and (node.tagName in [ "s:ac", "s:tex", "s:code", "s:term" ]))
+		XMLTools.walk(slide, self._slide_callback, cancel_descent_predicate = lambda node: (node.nodeType == node.ELEMENT_NODE) and (node.tagName in [ "s:ac", "s:tex", "s:code", "s:term", "s:var" ]))
 
 	def run(self):
 		self._acrofile = Acrofile.load_from_file(self._args.acrofile)
