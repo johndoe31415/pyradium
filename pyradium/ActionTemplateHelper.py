@@ -46,6 +46,13 @@ _KNOWN_TEMPLATES = {
 		<s:time abs="10 sec" />
 	</slide>
 	""",
+
+	"quote": """
+	<slide type="quote">
+        X
+		<s:var name="author" value="X" />
+	</slide>
+	""",
 }
 
 class ActionTemplateHelper(BaseAction):
