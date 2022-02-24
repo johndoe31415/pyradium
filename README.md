@@ -305,7 +305,11 @@ By copying the file `xml_pyradium.xml` to
 `~/.vim/after/ftplugin/xml_pyradium.vim` vim gains a pyradium menu (when
 editing pyradium XML files) over which templates can be easily inserted and
 specific keybdindings (e.g., Ctrl-Shift-B for bold, Ctrl-Shift-I for italics,
-Ctrl-Shift-A for links, etc.).
+Ctrl-Shift-A for links, etc.):
+
+```
+$ mkdir -p ~/.vim/after/ftplugin/ && cp xml_pyradium.vim ~/.vim/after/ftplugin/xml_pyradium.vim
+```
 
 ## License
 pyradium is licensed under the GNU GPL-3.
