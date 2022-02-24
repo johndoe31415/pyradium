@@ -27,7 +27,7 @@ endfunction
 :amenu 500.60 &pyradium.&Animation :call PyradiumTemplateHelperCommand("anim")<Enter>
 
 " Add specific keybindings
-vmap <C-S-b> :s/\%V.*\%V./<b>&<\/i><Enter>:noh<Enter>
+vmap <C-S-b> :s/\%V.*\%V./<b>&<\/b><Enter>:noh<Enter>
 vmap <C-S-i> :s/\%V.*\%V./<i>&<\/i><Enter>:noh<Enter>
 vmap <C-S-a> :s/\%V.*\%V./<a href="">&<\/a><Enter>:noh<Enter>
 vmap <C-S-q> :s/\%V.*\%V./<s:enq>&<\/s:enq><Enter>:noh<Enter>
