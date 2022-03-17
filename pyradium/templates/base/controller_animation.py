@@ -101,16 +101,18 @@ class AnimationController(BaseController):
 					"cmd":			"hide_layer",
 					"layer_id":		previous_layer_id,
 				})
-			rendered_image = renderer.render({
-				"src":				full_filename,
-				"max_dimension":	self.rendered_presentation.renderer.rendering_params.image_max_dimension,
-				"svg_transform":	svg_transforms,
-			})
-			local_filename = "imgs/anim/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
-			self.rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
-			additional_slide_var_list.append({
-				"image": local_filename,
-			})
+			if not "nostop" in tags:
+				# Actually emit this image
+				rendered_image = renderer.render({
+					"src":				full_filename,
+					"max_dimension":	self.rendered_presentation.renderer.rendering_params.image_max_dimension,
+					"svg_transform":	svg_transforms,
+				})
+				local_filename = "imgs/anim/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
+				self.rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
+				additional_slide_var_list.append({
+					"image": local_filename,
+				})
 			previous_layer_id = layer_id
 
 		if not self.rendered_presentation.renderer.rendering_params.collapse_animation:
