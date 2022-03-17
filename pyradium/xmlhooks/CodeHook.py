@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -34,5 +34,7 @@ class CodeHook(InnerTextHook):
 		highlighted_code = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter(cssclass = "code_highlight"))
 
 		replacement_node = xml.dom.minidom.parseString(highlighted_code).firstChild
+		if node.hasAttribute("height"):
+			replacement_node.setAttribute("style", "height: %s" % (node.getAttribute("height")))
 		rendered_presentation.add_feature(PresentationFeature.Pygments)
 		return replacement_node

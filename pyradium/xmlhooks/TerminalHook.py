@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -30,4 +30,6 @@ class TerminalHook(InnerTextHook):
 		replacement_node = node.ownerDocument.createElement("pre")
 		replacement_node.setAttribute("class", "terminal")
 		replacement_node.appendChild(node.ownerDocument.createTextNode(text))
+		if node.hasAttribute("height"):
+			replacement_node.setAttribute("style", "height: %s" % (node.getAttribute("height")))
 		return replacement_node
