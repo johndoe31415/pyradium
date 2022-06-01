@@ -20,6 +20,7 @@ setuptools.setup(
 	install_requires = [
 		"mako",
 		"pygments",
+		"requests",
 	],
 	entry_points = {
 		"console_scripts": [
