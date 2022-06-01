@@ -37,7 +37,7 @@ _KNOWN_TEMPLATES = {
 	""",
 
 	"term": """
-		<s:term><![CDATA[
+		<s:term prompt="$ "><![CDATA[
 		]]></s:term>
 	""",
 
