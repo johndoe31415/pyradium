@@ -112,6 +112,10 @@ pre.terminal {
 	overflow-x: auto;
 }
 
+pre.terminal .command {
+	user-select: all;
+}
+
 div.code_highlight {
 	background: #eee;
 	border: 1px gray dotted;

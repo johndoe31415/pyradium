@@ -209,20 +209,25 @@ ul {
 	margin-left: 38px;
 }
 
-ul li {
+ol {
+	text-indent: 0px;
+	margin-left: 15px;
+}
+
+ul > li {
 	list-style: none;
 }
 
-ul li:before {
+ul > li:before {
 	content: url("triangle1.svg");
 	margin-right: 8px;
 }
 
-ul li li:before {
+ul > li > ul > li:before {
 	content: url("triangle2.svg");
 }
 
-ul.bare li {
+ul.bare > li {
 	background-image: none;
 	padding-left: 0px;
 }

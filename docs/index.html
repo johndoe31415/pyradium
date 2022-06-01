@@ -11,10 +11,10 @@
 		<link rel="stylesheet" href="template/antonio/font_latinmodernmono.css" />
 		<link rel="stylesheet" href="template/base/pyradium_forms.css" />
 		<link rel="stylesheet" href="template/base/pyradium_modal.css" />
-		<link rel="stylesheet" href="template/base/pyradium_menu.css" />
-		<link rel="stylesheet" href="template/base/pyradium_timer.css" />
 		<link rel="stylesheet" href="template/base/pyradium_tooltip.css" />
+		<link rel="stylesheet" href="template/base/pyradium_timer.css" />
 		<link rel="stylesheet" href="template/base/pygments.css" />
+		<link rel="stylesheet" href="template/base/pyradium_menu.css" />
 		<link rel="stylesheet" href="template/base/pyradium_print.css" />
 	</head>
 
@@ -24,7 +24,7 @@
 				"format":		1,
 				"presentation":	{ },
 			};
-			globalThis.pyradium.presentation["info"] = {"renderer":"0.0.12rc0","source_versions":[{"filename":"examples/example.xml","version":{"git":"25914a556c72ffb0073087c9afbd8aacab5cd812","sha256":"2b1b1ea410759c30da015faaa3897aa31c948dea1586b4457fdc22863ab88b89"}},{"filename":"examples/sub/example_sub.xml","version":{"git":"df90ff86b1705eeb7c63a73140d5c072859bc319","sha256":"76d4e4f887f27f15f318f069f85923f53a905d402a85d2b34b4807529902a6fc"}}]};
+			globalThis.pyradium.presentation["info"] = {"renderer":"0.0.12rc0","source_versions":[{"filename":"examples/example.xml","version":{"git":"44b884599441e6983e0b6fa39c29fe817d7e8d32","sha256":"a2f7f9a8f241ae43fe8bfc6939498171398db2187d942a3902b4cf4cfc6e05d0"}},{"filename":"examples/sub/example_sub.xml","version":{"git":"df90ff86b1705eeb7c63a73140d5c072859bc319","sha256":"76d4e4f887f27f15f318f069f85923f53a905d402a85d2b34b4807529902a6fc"}}]};
 			globalThis.pyradium.presentation["interactive"] = {"presentation_time":"0:30","slide_ratios":[0.0181,0.0181,0.0181,0.0181,0.0181,0.0272,0.0333,0.0181,0.0181,0.0181,0.0181,0.0181,0.0083,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.0181,0.3333,0.0181,0.0,0.0,0.0]};
 		</script>
 
@@ -1076,9 +1076,15 @@
 			
 
 		
-		<pre class="terminal">$ ls /
+		<pre class="terminal">$ <span class="command">ls /</span>
 bin
-sbin</pre>
+sbin
+$ <span class="command">cat /var/log/auth.log \
+    | sed -rn 's/.*Failed password for invalid user (\w*?) from.*/\1/p' \
+    | sort \
+    | uniq \
+    | wc -l</span>
+3332</pre>
 	
 
 		</div>
@@ -1118,7 +1124,7 @@ sbin</pre>
 			
 
 		
-		<pre class="terminal">$ cat foo
+		<pre class="terminal">$ <span class="command">cat foo</span>
 This is terminal output.
 It comes from a file!</pre>
 	
