@@ -19,7 +19,6 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from dataclasses import replace
 from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
 
 @XMLHookRegistry.register_hook
