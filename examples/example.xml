@@ -175,10 +175,16 @@
 
 	<slide>
 		<s:var name="heading" value="Some Terminal"/>
-		<s:term><![CDATA[
+		<s:term prompt="$ "><![CDATA[
 			$ ls /
 			bin
 			sbin
+			$ cat /var/log/auth.log \
+				| sed -rn 's/.*Failed password for invalid user (\w*?) from.*/\1/p' \
+				| sort \
+				| uniq \
+				| wc -l
+			3332
 		]]></s:term>
 	</slide>
 

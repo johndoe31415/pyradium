@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from dataclasses import replace
 from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
 
 @XMLHookRegistry.register_hook
@@ -29,7 +30,26 @@ class TerminalHook(InnerTextHook):
 	def handle_text(cls, text, rendered_presentation, node):
 		replacement_node = node.ownerDocument.createElement("pre")
 		replacement_node.setAttribute("class", "terminal")
-		replacement_node.appendChild(node.ownerDocument.createTextNode(text))
+		if node.hasAttribute("prompt"):
+			prompt = node.getAttribute("prompt")
+			lines = text.splitlines(keepends=True)
+			while lines:
+				line = lines.pop(0)
+				if not line.startswith(prompt):
+					replacement_node.appendChild(node.ownerDocument.createTextNode(line))
+					continue
+				command = line[len(prompt):]
+				replacement_node.appendChild(node.ownerDocument.createTextNode(prompt))
+				while line.strip().endswith("\\"):
+					line = lines.pop(0)
+					command += line
+				command_node = node.ownerDocument.createElement("span")
+				command_node.setAttribute("class", "command")
+				command_node.appendChild(node.ownerDocument.createTextNode(command))
+				replacement_node.appendChild(command_node)
+		else:
+			replacement_node.appendChild(node.ownerDocument.createTextNode(text))
+
 		if node.hasAttribute("height"):
 			replacement_node.setAttribute("style", "height: %s" % (node.getAttribute("height")))
 		return replacement_node
