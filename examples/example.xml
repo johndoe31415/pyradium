@@ -221,6 +221,7 @@
 		<ul>
 			<li>By default dashes are replaced by endash and emdash, -- and ---</li>
 			<li>But they can be verbatim as well: <s:verb>-- and ---</s:verb></li>
+			<li>They can be broken by any empty tag, e.g. -<s:nsc/>-</li>
 		</ul>
 	</slide>
 
