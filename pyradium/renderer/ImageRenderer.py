@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -25,7 +25,7 @@ import subprocess
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
 from pyradium.RendererCache import BaseRenderer
-from pyradium.Exceptions import UsageException
+from pyradium.Exceptions import UsageException, ImageRenderingException
 from pyradium.SVGTransformation import SVGTransformation
 
 _log = logging.getLogger(__spec__.name)
@@ -80,7 +80,10 @@ class ImageRenderer(BaseRenderer):
 		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = "." + extension) as output_file:
 			cmd = [ "convert", "-geometry", ">%dx%d" % (max_dimension, max_dimension), src, output_file.name ]
 			_log.debug("Rendering raster image: %s", CmdlineEscape().cmdline(cmd))
-			subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+			try:
+				subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+			except subprocess.CalledProcessError as e:
+				raise ImageRenderingException(f"Failed to render {src} while trying to execute: {CmdlineEscape().cmdline(cmd)}") from e
 			img_data = output_file.read()
 		return (extension, img_data)
 
