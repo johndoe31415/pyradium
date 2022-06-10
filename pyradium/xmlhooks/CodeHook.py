@@ -23,6 +23,7 @@ import xml.dom.minidom
 import pygments
 from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
 from pyradium.Enums import PresentationFeature
+from pyradium.Exceptions import CodeHighlightingException
 
 @XMLHookRegistry.register_hook
 class CodeHook(InnerTextHook):
@@ -30,7 +31,11 @@ class CodeHook(InnerTextHook):
 
 	@classmethod
 	def handle_text(cls, text, rendered_presentation, node):
-		lexer = pygments.lexers.get_lexer_by_name(node.getAttribute("lang"))
+		lang = node.getAttribute("lang")
+		try:
+			lexer = pygments.lexers.get_lexer_by_name(lang)
+		except pygments.util.ClassNotFound as e:
+			raise CodeHighlightingException(f"Cannot find lexer to syntax highlight code in language '{lang}'.")
 		highlighted_code = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter(cssclass = "code_highlight"))
 
 		replacement_node = xml.dom.minidom.parseString(highlighted_code).firstChild
