@@ -51,7 +51,10 @@ jobs:
 
       - name: Commit and push the updated documentation
         run: |
+          echo "PYRADIUM_REV=$(git rev-parse HEAD)" >>$GITHUB_ENV
           cd pyradium-docs
+          git config --global user.email "nobody@invalid"
+          git config --global user.name "pyradium CI"
           git add *
-          git commit -a -m "CI job updated presentation"
+          git commit -a -m "CI job updated, rendered using ${PYRADIUM_REV}"
           git push
