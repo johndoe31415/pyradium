@@ -60,7 +60,7 @@ PyPi. It started out as pybeamer in 2015 as a pet project of mine that I've
 never published, but it has since been completely rewritten.
 
 ## Example
-You can view an example of a presentation [here](https://johndoe31415.github.io/pyradium/).
+You can view an example of a presentation [here](https://johndoe31415.github.io/pyradium-docs/).
 The source for that presentation can be found [here](https://github.com/johndoe31415/pyradium/tree/master/examples).
 
 ## Input Documents
