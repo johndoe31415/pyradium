@@ -1,5 +1,5 @@
 # pyradium
-[![Build Status](https://travis-ci.com/johndoe31415/pyradium.svg?branch=master)](https://travis-ci.com/johndoe31415/pyradium)
+[![Build Status](https://github.com/johndoe31415/pyradium/actions/workflows/run-testcases.yml/badge.svg)](https://github.com/johndoe31415/pyradium/actions/workflows/run-testcases.yml)
 
 This is a tool which takes XML input that describes a presentation and renders
 it into a presentation HTML. It borrows ideas from LaTeX-beamer but also
