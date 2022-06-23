@@ -23,8 +23,8 @@ jobs:
       - name: Install Python dependencies
         run: pip install mako pygments requests
 
-#      - name: Install Linux dependencies
-#        run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools
+      - name: Install Linux dependencies
+        run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools
 
       - name: Reconfigure ImageMagick policy to allow PDF conversion
         run: sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>//g;' /etc/ImageMagick-6/policy.xml
@@ -46,8 +46,7 @@ jobs:
         run: rm -fr pyradium-docs/*
 
       - name: Build the example presentation
-#        run: ./pyradium.py render -f -I examples/sub examples/example.xml -R pyradium-docs/customfiles:customfiles/ pyradium-docs -vvv
-        run: date >pyradium-docs/index.html
+        run: ./pyradium.py render -f -I examples/sub examples/example.xml -R pyradium-docs/customfiles:customfiles/ pyradium-docs -vvv
 
       - name: Commit and push the updated documentation
         run: |
