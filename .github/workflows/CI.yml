@@ -26,6 +26,9 @@ jobs:
       - name: Install Linux dependencies
         run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools
 
+      - name: Reconfigure ImageMagick policy to allow PDF conversion
+        run: sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>//g;' /etc/ImageMagick-6/policy.xml
+
       - name: Run all testcases
         run: python3 -m unittest pyradium.tests
 
