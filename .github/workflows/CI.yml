@@ -32,11 +32,8 @@ jobs:
       - name: Run all testcases
         run: python3 -m unittest pyradium.tests
 
-      - name: Store the SSH deployment key locally
-        run: |
-          mkdir -p ~/.ssh
-          echo {{ secrets.DOCS_DEPLOYMENT_SSH_KEY }} >~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+      - name: Add the SSH deployment key to the keyring
+        run: echo {{ secrets.DOCS_DEPLOYMENT_SSH_KEY }} | ssh-add -
 
       - name: Clone the documentation Github repository
         run: git clone git@github.com:johndoe31415/pyradium-docs
