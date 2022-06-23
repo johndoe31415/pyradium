@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install mako pygments requests
+
+      - name: Run all testcases
+        run: python3 -m unittest pyradium.tests
