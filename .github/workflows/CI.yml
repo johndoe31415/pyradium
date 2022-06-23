@@ -39,7 +39,7 @@ jobs:
           echo >>~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           wc -l ~/.ssh/id_ed25519
-          cat ~/.ssh/id_ed25519 | tr A-Z Z-A
+          cat ~/.ssh/id_ed25519 | tr A-Z A
 
       - name: Clone the documentation Github repository
         run: git clone git@github.com:johndoe31415/pyradium-docs
