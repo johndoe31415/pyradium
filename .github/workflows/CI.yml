@@ -38,6 +38,7 @@ jobs:
           echo {{ secrets.DOCS_DEPLOYMENT_SSH_KEY }} >~/.ssh/id_ed25519
           echo >>~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          wc -l ~/.ssh/id_ed25519
 
       - name: Clone the documentation Github repository
         run: git clone git@github.com:johndoe31415/pyradium-docs
