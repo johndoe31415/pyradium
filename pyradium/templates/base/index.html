@@ -7,7 +7,7 @@
 		%endif
 		<meta name="generator" content="https://github.com/johndoe31415/pyradium v${pyradium_version}" />
 		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
-		%for css_filename in rendered_presentation.css:
+		%for css_filename in sorted(rendered_presentation.css):
 		<link rel="stylesheet" href="${preuri}${css_filename}" />
 		%endfor
 	</head>
