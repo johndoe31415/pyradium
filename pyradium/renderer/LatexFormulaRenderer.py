@@ -111,7 +111,7 @@ class LatexFormulaRenderer(BaseRenderer):
 
 			# Then crop the image finally and capture cropping metadata along the way
 			crop_meta = json.loads(subprocess.check_output([ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", png_filename, "json:-" ]))[0]
-			cmd = [ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", png_filename, "png:-" ]
+			cmd = [ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", "-strip", png_filename, "png:-" ]
 			png_data = subprocess.check_output(cmd)
 			_log.trace("Final crop to output size: %s", CmdlineEscape().cmdline(cmd))
 			if _log.isEnabledFor(logging.SINGLESTEP):
