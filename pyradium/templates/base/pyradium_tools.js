@@ -87,7 +87,6 @@ export class TimeTools {
 
 				const option1 = new Date(now.getFullYear(), now.getMonth(), timestamp_day, timestamp_hour, timestamp_minute, 0);
 				const option2 = new Date(now.getFullYear(), now.getMonth() + 1, timestamp_day, timestamp_hour, timestamp_minute, 0);
-				console.log(option1);
 				const diff1 = Math.abs(option1.getTime() - now.getTime());
 				const diff2 = Math.abs(option2.getTime() - now.getTime());
 				const timestamp = (diff1 < diff2) ? option1 : option2;
@@ -132,6 +131,13 @@ export class TimeTools {
 		}
 
 		return null;
+	}
+
+	static format_datetime(datetime) {
+		return {
+			day: 	String(datetime.getFullYear()).padStart(4, "0") + "-" + String((datetime.getMonth() + 1)).padStart(2, "0") + "-" + String(datetime.getDate()).padStart(2, "0"),
+			hms:	String(datetime.getHours()).padStart(2, "0") + ":" + String(datetime.getMinutes()).padStart(2, "0") + ":" + String(datetime.getSeconds()).padStart(2, "0"),
+		}
 	}
 
 	static format_hms(total_seconds) {

@@ -46,6 +46,7 @@ div.topgrid div.top {
 }
 
 div.topgrid div.bottom {
+	text-align: center;
 	grid-row: 2;
 }
 

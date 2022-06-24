@@ -324,6 +324,11 @@ export class PresentationTimer {
 	}
 
 	_ui_update_display() {
+		const now_date = new Date();
+		const now = now_date.getTime();
+		const now_fmt = TimeTools.format_datetime(now_date);
+		this._ui_elements.datetime_now.innerHTML = now_fmt.day + "<br/>" + now_fmt.hms;
+
 		if (this._have_connection) {
 			switch (this._timer_mode) {
 				case TimerMode.STARTED:
@@ -350,7 +355,6 @@ export class PresentationTimer {
 			return;
 		}
 
-		const now = new Date().getTime();
 		const remaining_presentation_time_secs = (this._active_timer.presentation_end.getTime() - now) / 1000;
 		const nominal_elapsed_time_secs = (now - this._active_timer.presentation_start.getTime()) / 1000;
 		const dynamic_elapsed_time_secs = (now - this._dynamic_timer.presentation_start.getTime()) / 1000;
