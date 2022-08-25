@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -28,12 +28,10 @@ class QuoteHook(BaseHook):
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		text = XMLTools.inner_text(node).strip()
 		style = {
 			"fr":	"«»",
 			"de":	"„“",
 			"sgl":	"‘’",
 		}.get(node.getAttribute("type"), "“”")
-		replacement_text = style[0] + text + style[1]
-		replacement_node = node.ownerDocument.createTextNode(replacement_text)
-		return replacement_node
+		replacement_nodes = [ node.ownerDocument.createTextNode(style[0]) ] + node.childNodes + [ node.ownerDocument.createTextNode(style[1]) ]
+		return replacement_nodes

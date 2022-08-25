@@ -31,6 +31,7 @@
 		<ul>
 			<li>Now it's section <s:enq>Foo</s:enq></li>
 			<li>And subsection <s:enq>Bar</s:enq></li>
+			<li>Nestable as well: <s:enq>now <b>nestable</b> as well</s:enq></li>
 			<li>This should show &quot;Foo&quot; / &quot;Bar&quot; below.</li>
 		</ul>
 	</slide>
