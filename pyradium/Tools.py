@@ -22,7 +22,7 @@
 import json
 import hashlib
 import subprocess
-from pyradium.Exceptions import InvalidBooleanValueException
+from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException
 
 class XMLTools():
 	@classmethod
@@ -212,6 +212,20 @@ class XMLTools():
 			return False
 		else:
 			raise InvalidBooleanValueException("Invalid boolean value for attribute %s of node %s." % (attr_name, node))
+
+	@classmethod
+	def get_node_value(cls, node, find_file_function = None):
+		if node.hasAttribute("value"):
+			return node.getAttribute("value")
+		elif node.hasAttribute("src"):
+			filename = node.getAttribute("src")
+			if find_file_function is None:
+				raise InvalidValueNodeException(f"Value node referenced filename '{filename}', but no lookup function passed internally.")
+			full_filename = find_file_function(filename)
+			with open(full_filename) as f:
+				return f.read()
+		else:
+			return cls.inner_text(node)
 
 class JSONTools():
 	@classmethod

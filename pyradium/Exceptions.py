@@ -41,11 +41,13 @@ class InvalidTransformationException(PyRadiumException): pass
 
 class DuplicateOrderException(PyRadiumException): pass
 class InvalidBooleanValueException(PyRadiumException): pass
+class InvalidValueNodeException(PyRadiumException): pass
 class FailedToLookupFileException(PyRadiumException): pass
 class InvalidTeXException(PyRadiumException): pass
 class UnknownSlideTypeException(PyRadiumException): pass
 class ImageRenderingException(PyRadiumException): pass
 class CodeHighlightingException(PyRadiumException): pass
+class UnknownParameterException(PyRadiumException): pass
 
 class AcronymException(PyRadiumException): pass
 class InvalidAcronymFileException(AcronymException): pass
