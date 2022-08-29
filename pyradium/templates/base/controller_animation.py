@@ -19,9 +19,12 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import logging
 from pyradium.Controller import BaseController
 from pyradium.Exceptions import UsageException
 from pyradium.SVGTransformation import SVGTransformation
+
+_log = logging.getLogger(__spec__.name)
 
 class AnimationController(BaseController):
 	_VALID_ANIMATION_MODES = [ "compose", "compose-all", "replace" ]
@@ -115,6 +118,10 @@ class AnimationController(BaseController):
 				})
 			previous_layer_id = layer_id
 
+		if len(additional_slide_var_list) == 0:
+			_log.warning("SVG animation from %s rendered into no slides.", filename)
+		else:
+			_log.debug("SVG animation from %s rendered into %d slides.", filename, len(additional_slide_var_list))
 		if not self.rendered_presentation.renderer.rendering_params.collapse_animation:
 			yield from self.slide.emit_nocontent_slide(self.rendered_presentation, self.content_containers, additional_slide_var_list)
 		else:
