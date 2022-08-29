@@ -99,7 +99,7 @@ class SVGLayer():
 class SVGTransformation():
 	def __init__(self, svg_filename):
 		self._xml = xml.dom.minidom.parse(svg_filename)
-		self._svg = self._xml.childNodes[0]
+		self._svg = XMLTools.findfirst(self._xml, "svg")
 		self._layers = [ ]
 		self._layers_by_id = { }
 		for group_node in XMLTools.findall(self._svg, "g", namespace_uri = "http://www.w3.org/2000/svg"):

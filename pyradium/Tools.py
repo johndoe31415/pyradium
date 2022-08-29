@@ -117,12 +117,18 @@ class XMLTools():
 				yield from cls.findall_text(node, recursive = True)
 
 	@classmethod
-	def findall(cls, root_node, name, namespace_uri = "*"):
-		result = [ ]
+	def findall_generator(cls, root_node, name, namespace_uri = "*"):
 		for node in root_node.childNodes:
 			if (node.nodeType == node.ELEMENT_NODE) and (node.tagName == name) and (namespace_uri in ("*", node.namespaceURI)):
-				result.append(node)
-		return result
+				yield node
+
+	@classmethod
+	def findfirst(cls, root_node, name, namespace_uri = "*"):
+		return next(cls.findall_generator(root_node, name, namespace_uri = namespace_uri))
+
+	@classmethod
+	def findall(cls, root_node, name, namespace_uri = "*"):
+		return list(cls.findall_generator(root_node, name, namespace_uri = namespace_uri))
 
 	@classmethod
 	def normalize_ns(cls, node, known_namespaces = None):

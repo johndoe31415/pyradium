@@ -53,6 +53,9 @@ class AnimationController(BaseController):
 		else:
 			raise NotImplementedError(animation_mode)
 
+		if len(considered_layers) == 0:
+			_log.warning("SVG animation from %s has no layers to be considered.", filename)
+			return
 
 		# Then look at all these layers and determine their special handling
 		layer_tags = { }
