@@ -30,6 +30,7 @@ from pyradium.renderer.LatexFormulaRenderer import LatexFormulaRenderer
 from pyradium.renderer.ImageRenderer import ImageRenderer
 from pyradium.renderer.ExecRenderer import ExecRenderer
 from pyradium.renderer.PlotRenderer import PlotRenderer
+from pyradium.renderer.GraphvizRenderer import GraphvizRenderer
 from .Acronyms import Acronyms
 from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
@@ -51,6 +52,7 @@ class Renderer():
 			"img":		RendererCache(ImageRenderer()),
 			"exec":		RendererCache(ExecRenderer()),
 			"plot":		RendererCache(PlotRenderer()),
+			"graphviz":	RendererCache(GraphvizRenderer()),
 			"acronym":	Acronyms(),
 		}
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])

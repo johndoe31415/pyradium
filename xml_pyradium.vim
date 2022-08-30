@@ -24,7 +24,9 @@ endfunction
 :amenu 500.30 &pyradium.&Sectiontitle :call PyradiumTemplateHelperCommand("sectiontitle")<Enter>
 :amenu 500.40 &pyradium.&Quote :call PyradiumTemplateHelperCommand("quote")<Enter>
 :amenu 500.50 &pyradium.&Image :call PyradiumTemplateHelperCommand("img")<Enter>
-:amenu 500.60 &pyradium.&Animation :call PyradiumTemplateHelperCommand("anim")<Enter>
+:amenu 500.60 &pyradium.&Plot :call PyradiumTemplateHelperCommand("plot")<Enter>
+:amenu 500.70 &pyradium.&Graphviz :call PyradiumTemplateHelperCommand("graphviz")<Enter>
+:amenu 500.80 &pyradium.&Animation :call PyradiumTemplateHelperCommand("anim")<Enter>
 
 " Add specific keybindings
 vmap <C-S-b> :s/\%V.*\%V./<b>&<\/b><Enter>:noh<Enter>

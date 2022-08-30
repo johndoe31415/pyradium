@@ -23,6 +23,8 @@ from .BaseAction import BaseAction
 
 _KNOWN_TEMPLATES = {
 	"img": """<s:img src="X" />""",
+	"plot": """<s:plot src="X" />""",
+	"graphviz": """<s:graphviz src="X" />""",
 
 	"anim": """
 	<slide type="animation">

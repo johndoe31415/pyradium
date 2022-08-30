@@ -39,3 +39,4 @@ from .NoSpellcheckHook import NoSpellcheckHook
 from .NoLinebreakHook import NoLinebreakHook
 from .VerbatimHook import VerbatimHook
 from .CircuitHook import CircuitHook
+from .GraphvizHook import GraphvizHook

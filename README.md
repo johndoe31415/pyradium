@@ -34,7 +34,8 @@ $ pip3 install pyradium
 ```
 
 For usage of LaTeX formulas, you need pdflatex and ImageMagick. For SVG
-rendering you need Inkscape. For plotting of graphs, you need gnuplot. To use
+rendering you need Inkscape. For plotting of graphs, you need gnuplot. To
+render Graphviz graphs (e.g., a DAG) you need Graphviz installed. To use
 continuous building, pyradium relies on the inotifytools:
 
 ```
