@@ -6,7 +6,7 @@ with open("README.md") as f:
 setuptools.setup(
 	name = "pyradium",
 	packages = setuptools.find_packages(),
-	version = "0.0.13",
+	version = "0.0.14rc0",
 	license = "gpl-3.0",
 	description = "Creating HTML presentations with LaTeX-ish features from XML source",
 	long_description = long_description,
@@ -14,7 +14,7 @@ setuptools.setup(
 	author = "Johannes Bauer",
 	author_email = "joe@johannes-bauer.com",
 	url = "https://github.com/johndoe31415/pyradium",
-	download_url = "https://github.com/johndoe31415/pyradium/archive/0.0.13.tar.gz",
+	download_url = "https://github.com/johndoe31415/pyradium/archive/0.0.14rc0.tar.gz",
 	keywords = [ "latex", "presentation", "template", "html" ],
 	install_requires = [
 		"mako",
