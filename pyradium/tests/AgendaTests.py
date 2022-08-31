@@ -79,7 +79,7 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[1].start_time, "15:00")
 		self.assertEqual(agenda[1].end_time, "16:00")
 
-	def test_past_midnight(self):
+	def test_past_midnight1(self):
 		agenda = Agenda.parse("""
 		23:00
 		+2:00	Presentation
@@ -88,6 +88,22 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[0].start_time, "23:00")
 		self.assertEqual(agenda[0].end_time, "1:00")
 		self.assertEqual(agenda[0].text, "Presentation")
+
+	def test_past_midnight2(self):
+		agenda = Agenda.parse("""
+		23:00
+		1:00	A
+		3:00	B
+		""")
+		self.assertEqual(len(agenda), 2)
+		self.assertEqual(agenda[0].start_time, "23:00")
+		self.assertEqual(agenda[0].end_time, "1:00")
+		self.assertEqual(agenda[0].duration, "2:00")
+		self.assertEqual(agenda[0].text, "A")
+		self.assertEqual(agenda[1].start_time, "1:00")
+		self.assertEqual(agenda[1].end_time, "3:00")
+		self.assertEqual(agenda[1].duration, "2:00")
+		self.assertEqual(agenda[1].text, "B")
 
 	def test_variable_simple1(self):
 		agenda = Agenda.parse("""
@@ -143,3 +159,37 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[1].end_time, "13:40")
 		self.assertEqual(agenda[2].start_time, "13:40")
 		self.assertEqual(agenda[2].end_time, "14:00")
+
+	def test_variable_complex3(self):
+		agenda = Agenda.parse("""
+		13:00
+		*		A
+		+0:30	B
+		*2		C
+		+0:10	D
+		*		E
+		14:00
+		""")
+		self.assertEqual(len(agenda), 5)
+		self.assertEqual(agenda[0].start_time, "13:00")
+		self.assertEqual(agenda[0].end_time, "13:05")
+		self.assertEqual(agenda[1].start_time, "13:05")
+		self.assertEqual(agenda[1].end_time, "13:35")
+		self.assertEqual(agenda[2].start_time, "13:35")
+		self.assertEqual(agenda[2].end_time, "13:45")
+		self.assertEqual(agenda[3].start_time, "13:45")
+		self.assertEqual(agenda[3].end_time, "13:55")
+		self.assertEqual(agenda[4].start_time, "13:55")
+		self.assertEqual(agenda[4].end_time, "14:00")
+
+	def test_rounding(self):
+		agenda = Agenda.parse("""
+		13:01
+		14:02	A
+		15:03	B
+		""", granularity_minutes = 5)
+		self.assertEqual(len(agenda), 2)
+		self.assertEqual(agenda[0].start_time, "13:00")
+		self.assertEqual(agenda[0].end_time, "14:00")
+		self.assertEqual(agenda[1].start_time, "14:00")
+		self.assertEqual(agenda[1].end_time, "15:05")

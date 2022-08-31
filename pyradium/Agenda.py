@@ -48,6 +48,10 @@ class Agenda():
 		return f"{minutes // 60}:{minutes % 60:02d}"
 
 	@classmethod
+	def _roundto(cls, value, boundary):
+		return round(value / boundary) * boundary
+
+	@classmethod
 	def _resolve_relative_references(cls, unresolved_agenda_iterator, reverse = False):
 		now = None
 		resolved_items = [ ]
@@ -154,18 +158,14 @@ class Agenda():
 				if prev_item is None:
 					raise UndefinedAgendaTimeException(f"Unable to determine start time of event: {item}")
 
-				start = prev_item.value
-				end = item.value
+				start = cls._roundto(prev_item.value, granularity_minutes)
+				end = cls._roundto(item.value, granularity_minutes)
 				duration = end - start
 				agenda_item = AgendaItem(start_time = cls._hmstr(start), end_time = cls._hmstr(end), duration = cls._hmstr(duration), text = item.text)
 				resolved_agenda_items.append(agenda_item)
 
 			prev_item = item
-
-		# TODO rounding
-
 		return resolved_agenda_items
-
 
 	@classmethod
 	def parse(cls, text: str, name: str | None = None, granularity_minutes: int = 5):
