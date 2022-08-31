@@ -57,8 +57,8 @@ class Agenda():
 				now = item.value
 				resolved_items.append(item)
 			elif (item.spec_type == "rel") and (now is not None):
-				resolved_value = now + scalar * item.value
-				resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = resolved_value, text = item.text)
+				now += scalar * item.value
+				resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text)
 				resolved_items.append(resolved_item)
 			else:
 				now = None
