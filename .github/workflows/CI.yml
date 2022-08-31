@@ -24,7 +24,7 @@ jobs:
         run: pip install mako pygments requests
 
       - name: Install Linux dependencies
-        run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools
+        run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools graphviz
 
       - name: Reconfigure ImageMagick policy to allow PDF conversion
         run: sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>//g;' /etc/ImageMagick-6/policy.xml

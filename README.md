@@ -39,7 +39,7 @@ render Graphviz graphs (e.g., a DAG) you need Graphviz installed. To use
 continuous building, pyradium relies on the inotifytools:
 
 ```
-# apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools
+# apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools graphviz
 ```
 
 You also need to tell ImageMagick to permit PDF to raster image conversion by

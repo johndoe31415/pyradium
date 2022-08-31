@@ -1,0 +1,30 @@
+digraph {
+	charset = "utf-8";
+	fontname = "Latin Modern Mono";
+	graph [ ordering = "out" ];
+	n_W [ shape = "box", label = "W", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_D [ shape = "box", label = "D", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_WD -> n_W [ label = " 0", color = "#c0392b" ];
+	n_WD -> n_D [ label = " 1", color = "#27ae60" ];
+	n_L [ shape = "box", label = "L", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_H [ shape = "box", label = "H", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_LH -> n_L [ label = " 0", color = "#c0392b" ];
+	n_LH -> n_H [ label = " 1", color = "#27ae60" ];
+	n_R [ shape = "box", label = "R", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_WD [ shape = "box", label = "WD", fontname = "Latin Modern Mono" ];
+	n_RWD -> n_R [ label = " 0", color = "#c0392b" ];
+	n_RWD -> n_WD [ label = " 1", color = "#27ae60" ];
+	n_O [ shape = "box", label = "O", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_LH [ shape = "box", label = "LH", fontname = "Latin Modern Mono" ];
+	n_OLH -> n_O [ label = " 0", color = "#c0392b" ];
+	n_OLH -> n_LH [ label = " 1", color = "#27ae60" ];
+	n_RWD [ shape = "box", label = "RWD", fontname = "Latin Modern Mono" ];
+	n_E [ shape = "box", label = "E", style = "filled", fillcolor = "#f1c40f", fontname = "Latin Modern Mono" ];
+	n_RWDE -> n_RWD [ label = " 0", color = "#c0392b" ];
+	n_RWDE -> n_E [ label = " 1", color = "#27ae60" ];
+	n_OLH [ shape = "box", label = "OLH", fontname = "Latin Modern Mono" ];
+	n_RWDE [ shape = "box", label = "RWDE", fontname = "Latin Modern Mono" ];
+	n_OLHRWDE -> n_OLH [ label = " 0", color = "#c0392b" ];
+	n_OLHRWDE -> n_RWDE [ label = " 1", color = "#27ae60" ];
+	n_OLHRWDE [ shape = "box", label = "OLHRWDE", color = "#3498db", fontname = "Latin Modern Mono" ];
+}

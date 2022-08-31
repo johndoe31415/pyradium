@@ -262,8 +262,13 @@
 	</slide>
 
 	<slide>
-		<s:var name="heading" value="Plot Rendering"/>
-		<s:plot src="histo.gnuplot"/>
+		<s:var name="heading" value="gnuplot Rendering"/>
+		<s:plot src="histogram.gnuplot"/>
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="graphviz Rendering"/>
+		<s:graphviz src="directed_graph.dot" />
 	</slide>
 
 	<subsection>Esc&lt;&gt;ping</subsection>
