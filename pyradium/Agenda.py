@@ -37,6 +37,11 @@ class Agenda():
 	def name(self):
 		return self._name
 
+	def dump(self):
+		print(f"Agenda with {len(self)} items:")
+		for item in self:
+			print(f"    {item}")
+
 	def __len__(self):
 		return len(self._agenda_items)
 
@@ -53,21 +58,34 @@ class Agenda():
 		return round(value / boundary) * boundary
 
 	@classmethod
-	def _resolve_relative_references(cls, unresolved_agenda_iterator, reverse = False):
+	def _resolve_relative_references(cls, unresolved_agenda, reverse = False):
+		if len(unresolved_agenda) == 0:
+			return [ ]
+
 		now = None
 		resolved_items = [ ]
 		scalar = 1 if (not reverse) else -1
-		for item in unresolved_agenda_iterator:
+		unresolved_agenda = unresolved_agenda if (not reverse) else reversed(unresolved_agenda)
+
+		for item in unresolved_agenda:
 			if item.spec_type == "abs":
 				now = item.value
 				resolved_items.append(item)
 			elif (item.spec_type == "rel") and (now is not None):
-				now += scalar * item.value
+				if not reversed:
+					now += scalar * item.value
 				resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text)
+				if reversed:
+					now += scalar * item.value
 				resolved_items.append(resolved_item)
 			else:
 				now = None
 				resolved_items.append(item)
+
+		if reverse:
+			resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = None)
+			resolved_items.append(resolved_item)
+
 		if reverse:
 			resolved_items.reverse()
 		return resolved_items
@@ -78,7 +96,7 @@ class Agenda():
 
 	@classmethod
 	def _resolve_backward_relative_references(cls, unresolved_agenda: list[_UnresolvedAgendaItem]):
-		return cls._resolve_relative_references(reversed(unresolved_agenda), reverse = True)
+		return cls._resolve_relative_references(unresolved_agenda, reverse = True)
 
 	@classmethod
 	def _resolve_all_relative_references(cls, unresolved_agenda: list[_UnresolvedAgendaItem]):

@@ -21,6 +21,7 @@
 
 import unittest
 from pyradium.Agenda import Agenda
+from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException
 
 class AgendaTests(unittest.TestCase):
 	def test_simple1(self):
@@ -65,6 +66,41 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[1].end_time, "15:15")
 		self.assertEqual(agenda[2].start_time, "15:15")
 		self.assertEqual(agenda[2].end_time, "16:20")
+
+	def test_backwards1(self):
+		agenda = Agenda.parse("""
+		+0:15	A
+		+0:30	B
+		+1:00	C
+		14:00
+		""")
+		agenda.dump()
+		self.assertEqual(len(agenda), 3)
+		self.assertEqual(agenda[0].start_time, "12:15")
+		self.assertEqual(agenda[0].end_time, "12:30")
+		self.assertEqual(agenda[1].start_time, "12:30")
+		self.assertEqual(agenda[1].end_time, "13:00")
+		self.assertEqual(agenda[2].start_time, "13:00")
+		self.assertEqual(agenda[2].end_time, "14:00")
+
+	def test_backwards2(self):
+		agenda = Agenda.parse("""
+		+0:15	A
+		+0:30	B
+		+1:00	C
+		14:00
+		*		D
+		14:15
+		""")
+		self.assertEqual(len(agenda), 4)
+		self.assertEqual(agenda[0].start_time, "12:15")
+		self.assertEqual(agenda[0].end_time, "12:30")
+		self.assertEqual(agenda[1].start_time, "12:30")
+		self.assertEqual(agenda[1].end_time, "13:00")
+		self.assertEqual(agenda[2].start_time, "13:00")
+		self.assertEqual(agenda[2].end_time, "14:00")
+		self.assertEqual(agenda[3].start_time, "14:00")
+		self.assertEqual(agenda[3].end_time, "14:15")
 
 	def test_variable_gap(self):
 		agenda = Agenda.parse("""
@@ -205,3 +241,15 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[0].end_time, "14:30")
 		self.assertEqual(agenda[1].start_time, "14:30")
 		self.assertEqual(agenda[1].end_time, "14:45")
+
+	def test_error_syntax1(self):
+		with self.assertRaises(IllegalAgendaSyntaxException):
+			Agenda.parse("foo")
+
+	def test_error_syntax2(self):
+		with self.assertRaises(IllegalAgendaSyntaxException):
+			Agenda.parse("1:00/2	A")
+
+	def test_error_underspecified(self):
+		with self.assertRaises(UndefinedAgendaTimeException):
+			Agenda.parse("+1:00	A")
