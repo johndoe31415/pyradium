@@ -4,3 +4,4 @@ rendered
 dist
 pyradium.egg-info/
 venv
+.coverage
