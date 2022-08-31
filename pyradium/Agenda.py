@@ -132,6 +132,7 @@ class Agenda():
 					enclosed.append(item)
 					if item.spec_type == "abs":
 						break
+					index += 1
 
 				if enclosed[-1].spec_type != "abs":
 					raise UnresolvableWeightedEntryException("Unresolvable weighted exception: May not have a weighted relative item at the end")
@@ -155,7 +156,6 @@ class Agenda():
 
 				start = prev_item.value
 				end = item.value
-				print(item, prev_item)
 				duration = end - start
 				agenda_item = AgendaItem(start_time = cls._hmstr(start), end_time = cls._hmstr(end), duration = cls._hmstr(duration), text = item.text)
 				resolved_agenda_items.append(agenda_item)
@@ -186,8 +186,11 @@ class Agenda():
 				time_value = (int(rematch["hour"]) * 60) + int(rematch["minute"])
 				relative = rematch["relative"] is not None
 				timespec = ("rel" if relative else "abs", time_value)
-			elif rematch["weight"] is not None:
-				weight = float(rematch["weight"])
+			elif rematch["wildcard"] is not None:
+				if rematch["weight"] is not None:
+					weight = float(rematch["weight"])
+				else:
+					weight = 1
 				timespec = ("weight", weight)
 
 			unresolved_item = _UnresolvedAgendaItem(spec_type = timespec[0], value = timespec[1], text = rematch["text"])
