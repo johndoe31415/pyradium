@@ -193,3 +193,15 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[0].end_time, "14:00")
 		self.assertEqual(agenda[1].start_time, "14:00")
 		self.assertEqual(agenda[1].end_time, "15:05")
+
+	def test_divisor(self):
+		agenda = Agenda.parse("""
+		14:00
+		+1:00/2		A
+		+1:00/4		B
+		""")
+		self.assertEqual(len(agenda), 2)
+		self.assertEqual(agenda[0].start_time, "14:00")
+		self.assertEqual(agenda[0].end_time, "14:30")
+		self.assertEqual(agenda[1].start_time, "14:30")
+		self.assertEqual(agenda[1].end_time, "14:45")

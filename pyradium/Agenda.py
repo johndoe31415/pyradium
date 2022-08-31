@@ -21,12 +21,13 @@
 
 import re
 import collections
+from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException
 
 AgendaItem = collections.namedtuple("AgendaItem", [ "start_time", "end_time", "duration", "text" ])
 _UnresolvedAgendaItem = collections.namedtuple("UnresolvedAgendaItem", [ "spec_type", "value", "text" ])
 
 class Agenda():
-	_AGENDA_REGEX = re.compile(r"((?P<relative>\+)?(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(/(?P<divider>\d+(\.\d+)))?|(?P<wildcard>\*)(?P<weight>\d+(\.\d+)?)?)(\s+(?P<text>.*))?")
+	_AGENDA_REGEX = re.compile(r"((?P<relative>\+)?(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(/(?P<divider>\d+(\.\d+)?))?|(?P<wildcard>\*)(?P<weight>\d+(\.\d+)?)?)(\s+(?P<text>.*))?")
 
 	def __init__(self, agenda_items: list[AgendaItem], name: str | None = None):
 		self._agenda_items = agenda_items
@@ -179,12 +180,17 @@ class Agenda():
 
 			rematch = cls._AGENDA_REGEX.fullmatch(line)
 			if rematch is None:
-				fdous
+				raise IllegalAgendaSyntaxException(f"Do not understand agenda element: {line}")
 
 			rematch = rematch.groupdict()
 			if rematch["hour"] is not None:
 				time_value = (int(rematch["hour"]) * 60) + int(rematch["minute"])
 				relative = rematch["relative"] is not None
+				if rematch["divider"] is not None:
+					if not relative:
+						raise IllegalAgendaSyntaxException(f"Specifying a divider for an absolute time element does not make sense: {line}")
+					divider = float(rematch["divider"])
+					time_value /= divider
 				timespec = ("rel" if relative else "abs", time_value)
 			elif rematch["wildcard"] is not None:
 				if rematch["weight"] is not None:

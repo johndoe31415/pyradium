@@ -53,6 +53,11 @@ class AcronymException(PyRadiumException): pass
 class InvalidAcronymFileException(AcronymException): pass
 class DuplicateAcronymException(AcronymException): pass
 
+class AgendaException(PyRadiumException): pass
+class IllegalAgendaSyntaxException(AgendaException): pass
+class UndefinedAgendaTimeException(AgendaException): pass
+class UnresolvableWeightedEntryException(AgendaException): pass
+
 class FailedToExecuteSubprocessException(PyRadiumException): pass
 
 class SpellcheckerException(PyRadiumException): pass
