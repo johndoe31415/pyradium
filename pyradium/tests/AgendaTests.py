@@ -74,7 +74,6 @@ class AgendaTests(unittest.TestCase):
 		+1:00	C
 		14:00
 		""")
-		agenda.dump()
 		self.assertEqual(len(agenda), 3)
 		self.assertEqual(agenda[0].start_time, "12:15")
 		self.assertEqual(agenda[0].end_time, "12:30")

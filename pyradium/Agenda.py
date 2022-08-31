@@ -64,7 +64,6 @@ class Agenda():
 
 		now = None
 		resolved_items = [ ]
-		scalar = 1 if (not reverse) else -1
 		unresolved_agenda = unresolved_agenda if (not reverse) else reversed(unresolved_agenda)
 
 		for item in unresolved_agenda:
@@ -72,11 +71,11 @@ class Agenda():
 				now = item.value
 				resolved_items.append(item)
 			elif (item.spec_type == "rel") and (now is not None):
-				if not reversed:
-					now += scalar * item.value
+				if not reverse:
+					now += item.value
 				resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text)
-				if reversed:
-					now += scalar * item.value
+				if reverse:
+					now -= item.value
 				resolved_items.append(resolved_item)
 			else:
 				now = None
@@ -174,7 +173,7 @@ class Agenda():
 		prev_item = None
 		for item in unresolved_agenda:
 			if item.text is not None:
-				if prev_item is None:
+				if (prev_item is None) or (prev_item.value is None):
 					raise UndefinedAgendaTimeException(f"Unable to determine start time of event: {item}")
 
 				start = cls._roundto(prev_item.value, granularity_minutes)
