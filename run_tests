@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ "$1" == "" ]; then
+	python3 -m unittest pyradium.tests
+else
+	python3 -m unittest pyradium.tests.${1}
+fi

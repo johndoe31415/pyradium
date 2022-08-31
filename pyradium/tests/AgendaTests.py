@@ -51,6 +51,34 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[2].end_time, "16:30")
 		self.assertEqual(agenda[2].text, "ABC")
 
+	def test_variable_simple3(self):
+		agenda = Agenda.parse("""
+		13:00
+		14:00	A
+		15:15	B
+		16:20	C
+		""")
+		self.assertEqual(len(agenda), 3)
+		self.assertEqual(agenda[0].start_time, "13:00")
+		self.assertEqual(agenda[0].end_time, "14:00")
+		self.assertEqual(agenda[1].start_time, "14:00")
+		self.assertEqual(agenda[1].end_time, "15:15")
+		self.assertEqual(agenda[2].start_time, "15:15")
+		self.assertEqual(agenda[2].end_time, "16:20")
+
+	def test_variable_gap(self):
+		agenda = Agenda.parse("""
+		13:00
+		14:00	A
+		15:00
+		16:00	B
+		""")
+		self.assertEqual(len(agenda), 2)
+		self.assertEqual(agenda[0].start_time, "13:00")
+		self.assertEqual(agenda[0].end_time, "14:00")
+		self.assertEqual(agenda[1].start_time, "15:00")
+		self.assertEqual(agenda[1].end_time, "16:00")
+
 	def test_past_midnight(self):
 		agenda = Agenda.parse("""
 		23:00
