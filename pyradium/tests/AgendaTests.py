@@ -67,6 +67,28 @@ class AgendaTests(unittest.TestCase):
 		self.assertEqual(agenda[2].start_time, "15:15")
 		self.assertEqual(agenda[2].end_time, "16:20")
 
+	def test_marker(self):
+		agenda = Agenda.parse("""
+		14:00
+		:Beg
+		+1:00	Presentation
+		:First
+		+0:45	XYZ
+		+0:45	ABC
+		:End
+		""")
+		self.assertEqual(len(agenda), 3)
+		self.assertEqual(agenda[0].start_time, "14:00")
+		self.assertEqual(agenda[0].end_time, "15:00")
+		self.assertEqual(agenda[0].text, "Presentation")
+		self.assertEqual(agenda[1].start_time, "15:00")
+		self.assertEqual(agenda[1].end_time, "15:45")
+		self.assertEqual(agenda[1].text, "XYZ")
+		self.assertEqual(agenda[2].start_time, "15:45")
+		self.assertEqual(agenda[2].end_time, "16:30")
+		self.assertEqual(agenda[2].text, "ABC")
+		self.assertEqual(list(agenda.markers), [ ("Beg", "14:00"), ("First", "15:00"), ("End", "16:30") ])
+
 	def test_backwards1(self):
 		agenda = Agenda.parse("""
 		+0:15	A

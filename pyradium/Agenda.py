@@ -24,18 +24,23 @@ import collections
 from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException
 
 AgendaItem = collections.namedtuple("AgendaItem", [ "start_time", "end_time", "duration", "text" ])
-_UnresolvedAgendaItem = collections.namedtuple("UnresolvedAgendaItem", [ "spec_type", "value", "text" ])
+_UnresolvedAgendaItem = collections.namedtuple("UnresolvedAgendaItem", [ "spec_type", "value", "text", "markers" ])
 
 class Agenda():
-	_AGENDA_REGEX = re.compile(r"((?P<relative>\+)?(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(/(?P<divider>\d+(\.\d+)?))?|(?P<wildcard>\*)(?P<weight>\d+(\.\d+)?)?)(\s+(?P<text>.*))?")
+	_AGENDA_REGEX = re.compile(r"((?P<relative>\+)?(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(/(?P<divider>\d+(\.\d+)?))?|(?P<wildcard>\*)(?P<weight>\d+(\.\d+)?)?)(\s+(?P<text>.*))?|:(?P<marker>.+)")
 
-	def __init__(self, agenda_items: list[AgendaItem], name: str | None = None):
+	def __init__(self, agenda_items: list[AgendaItem], markers: collections.OrderedDict, name: str | None = None):
 		self._agenda_items = agenda_items
+		self._markers = markers
 		self._name = name
 
 	@property
 	def name(self):
 		return self._name
+
+	@property
+	def markers(self):
+		return iter(self._markers.items())
 
 	def dump(self):
 		print(f"Agenda with {len(self)} items:")
@@ -73,7 +78,7 @@ class Agenda():
 			elif (item.spec_type == "rel") and (now is not None):
 				if not reverse:
 					now += item.value
-				resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text)
+				resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text, markers = item.markers)
 				if reverse:
 					now -= item.value
 				resolved_items.append(resolved_item)
@@ -82,7 +87,7 @@ class Agenda():
 				resolved_items.append(item)
 
 		if reverse:
-			resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = None)
+			resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = None, markers = [ ])
 			resolved_items.append(resolved_item)
 
 		if reverse:
@@ -129,10 +134,10 @@ class Agenda():
 				pass
 			elif item.spec_type == "rel":
 				now += item.value
-				item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text)
+				item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text, markers = item.markers)
 			elif item.spec_type == "weight":
 				now += (item.value / weight_sum) * weighted_time
-				item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text)
+				item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = item.text, markers = item.markers)
 			resolved_items.append(item)
 		return resolved_items
 
@@ -170,6 +175,7 @@ class Agenda():
 		unresolved_agenda = cls._resolve_weighted_references(unresolved_agenda)
 
 		resolved_agenda_items = [ ]
+		markers = collections.OrderedDict()
 		prev_item = None
 		for item in unresolved_agenda:
 			if item.text is not None:
@@ -181,9 +187,11 @@ class Agenda():
 				duration = end - start
 				agenda_item = AgendaItem(start_time = cls._hmstr(start), end_time = cls._hmstr(end), duration = cls._hmstr(duration), text = item.text)
 				resolved_agenda_items.append(agenda_item)
-
+			for marker in item.markers:
+				ts = cls._roundto(item.value, granularity_minutes)
+				markers[marker] = cls._hmstr(ts)
 			prev_item = item
-		return resolved_agenda_items
+		return (resolved_agenda_items, markers)
 
 	@classmethod
 	def parse(cls, text: str, name: str | None = None, granularity_minutes: int = 5):
@@ -215,8 +223,14 @@ class Agenda():
 				else:
 					weight = 1
 				timespec = ("weight", weight)
+			elif rematch["marker"] is not None:
+				if len(unresolved_items) == 0:
+					raise IllegalAgendaSyntaxException(f"Cannot have a marker as the first element: {line}")
+				last_item = unresolved_items[-1]
+				last_item.markers.append(rematch["marker"])
+				continue
 
-			unresolved_item = _UnresolvedAgendaItem(spec_type = timespec[0], value = timespec[1], text = rematch["text"])
+			unresolved_item = _UnresolvedAgendaItem(spec_type = timespec[0], value = timespec[1], text = rematch["text"], markers = [ ])
 			unresolved_items.append(unresolved_item)
-		agenda_items = cls._resolve(unresolved_items, granularity_minutes = granularity_minutes)
-		return cls(agenda_items = agenda_items, name = name)
+		(agenda_items, markers) = cls._resolve(unresolved_items, granularity_minutes = granularity_minutes)
+		return cls(agenda_items = agenda_items, markers = markers, name = name)
