@@ -21,7 +21,7 @@
 
 import unittest
 from pyradium.Agenda import Agenda
-from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException
+from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException, AgendaTimeMismatchException
 
 class AgendaTests(unittest.TestCase):
 	def test_simple1(self):
@@ -149,7 +149,7 @@ class AgendaTests(unittest.TestCase):
 	def test_past_midnight2(self):
 		agenda = Agenda.parse("""
 		23:00
-		1:00	A
+		1+1:00	A
 		3:00	B
 		""")
 		self.assertEqual(len(agenda), 2)
@@ -274,3 +274,55 @@ class AgendaTests(unittest.TestCase):
 	def test_error_underspecified(self):
 		with self.assertRaises(UndefinedAgendaTimeException):
 			Agenda.parse("+1:00	A")
+
+	def test_error_weights_zero(self):
+		with self.assertRaises(UnresolvableWeightedEntryException):
+			Agenda.parse("""
+			13:00
+			*0	foo
+			14:00
+			""")
+
+	def test_error_weighted_out_of_time(self):
+		with self.assertRaises(UnresolvableWeightedEntryException):
+			Agenda.parse("""
+			13:00
+			+1:05	foo
+			*	blah
+			14:00
+			""")
+
+	def test_error_weighted_at_beginning(self):
+		with self.assertRaises(UnresolvableWeightedEntryException):
+			Agenda.parse("""
+			*	blah
+			14:00
+			""")
+
+	def test_error_weighted_at_end(self):
+		with self.assertRaises(UnresolvableWeightedEntryException):
+			Agenda.parse("""
+			14:00
+			*	blah
+			""")
+
+	def test_error_marker_first(self):
+		with self.assertRaises(IllegalAgendaSyntaxException):
+			Agenda.parse("""
+			:Start
+			14:00
+			*	blah
+			15:00
+			""")
+
+	def test_error_relative_out_of_time(self):
+		with self.assertRaises(AgendaTimeMismatchException):
+			Agenda.parse("""
+			13:00
+			+1:05	foo
+			14:00
+			""")
+
+	def test_empty(self):
+		agenda = Agenda.parse("")
+		self.assertEqual(len(agenda), 0)

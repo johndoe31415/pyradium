@@ -21,13 +21,13 @@
 
 import re
 import collections
-from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException
+from pyradium.Exceptions import IllegalAgendaSyntaxException, UndefinedAgendaTimeException, UnresolvableWeightedEntryException, AgendaTimeMismatchException
 
 AgendaItem = collections.namedtuple("AgendaItem", [ "start_time", "end_time", "duration", "text" ])
 _UnresolvedAgendaItem = collections.namedtuple("UnresolvedAgendaItem", [ "spec_type", "value", "text", "markers" ])
 
 class Agenda():
-	_AGENDA_REGEX = re.compile(r"((?P<relative>\+)?(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(/(?P<divider>\d+(\.\d+)?))?|(?P<wildcard>\*)(?P<weight>\d+(\.\d+)?)?)(\s+(?P<text>.*))?|:(?P<marker>.+)")
+	_AGENDA_REGEX = re.compile(r"((?P<relative>\+)?((?P<day>\d+)\+)?(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(/(?P<divider>\d+(\.\d+)?))?|(?P<wildcard>\*)(?P<weight>\d+(\.\d+)?)?)(\s+(?P<text>.*))?|:(?P<marker>.+)")
 
 	def __init__(self, agenda_items: list[AgendaItem], markers: collections.OrderedDict, name: str | None = None):
 		self._agenda_items = agenda_items
@@ -86,7 +86,7 @@ class Agenda():
 				now = None
 				resolved_items.append(item)
 
-		if reverse:
+		if reverse and (now is not None):
 			resolved_item = _UnresolvedAgendaItem(spec_type = "abs", value = now, text = None, markers = [ ])
 			resolved_items.append(resolved_item)
 
@@ -178,6 +178,8 @@ class Agenda():
 		markers = collections.OrderedDict()
 		prev_item = None
 		for item in unresolved_agenda:
+			if (prev_item is not None) and (item.value is not None) and (prev_item.value is not None) and (item.value < prev_item.value):
+				raise AgendaTimeMismatchException(f"Time cannot move backwards: Previously at {cls._hmstr(prev_item.value)}, but requested moving back to {cls._hmstr(item.value)} (from {prev_item} to {item})")
 			if item.text is not None:
 				if (prev_item is None) or (prev_item.value is None):
 					raise UndefinedAgendaTimeException(f"Unable to determine start time of event: {item}")
@@ -198,6 +200,7 @@ class Agenda():
 		now = None
 
 		unresolved_items = [ ]
+		day = 0
 		for line in text.split("\n"):
 			line = line.strip()
 			if line == "":
@@ -209,7 +212,9 @@ class Agenda():
 
 			rematch = rematch.groupdict()
 			if rematch["hour"] is not None:
-				time_value = (int(rematch["hour"]) * 60) + int(rematch["minute"])
+				if rematch["day"] is not None:
+					day = int(rematch["day"])
+				time_value = (int(rematch["hour"]) * 60) + int(rematch["minute"]) + (1440 * day)
 				relative = rematch["relative"] is not None
 				if rematch["divider"] is not None:
 					if not relative:
