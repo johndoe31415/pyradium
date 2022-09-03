@@ -28,7 +28,7 @@ _log = logging.getLogger(__spec__.name)
 
 class XMLHookRegistry():
 	_HOOKS = { }
-	_SPECIAL = set([ "var", "pause", "content", "param" ])
+	_SPECIAL = set([ "var", "pause", "content", "param", "format" ])
 	_BREAK_DESCENT_ON = set([ "s:verb", "s:term", "s:code" ])
 
 	@classmethod

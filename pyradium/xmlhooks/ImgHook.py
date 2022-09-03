@@ -21,34 +21,43 @@
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
+from pyradium.Exceptions import InvalidTransformationException
 
 @XMLHookRegistry.register_hook
 class ImgHook(BaseHook):
 	_TAG_NAME = "img"
 
 	@classmethod
-	def _parse_transformation(self, node):
-		if not node.hasAttribute("cmd"):
-			raise InvalidTransformationException("A 'transform' node needs at least a 'cmd' attribute.")
-		cmd = node.getAttribute("cmd")
-		transform_dict = { "cmd": cmd }
-		if cmd == "replace_text":
-			if not (node.hasAttribute("search") and node.hasAttribute("replace")):
-				raise InvalidTransformationException("A transform command '%s' needs a 'search' and 'replace' attribute." % (cmd))
-			transform_dict.update({
-				"search":	node.getAttribute("search"),
-				"replace":	node.getAttribute("replace"),
+	def _parse_transformations(cls, node):
+		transformations = [ ]
+
+		variables = { }
+		for child_node in node.childNodes:
+			if (child_node.nodeType == child_node.ELEMENT_NODE) and (child_node.tagName == "s:format"):
+				if not (child_node.hasAttribute("name") and child_node.hasAttribute("value")):
+					raise InvalidTransformationException(f"s:format element needs a 'name' and 'value' attribute.")
+				name = child_node.getAttribute("name")
+				value = child_node.getAttribute("value")
+
+				if child_node.hasAttribute("type"):
+					vtype = child_node.getAttribute("type")
+					match vtype:
+						case "int":
+							value = int(value)
+						case _:
+							raise InvalidTransformationException(f"s:format element recevied unsupported type '{vtype}'.")
+				variables[name] = value
+
+		if len(variables) > 0:
+			transformations.append({
+				"cmd":			"format_text",
+				"variables":	variables,
 			})
-		else:
-			raise InvalidTransformationException("Unknown command '%s' supplied to 'transform' node." % (cmd))
-		return transform_dict
+		return transformations
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		transformations = [ ]
-		for child_node in node.childNodes:
-			if (child_node.nodeType == child_node.ELEMENT_NODE) and (child_node.tagName == "transform"):
-				transformations.append(cls._parse_transformation(child_node))
+		transformations = cls._parse_transformations(node)
 
 		properties = {
 			"src":				rendered_presentation.renderer.lookup_include(node.getAttribute("src")),

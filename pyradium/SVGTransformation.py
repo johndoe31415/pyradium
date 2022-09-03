@@ -21,6 +21,7 @@
 
 import xml.dom.minidom
 from .Tools import XMLTools
+from .Exceptions import InvalidTransformationException
 
 class SVGStyle():
 	def __init__(self, style_dict = None):
@@ -128,19 +129,23 @@ class SVGTransformation():
 	def get_layer(self, layer_id):
 		return self._layers_by_id[layer_id]
 
-	def _search_replace_text(self, search, replace):
+	def _format_text(self, variables):
 		for text_node in XMLTools.findall_recurse(self._xml, "text"):
 			for tspan_node in XMLTools.findall(text_node, "tspan"):
 				for cdata_node in XMLTools.findall_text(tspan_node, recursive = True):
-					cdata_node.replaceWholeText(cdata_node.wholeText.replace(search, replace))
+					try:
+						replacement_text = cdata_node.wholeText.format(**variables)
+					except KeyError as e:
+						raise InvalidTransformationException(f"Requested variable substitution is missing variable name: {e}") from e
+					cdata_node.replaceWholeText(replacement_text)
 
 	def apply(self, transformation_dict):
 		if transformation_dict["cmd"] == "show_layer":
 			self.get_layer(transformation_dict["layer_id"]).show()
 		elif transformation_dict["cmd"] == "hide_layer":
 			self.get_layer(transformation_dict["layer_id"]).hide()
-		elif transformation_dict["cmd"] == "replace_text":
-			self._search_replace_text(transformation_dict["search"], transformation_dict["replace"])
+		elif transformation_dict["cmd"] == "format_text":
+			self._format_text(transformation_dict["variables"])
 		else:
 			raise NotImplementedError(transformation_dict["cmd"])
 

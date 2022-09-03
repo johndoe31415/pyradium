@@ -252,7 +252,8 @@
 	<slide>
 		<s:var name="heading" value="Image Rendering with substitution"/>
 		<s:img src="3dbox.svg">
-			<transform cmd="replace_text" search="${foo}" replace="Works!"/>
+			<s:format name="foo" value="Works!"/>
+			<s:format name="n" value="123" type="int" />
 		</s:img>
 	</slide>
 
