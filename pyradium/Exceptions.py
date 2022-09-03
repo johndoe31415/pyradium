@@ -48,6 +48,7 @@ class UnknownSlideTypeException(PyRadiumException): pass
 class ImageRenderingException(PyRadiumException): pass
 class CodeHighlightingException(PyRadiumException): pass
 class UnknownParameterException(PyRadiumException): pass
+class MissingParameterException(PyRadiumException): pass
 
 class AcronymException(PyRadiumException): pass
 class InvalidAcronymFileException(AcronymException): pass

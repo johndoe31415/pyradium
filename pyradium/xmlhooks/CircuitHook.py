@@ -22,7 +22,7 @@
 import urllib.parse
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.Exceptions import UnknownParameterException
+from pyradium.Exceptions import UnknownParameterException, MissingParameterException
 
 @XMLHookRegistry.register_hook
 class CircuitHook(BaseHook):
@@ -36,7 +36,8 @@ class CircuitHook(BaseHook):
 			"IECGates":			"false",
 			"whiteBackground":	"true",
 			"positiveColor":	"#27ae60",
-			"negativeColor":	"#ff0000",
+			"negativeColor":	"#c0392b",
+			"selectionColor":	"#2c3e50",
 		}
 		uri = "https://www.falstad.com/circuit/circuitjs.html"
 		srclink = None
@@ -54,7 +55,11 @@ class CircuitHook(BaseHook):
 				elif name == "src":
 					raise NotImplementedError("Conversion from text to link using compression not implemented.")
 				elif name == "srclink":
-					srclink = value
+					parsed_url = urllib.parse.urlparse(value)
+					query = urllib.parse.parse_qs(parsed_url.query)
+					if "ctz" not in query:
+						raise MissingParameterException(f"The URI provided as a 'srclink' for the 's:circuit' tag is missing the ctz= portion in its query string: {value}")
+					srclink = query["ctz"][0]
 				else:
 					raise UnknownParameterException(f"Circuit parameter not understood: {name} (value: {value})")
 			else:
