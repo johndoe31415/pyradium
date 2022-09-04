@@ -37,7 +37,7 @@ class CircuitHook(BaseHook):
 			"whiteBackground":	"true",
 			"positiveColor":	"#27ae60",
 			"negativeColor":	"#c0392b",
-			"selectionColor":	"#2c3e50",
+			"selectColor":		"#2c3e50",
 		}
 		uri = "https://www.falstad.com/circuit/circuitjs.html"
 		srclink = None
