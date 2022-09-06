@@ -272,6 +272,41 @@
 		<s:graphviz src="directed_graph.dot" />
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="CircuitJS Circuit"/>
+		<s:circuit>
+			<s:param name="src">
+				$ 1 0.001 0.03998496543448474 50 5 43 5e-11
+				M 400 272 480 272 2 2.5
+				x -3 246 18 249 4 20 x2
+				x -3 214 18 217 4 20 x1
+				x 498 276 508 279 4 20 y
+				L 48 208 32 208 2 0 false 5 0
+				L 48 240 32 240 2 0 false 5 0
+				w 80 240 48 240 0
+				w 48 208 96 208 0
+				I 128 208 192 208 0 0.5 5
+				150 192 224 288 224 0 2 0 5
+				150 192 320 288 320 0 2 0 5
+				I 128 336 192 336 0 0.5 5
+				w 112 208 128 208 0
+				w 112 240 192 240 0
+				w 80 240 80 336 0
+				w 80 336 128 336 0
+				w 192 304 96 304 0
+				w 96 304 96 208 0
+				w 112 208 96 208 0
+				w 80 240 112 240 0
+				152 304 272 400 272 0 2 0 5
+				w 288 224 304 224 0
+				w 304 224 304 256 0
+				w 304 288 304 320 0
+				w 304 320 288 320 0
+			</s:param>
+			This links to a CircuitJS circuit!
+		</s:circuit>
+	</slide>
+
 	<subsection>Esc&lt;&gt;ping</subsection>
 	<slide>
 		<s:var name="heading" value="Escaped &lt;&gt; Characters"/>

@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import lzstr
 import urllib.parse
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
@@ -40,7 +41,7 @@ class CircuitHook(BaseHook):
 			"selectColor":		"#2c3e50",
 		}
 		uri = "https://www.falstad.com/circuit/circuitjs.html"
-		srclink = None
+		src = None
 
 		inner = [ ]
 		for child_node in node.childNodes:
@@ -53,13 +54,14 @@ class CircuitHook(BaseHook):
 				elif name == "uri":
 					uri = value
 				elif name == "src":
-					raise NotImplementedError("Conversion from text to link using compression not implemented.")
+					src = value
 				elif name == "srclink":
 					parsed_url = urllib.parse.urlparse(value)
 					query = urllib.parse.parse_qs(parsed_url.query)
 					if "ctz" not in query:
 						raise MissingParameterException(f"The URI provided as a 'srclink' for the 's:circuit' tag is missing the ctz= portion in its query string: {value}")
 					srclink = query["ctz"][0]
+					src = lzstr.LZStringDecompressor.decompress_url_component(srclink).decode("ascii")
 				else:
 					raise UnknownParameterException(f"Circuit parameter not understood: {name} (value: {value})")
 			else:
@@ -67,7 +69,9 @@ class CircuitHook(BaseHook):
 				# iteration
 				inner.append(child_node)
 
-		if srclink is not None:
+		if src is not None:
+			src = "\n".join(line.strip() for line in src.strip("\r\n").split("\n")) + "\n"
+			srclink = lzstr.LZStringCompressor.compress_to_url_component(src.encode("ascii")).replace("+", " ")
 			params["ctz"] = srclink
 
 		for child_node in inner:
