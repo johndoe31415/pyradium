@@ -125,7 +125,7 @@ class ActionSpellcheck(BaseAction):
 				with ltp as spellchecker_api:
 					self._run_spellcheck(spellchecker_api)
 			else:
-				spellchecker_api = SpellcheckAPI(lt_uri = self._args.uri)
+				spellchecker_api = SpellcheckerAPI(languagetool_uri = self._args.uri)
 				self._run_spellcheck(spellchecker_api)
 		finally:
 			self._f.close()

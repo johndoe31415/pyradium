@@ -53,17 +53,18 @@ class SVGAnimation():
 				raise UsageException(f"SVG animation mode '{animation_mode}' is  invalid (needs to be one of {SVGAnimationMode})")
 		self._svg = SVGTransformation(svg_filename)
 
-	def _determine_considered_layers(self):
+	def _determine_considered_layers(self) -> list[str]:
 		if self._animation_mode == SVGAnimationMode.Compose:
-			considered_layers = list(svg.visible_layer_ids)
-		elif animation_mode in [ SVGAnimationMode.ComposeAll, SVGAnimationMode.Replace ]:
-			considered_layers = list(svg.layer_ids)
+			considered_layers = list(self._svg.visible_layer_ids)
+		elif self._animation_mode in [ SVGAnimationMode.ComposeAll, SVGAnimationMode.Replace ]:
+			considered_layers = list(self._svg.layer_ids)
 		else:
-			raise NotImplementedError(animation_mode)
+			raise NotImplementedError(self._animation_mode)
+		return considered_layers
 
 	def _get_layer_tags(self, layer_id):
 		tags = set()
-		layer = svg.get_layer(layer_id)
+		layer = self._svg.get_layer(layer_id)
 		label = layer.label
 		if ":" in label:
 			(tags, _) = label.split(":", maxsplit = 1)
@@ -72,7 +73,7 @@ class SVGAnimation():
 					tag = SVGLayerTag(tag)
 					tags.add(tag)
 				except ValueError:
-					_log.warning("Unknown layer tag in %s layer %s: %s", self._svg_filename, layer_id, tag)
+					_log.warning(f"Unknown layer tag in %s layer %s: %s", self._svg_filename, layer_id, tag)
 		return tags
 
 	def _show_layer(self, layer_id):
@@ -81,7 +82,7 @@ class SVGAnimation():
 			"layer_id":		layer_id,
 		})
 		if SVGLayerTag.Protect not in self._layer_tags[layer_id]:
-			self._shown_unprotected_layers.append(layer_id)
+			self._shown_unprotected_layers.add(layer_id)
 
 	def _hide_layer(self, layer_id):
 		self._svg_transforms.append({
@@ -126,7 +127,7 @@ class SVGAnimation():
 			self._show_layer(layer_id)
 
 			# If we're in a replacing mode, then hide the previous layer
-			if (animation_mode == SVGAnimationMode.Replace) and (previous_layer_id is not None):
+			if (self._animation_mode == SVGAnimationMode.Replace) and (previous_layer_id is not None):
 				self._hide_layer(previous_layer_id)
 
 			# Emit it as a frame if it's not marked as "nostop"

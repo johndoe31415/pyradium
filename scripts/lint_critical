@@ -51,4 +51,5 @@ if len(critical_findings) > 0:
 		print_finding(finding)
 	sys.exit(1)
 else:
+	print("No critical linter findings found.")
 	sys.exit(0)
