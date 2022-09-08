@@ -57,27 +57,33 @@ class Presentation():
 
 	@classmethod
 	def _merge_metadata(cls, meta_dict, injected_dict):
+		# TODO is this even used? What is _error?
 		if not isinstance(injected_dict, dict):
-			self._error("Could not inject metadata (not a dictionary): %s", str(injected_dict))
+			self._error(f"Could not inject metadata (not a dictionary): {str(injected_dict)}")
 			return meta_dict
 		meta_dict.update(injected_dict)
 		return meta_dict
 
 	@classmethod
-	def load_from_file(cls, filename, rendering_parameters = None):
+	def parse_xml(cls, filename):
 		try:
 			dom = xml.dom.minidom.parse(filename)
 		except FileNotFoundError as e:
-			raise XMLFileNotFoundException("Cannot parse %s: %s" % (filename, str(e))) from e
+			raise XMLFileNotFoundException(f"Cannot parse {filename}: {str(e)}") from e
 		except xml.parsers.expat.ExpatError as e:
-			raise MalformedXMLInputException("Cannot parse %s: %s" % (filename, str(e))) from e
-		cls._NAMESPACES.update(XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES))
-		meta = None
-		content = [ ]
-		sources = [ filename ]
+			raise MalformedXMLInputException(f"Cannot parse {filename}: {str(e)}") from e
+		XMLTools.normalize_ns(dom.documentElement, cls._NAMESPACES)
 		presentation = XMLTools.child_tagname(dom, "presentation")
 		if presentation is None:
 			raise MalformedXMLInputException("No 'presentation' node is present as top node of the XML input document.")
+		return dom
+
+	@classmethod
+	def load_from_file(cls, filename, rendering_parameters = None):
+		dom = cls.parse_xml(filename)
+		meta = None
+		content = [ ]
+		sources = [ filename ]
 		for child in presentation.childNodes:
 			if child.nodeType != child.ELEMENT_NODE:
 				continue
@@ -88,10 +94,14 @@ class Presentation():
 				if not XMLTools.get_bool_attr(child, "hide"):
 					content.append(RenderSlideDirective(child))
 			elif child.tagName == "include":
-				sub_presentation_filename = rendering_parameters.include_dirs.lookup(child.getAttribute("src"))
-				sub_presentation = cls.load_from_file(sub_presentation_filename)
-				content += sub_presentation.content
-				sources += sub_presentation.sources
+				src = child.getAttribute("src")
+				if rendering_parameters is not None:
+					sub_presentation_filename = rendering_parameters.include_dirs.lookup(src)
+					sub_presentation = cls.load_from_file(sub_presentation_filename)
+					content += sub_presentation.content
+					sources += sub_presentation.sources
+				else:
+					_log.warning("Ingored include directive because no include directories are known: %s", src)
 			elif child.tagName in [ "chapter", "section", "subsection" ]:
 				toc_element = TOCElement(child.tagName)
 				toc_directive = TOCDirective(toc_element, XMLTools.inner_text(child))
