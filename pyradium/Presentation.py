@@ -57,7 +57,6 @@ class Presentation():
 
 	@classmethod
 	def _merge_metadata(cls, meta_dict, injected_dict):
-		# TODO is this even used? What is _error?
 		if not isinstance(injected_dict, dict):
 			self._error(f"Could not inject metadata (not a dictionary): {str(injected_dict)}")
 			return meta_dict
@@ -76,11 +75,11 @@ class Presentation():
 		presentation = XMLTools.child_tagname(dom, "presentation")
 		if presentation is None:
 			raise MalformedXMLInputException("No 'presentation' node is present as top node of the XML input document.")
-		return dom
+		return (dom, presentation)
 
 	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
-		dom = cls.parse_xml(filename)
+		(dom, presentation) = cls.parse_xml(filename)
 		meta = None
 		content = [ ]
 		sources = [ filename ]
