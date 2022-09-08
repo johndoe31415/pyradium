@@ -20,6 +20,7 @@ setuptools.setup(
 		"mako",
 		"pygments",
 		"requests",
+		"lzstr",
 	],
 	entry_points = {
 		"console_scripts": [

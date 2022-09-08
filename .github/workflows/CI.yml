@@ -21,7 +21,9 @@ jobs:
           cache-dependency-path: "**/setup.py"
 
       - name: Install Python dependencies
-        run: pip install mako pygments requests
+        run: |
+          python3 setup.py egg_info
+          pip install -r pyradium.egg-info/requires.txt
 
       - name: Install Linux dependencies
         run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools graphviz
