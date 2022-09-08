@@ -24,6 +24,7 @@ jobs:
         run: |
           python3 setup.py egg_info
           pip install -r pyradium.egg-info/requires.txt
+          pip install pylint
 
       - name: Install Linux dependencies
         run: sudo apt-get install texlive texlive-latex-extra imagemagick inkscape gnuplot inotify-tools graphviz
@@ -33,6 +34,9 @@ jobs:
 
       - name: Run all testcases
         run: python3 -m unittest pyradium.tests
+
+      - name: Ensure no critical linter issues exist
+        run: scripts/linter_critical
 
       - name: Store the SSH deployment key locally
         run: |

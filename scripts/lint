@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+#
+
+pylint --rcfile .pylintrc pyradium

@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+#	pyradium - HTML presentation/slide show generator
+#	Copyright (C) 2015-2022 Johannes Bauer
+#
+#	This file is part of pyradium.
+#
+#	pyradium is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; this program is ONLY licensed under
+#	version 3 of the License, later versions are explicitly excluded.
+#
+#	pyradium is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with pyradium; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#	Johannes Bauer <JohannesBauer@gmx.de>
+
+import sys
+import json
+import subprocess
+
+lint_cmd = [ "pylint", "--disable=R,C,W", "-f", "json", "pyradium" ]
+findings = json.loads(subprocess.run(lint_cmd, check = False, capture_output = True).stdout)
+
+def print_finding(finding):
+	print(f"{finding['path']} {finding['line']} MOC (\"{finding['module']}\", \"{finding['obj']}\", \"{finding['message-id']}\"), {finding['symbol']}: {finding['message']}")
+
+def ignore_finding(finding):
+	moc = (finding["module"], finding["obj"], finding["message-id"])
+	ignore_mocs = set([
+		("pyradium.__main__", "main.genparser", "E0102"),
+		("pyradium.MultiCommand", "genparser", "E0102"),
+		("pyradium.Tools", "XMLTools.normalize_ns.visit", "E0102"),
+	])
+	if moc in ignore_mocs:
+		return True
+	return False
+
+critical_findings = [ finding for finding in findings if not ignore_finding(finding) ]
+if len(critical_findings) > 0:
+	print(f"Error: {len(critical_findings)} critical findings found.", file = sys.stderr)
+	for finding in critical_findings:
+		print_finding(finding)
+	sys.exit(1)
+else:
+	sys.exit(0)
