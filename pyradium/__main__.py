@@ -24,6 +24,8 @@ import argparse
 import pyradium
 from .MultiCommand import MultiCommand
 from .ActionRender import ActionRender
+from .ActionShowStyleOpts import ActionShowStyleOpts
+from .ActionModify import ActionModify
 from .ActionServe import ActionServe
 from .ActionAcroAdd import ActionAcroAdd
 from .ActionAcroScan import ActionAcroScan
@@ -33,8 +35,8 @@ from .ActionHashPresentation import ActionHashPresentation
 from .ActionDumpMetadata import ActionDumpMetadata
 from .ActionSpellcheck import ActionSpellcheck
 from .ActionDictAdd import ActionDictAdd
-from .ActionShowStyleOpts import ActionShowStyleOpts
 from .ActionTemplateHelper import ActionTemplateHelper
+from .modify.BaseModifyCommand import BaseModifyCommand
 from .Enums import PresentationFeature
 from .GlobalConfig import GlobalConfig
 
@@ -81,6 +83,13 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
 		parser.add_argument("template_style", help = "Name of the template that should be shown.")
 	mc.register("showstyleopts", "Show all options a specific template style supports", genparser, action = ActionShowStyleOpts)
+
+	modify_commands = list(sorted(BaseModifyCommand.get_supported_cmd_list()))
+	if len(modify_commands) > 0:
+		def genparser(parser):
+			parser.add_argument("subcommand", choices = modify_commands, help = "Name of subcommand to call.")
+			parser.add_argument("params", nargs = argparse.REMAINDER, help = "Arguments for the respective sub-command.")
+		mc.register("modify", "Modify a presentation through one of many sub-commands", genparser, action = ActionModify)
 
 	def genparser(parser):
 		parser.add_argument("-b", "--bind-addr", metavar = "addr", type = str, default = "127.0.0.1", help = "Address to bind to. Defaults to %(default)s.")

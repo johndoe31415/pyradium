@@ -19,15 +19,4 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import logging
-
-class BaseAction():
-	def __init__(self, action, args):
-		self._action = action
-		self._args = args
-		if hasattr(self._args, "verbose"):
-			logging.getLoggerClass().set_logging_by_verbosity(self._args.verbose)
-		self.run()
-
-	def run(self):
-		raise NotImplementedError("%s.run" % (self.__class__.__name__))
+from .CircuitJSRenderImages import CircuitJSRenderImages

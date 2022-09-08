@@ -19,15 +19,12 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import logging
+from .BaseAction import BaseAction
+from pyradium.modify.BaseModifyCommand import BaseModifyCommand
 
-class BaseAction():
-	def __init__(self, action, args):
-		self._action = action
-		self._args = args
-		if hasattr(self._args, "verbose"):
-			logging.getLoggerClass().set_logging_by_verbosity(self._args.verbose)
-		self.run()
-
+class ActionModify(BaseAction):
 	def run(self):
-		raise NotImplementedError("%s.run" % (self.__class__.__name__))
+		handler = BaseModifyCommand.get_handler(self._args.subcommand)
+		subcommand_arguments = handler.parse(self._args.params)
+		instance = handler(subcommand_arguments)
+		instance.run()

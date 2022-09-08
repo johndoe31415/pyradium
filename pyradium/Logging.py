@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -42,5 +42,19 @@ class CustomLogger(logging.Logger):
 	def singlestep(self, msg, *args, **kwargs):
 		if self.isEnabledFor(logging.SINGLESTEP):
 			self._log(logging.SINGLESTEP, msg, args, **kwargs)
+
+	@classmethod
+	def set_logging_by_verbosity(cls, verbosity):
+		if verbosity == 0:
+			loglevel = logging.WARN
+		elif verbosity == 1:
+			loglevel = logging.INFO
+		elif verbosity == 2:
+			loglevel = logging.DEBUG
+		elif verbosity == 3:
+			loglevel = logging.TRACE
+		else:
+			loglevel = logging.SINGLESTEP
+		logging.basicConfig(format = "{name:>30s} [{levelname:.1s}]: {message}", style = "{", level = loglevel)
 
 logging.setLoggerClass(CustomLogger)
