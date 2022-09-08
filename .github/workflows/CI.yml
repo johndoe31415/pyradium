@@ -36,7 +36,7 @@ jobs:
         run: python3 -m unittest pyradium.tests
 
       - name: Ensure no critical linter issues exist
-        run: scripts/linter_critical
+        run: scripts/lint_critical
 
       - name: Store the SSH deployment key locally
         run: |
