@@ -61,7 +61,7 @@ class CircuitHook(BaseHook):
 					if "ctz" not in query:
 						raise MissingParameterException(f"The URI provided as a 'srclink' for the 's:circuit' tag is missing the ctz= portion in its query string: {value}")
 					srclink = query["ctz"][0]
-					src = lzstr.LZStringDecompressor.decompress_url_component(srclink).decode("ascii")
+					src = lzstr.LZStringDecompressor.decompress_from_url_component(srclink).decode("ascii")
 				else:
 					raise UnknownParameterException(f"Circuit parameter not understood: {name} (value: {value})")
 			else:

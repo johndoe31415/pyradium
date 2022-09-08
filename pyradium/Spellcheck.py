@@ -213,10 +213,6 @@ class LanguageToolProcess():
 		self._languagetool_config = languagetool_config
 		self._proc = None
 
-	@property
-	def uri(self):
-		return self._languagetool_uri
-
 	def __enter__(self):
 		assert(self._proc is None)
 		try:
@@ -234,7 +230,6 @@ class LanguageToolProcess():
 	def __exit__(self, *args):
 		self._proc.kill()
 		self._proc = None
-
 
 class XMLSpellchecker():
 	class ParserMode(enum.IntEnum):

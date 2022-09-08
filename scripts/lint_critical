@@ -36,6 +36,9 @@ def ignore_finding(finding):
 		("pyradium.__main__", "main.genparser", "E0102"),
 		("pyradium.MultiCommand", "genparser", "E0102"),
 		("pyradium.Tools", "XMLTools.normalize_ns.visit", "E0102"),
+		("pyradium.xmlhooks.CodeHook", "CodeHook.handle_text", "E1101"),
+		("pyradium.xmlhooks.XMLHookRegistry", "ReplacementHook.handle", "E1135"),
+		("pyradium.xmlhooks.XMLHookRegistry", "ReplacementHook.handle", "E1136"),
 	])
 	if moc in ignore_mocs:
 		return True

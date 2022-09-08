@@ -28,7 +28,7 @@ from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
-from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException
+from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, MalformedJSONInputException
 
 _log = logging.getLogger(__spec__.name)
 
@@ -58,8 +58,7 @@ class Presentation():
 	@classmethod
 	def _merge_metadata(cls, meta_dict, injected_dict):
 		if not isinstance(injected_dict, dict):
-			self._error(f"Could not inject metadata (not a dictionary): {str(injected_dict)}")
-			return meta_dict
+			raise MalformedJSONInputException(f"Could not inject metadata (not a dictionary): {str(injected_dict)}")
 		meta_dict.update(injected_dict)
 		return meta_dict
 
