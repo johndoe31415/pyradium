@@ -29,11 +29,11 @@ try:
 except ModuleNotFoundError:
 	aiohttp = None
 import asyncio
-from .BaseModifyCommand import BaseModifyCommand
 from pyradium.Presentation import Presentation
 from pyradium.Tools import XMLTools
 from pyradium.CircuitJS import CircuitJSCircuit
 from pyradium.CmdlineEscape import CmdlineEscape
+from .BaseModifyCommand import BaseModifyCommand
 
 _log = logging.getLogger(__spec__.name)
 

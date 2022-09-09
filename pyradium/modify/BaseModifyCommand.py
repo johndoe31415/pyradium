@@ -21,7 +21,6 @@
 
 import sys
 import logging
-from pyradium.PrefixMatcher import PrefixMatcher
 from pyradium.FriendlyArgumentParser import FriendlyArgumentParser
 
 class BaseModifyCommand():

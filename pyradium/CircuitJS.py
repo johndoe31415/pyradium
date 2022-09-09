@@ -19,10 +19,10 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import lzstr
 import urllib.parse
+import lzstr
 from pyradium.Tools import XMLTools
-from pyradium.Exceptions import UnknownParameterException, MissingParameterException
+from pyradium.Exceptions import MissingParameterException
 
 class CircuitJSCircuit():
 	_DEFAULTS = {

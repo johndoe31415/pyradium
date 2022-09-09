@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
-from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
 class QuoteHook(BaseHook):

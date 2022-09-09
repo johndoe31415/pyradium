@@ -35,7 +35,7 @@ class CodeHook(InnerTextHook):
 		try:
 			lexer = pygments.lexers.get_lexer_by_name(lang)
 		except pygments.util.ClassNotFound as e:
-			raise CodeHighlightingException(f"Cannot find lexer to syntax highlight code in language '{lang}'.")
+			raise CodeHighlightingException(f"Cannot find lexer to syntax highlight code in language '{lang}'.") from e
 		highlighted_code = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter(cssclass = "code_highlight"))
 
 		replacement_node = xml.dom.minidom.parseString(highlighted_code).firstChild

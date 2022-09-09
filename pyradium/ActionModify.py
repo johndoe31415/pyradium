@@ -19,8 +19,8 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .BaseAction import BaseAction
 from pyradium.modify.BaseModifyCommand import BaseModifyCommand
+from .BaseAction import BaseAction
 
 class ActionModify(BaseAction):
 	def run(self):

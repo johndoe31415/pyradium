@@ -29,7 +29,6 @@ import bisect
 import urllib.parse
 import xml.parsers.expat
 import requests
-from pyradium.Tools import XMLTools
 from pyradium.Exceptions import SpellcheckerException
 
 _log = logging.getLogger(__spec__.name)

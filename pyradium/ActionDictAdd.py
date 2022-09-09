@@ -27,7 +27,7 @@ from .BaseAction import BaseAction
 from .SpellcheckDictionary import SpellcheckDictionary, SpellcheckExceptionType
 
 class ActionDictAdd(BaseAction):
-	_EVIM_REGEX = re.compile("^(?P<base64>[A-Za-z0-9/+=]+)::(?P<filename>[^:]+)::(?P<line>\d+)::(?P<col>\d+)::(?P<msg>.*)$")
+	_EVIM_REGEX = re.compile(r"^(?P<base64>[A-Za-z0-9/+=]+)::(?P<filename>[^:]+)::(?P<line>\d+)::(?P<col>\d+)::(?P<msg>.*)$")
 
 	def _choice(self, prompt, valid_answers, default_answer = None):
 		while True:

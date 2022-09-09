@@ -49,8 +49,8 @@ class SVGAnimation():
 		else:
 			try:
 				self._animation_mode = SVGAnimationMode(animation_mode)
-			except ValueError:
-				raise UsageException(f"SVG animation mode '{animation_mode}' is  invalid (needs to be one of {SVGAnimationMode})")
+			except ValueError as e:
+				raise UsageException(f"SVG animation mode '{animation_mode}' is  invalid (needs to be one of {SVGAnimationMode})") from e
 		self._svg = SVGTransformation(svg_filename)
 
 	def _determine_considered_layers(self) -> list[str]:
@@ -72,7 +72,7 @@ class SVGAnimation():
 				try:
 					tag = SVGLayerTag(tag)
 					tags.add(tag)
-				except ValueError:
+				except ValueError as e:
 					_log.warning(f"Unknown layer tag in %s layer %s: %s", self._svg_filename, layer_id, tag)
 		return tags
 

@@ -21,7 +21,6 @@
 
 import logging
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
-from pyradium.Tools import XMLTools
 from pyradium.CircuitJS import CircuitJSCircuit
 from pyradium.Exceptions import MalformedXMLInputException, FailedToLookupFileException
 

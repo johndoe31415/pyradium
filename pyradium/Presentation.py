@@ -22,8 +22,8 @@
 import hashlib
 import subprocess
 import logging
-import pyradium
 import xml.dom.minidom
+import pyradium
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective

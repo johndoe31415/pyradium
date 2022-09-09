@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -28,7 +28,7 @@ from pyradium.RendererCache import BaseRenderer
 _log = logging.getLogger(__spec__.name)
 
 class PlotRenderer(BaseRenderer):
-	_SET_TERMINAL_RE = re.compile("^\s*set\s+terminal.*$", flags = re.MULTILINE)
+	_SET_TERMINAL_RE = re.compile(r"^\s*set\s+terminal.*$", flags = re.MULTILINE)
 
 	def __init__(self):
 		super().__init__()

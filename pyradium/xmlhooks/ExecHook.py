@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -46,7 +46,7 @@ class ExecHook(BaseHook):
 				# Try if this is a path command
 				full_executable_path = shutil.which(cmd[0])
 				if full_executable_path is None:
-					raise FailedToLookupFileException("Could lookup executable \"%s\" neither in include dirs (%s) not in $PATH." % (cmd[0], str(e)))
+					raise FailedToLookupFileException("Could lookup executable \"%s\" neither in include dirs (%s) not in $PATH." % (cmd[0], str(e))) from e
 
 		cmd[0] = full_executable_path
 		properties = {
@@ -61,7 +61,7 @@ class ExecHook(BaseHook):
 		try:
 			doc = xml.dom.minidom.parseString(xml_data)
 		except xml.parsers.expat.ExpatError as e:
-			raise MalformedXMLInputException("Ouptut of script execution (%s) returned invalid XML: %s" % (CmdlineEscape().cmdline(cmd), str(e)))
+			raise MalformedXMLInputException("Ouptut of script execution (%s) returned invalid XML: %s" % (CmdlineEscape().cmdline(cmd), str(e))) from e
 
 		root = doc.firstChild
 		return list(root.childNodes)

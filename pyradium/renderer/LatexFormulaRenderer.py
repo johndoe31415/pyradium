@@ -148,19 +148,3 @@ class LatexFormulaRenderer(BaseRenderer):
 				_log.singlestep("Interrupting execution.")
 				input("Press RETURN to continue...")
 			return image
-
-if __name__ == "__main__":
-	logging.basicConfig(format = " {name:>20s} [{levelname:.1s}]: {message}", style = "{", level = logging.DEBUG)
-
-	from pyradium.RendererCache import RendererCache
-	#renderer = RendererCache(LatexFormulaRenderer())
-	renderer = LatexFormulaRenderer()
-	#print(renderer.render({ "formula": "y^2 = x^3 + ax + b" }))
-	#result = renderer.render({ "formula": r"\Gamma" })
-	#result = renderer.render({ "formula": r"^{\circ}" })
-	#result = renderer.render({ "formula": r"abcdefg" })
-	#result = renderer.render({ "formula": r"_{\circ}" })
-	#result = renderer.render({ "formula": r"\left( 1 + \frac{1}{2} \right)^{x^2 + \frac{10}{123}}" })
-	result = renderer.render({ "formula": r"\left( 3 + \frac{1}{2} \right)^{\frac{10}{123}}" })		# REMOVE THIS BEFORE COMMITING
-#	with open("out.png", "wb") as f:
-#		f.write(result.data["png_data"])
