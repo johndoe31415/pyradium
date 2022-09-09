@@ -33,6 +33,7 @@ from .BaseModifyCommand import BaseModifyCommand
 from pyradium.Presentation import Presentation
 from pyradium.Tools import XMLTools
 from pyradium.CircuitJS import CircuitJSCircuit
+from pyradium.CmdlineEscape import CmdlineEscape
 
 _log = logging.getLogger(__spec__.name)
 
@@ -68,34 +69,29 @@ class CircuitJSRenderImages(BaseModifyCommand):
 		ws = aiohttp.web.WebSocketResponse()
 		await ws.prepare(request)
 
-		async def tx_rx(msg, wait_response = True):
+		async def tx_rx(msg, expect_response = True):
+			self._msgid += 1
+			used_msgid = self._msgid
+			msg["msgid"] = used_msgid
 			_log.trace("Sending: %s", msg)
 			await ws.send_json(msg)
-			if wait_response:
+			while expect_response:
 				answer = await ws.receive_json()
-				_log.trace("Response: %s", answer)
-				return answer
-			else:
-				return None
+				if ("msgid" in answer) and (answer["msgid"] == used_msgid):
+					_log.trace("Response: %s", answer)
+					return answer
+				else:
+					_log.trace("Response with different/no message ID: %s", answer)
 
-		async def wait_event(event_name):
-			_log.debug("Waiting for event %s", event_name)
-			while True:
-				answer = await ws.receive_json()
-				_log.trace("Received: %s", answer)
 
-				if (answer["type"] == "event") and (answer["event"] == event_name):
-					_log.debug("Received event %s", event_name)
-					break
-
-			# TODO: This is not a pretty hack. But apparently the JS portion is
-			# not fully ready even when it shows it's ready at startup.
-			await asyncio.sleep(0.5)
 
 		# Wait for connection to become available; otherwise, reloading too
 		# soon has no effect.
-		await tx_rx({ "cmd": "wait_available" }, wait_response = False)
-		await wait_event("available")
+		await tx_rx({ "cmd": "wait_available" })
+
+		# TODO: This is not a pretty hack. But apparently the JS portion is
+		# not fully ready even when it shows it's ready at startup.
+		await asyncio.sleep(0.5)
 
 		try:
 
@@ -105,10 +101,14 @@ class CircuitJSRenderImages(BaseModifyCommand):
 				if circuit.circuit_params() != circuit_params:
 					circuit_params = circuit.circuit_params()
 					_log.debug("Circuit parameters changed, forcing reload of circuit simulator")
-					await tx_rx({ "cmd": "reload", "args": circuit_params }, wait_response = False)
+					await tx_rx({ "cmd": "reload", "args": circuit_params })
 
 					# Wait for the simulator to become available again
-					await wait_event("available")
+					await tx_rx({ "cmd": "wait_available" })
+
+					# TODO: This is not a pretty hack. But apparently the JS portion is
+					# not fully ready even when it shows it's ready at startup.
+					await asyncio.sleep(0.5)
 
 				# Load circuit
 				await tx_rx({ "cmd": "circuit_import", "circuit": circuit.circuit_text })
@@ -122,15 +122,30 @@ class CircuitJSRenderImages(BaseModifyCommand):
 				# Then make a snapshot of the SVG
 				svg = await tx_rx({ "cmd": "get_svg" })
 
-				# Move this to
-				output_filename = f"{self._args.output_dir}/circuit_{circuit.get_presentation_parameter('name')}.svg"
-				with open(output_filename, "w") as f:
-					f.write(svg)
+				# Create the output SVG file
+				output_filename_svg = f"{self._args.output_dir}/circuit_{circuit.get_presentation_parameter('name')}.svg"
+				with open(output_filename_svg, "w") as f:
+					f.write(svg["data"])
+
+				# Postprocess the SVG file
+				if not self._args.no_svg_postprocessing:
+					cmd = [ "inkscape", "-g", "--verb=FitCanvasToDrawing;FileSave;FileQuit", output_filename_svg ]
+					_log.debug("Fitting SVG to canvas: %s", CmdlineEscape().cmdline(cmd))
+					subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+
+				if self._args.capture_circuit:
+					# The circuit may have modified after it's settled. Retrieve it if user requests it.
+					exported_circuit = await tx_rx({ "cmd": "circuit_export" })
+					output_filename_circuit = f"{self._args.output_dir}/circuit_{circuit.get_presentation_parameter('name')}.txt"
+					with open(output_filename_circuit, "w") as f:
+						f.write(exported_circuit["data"])
+
+
 		finally:
 			if not self._args.no_shutdown:
 				# Shutdown the simulator
 				_log.debug("Shutting down the simulator")
-				await tx_rx({ "cmd": "shutdown" }, wait_response = False)
+				await tx_rx({ "cmd": "shutdown" }, expect_response = False)
 		raise aiohttp.web_runner.GracefulExit()
 
 
@@ -148,6 +163,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 	def run(self):
 		self._connection = False
+		self._msgid = 0
 		self._circuits = self._parse_circuits()
 		if len(self._circuits) == 0:
 			_log.warning("No circuits found in presentation, nothing to do.")

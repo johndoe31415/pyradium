@@ -40,7 +40,7 @@ class CircuitJSCircuit():
 		self._circuit_params = circuit_params if (circuit_params is not None) else { }
 		self._uri = uri
 		self._presentation_params = presentation_params if (presentation_params is not None) else { }
-		self._display_content = display_content
+		self._display_content = display_content if (display_content is not None) else [ ]
 
 	@property
 	def circuit_text(self):
@@ -48,6 +48,10 @@ class CircuitJSCircuit():
 			return None
 		else:
 			return "\n".join(self._circuit) + "\n"
+
+	@property
+	def display_content(self):
+		return self._display_content
 
 	def circuit_params(self, include_circuit: bool = False):
 		args = dict(self._circuit_params)
@@ -96,7 +100,7 @@ class CircuitJSCircuit():
 						raise MissingParameterException(f"The URI provided as a 'srclink' for the 's:circuit' tag is missing the ctz= portion in its query string: {value}")
 					srclink = query["ctz"][0]
 					circuit = lzstr.LZStringDecompressor.decompress_from_url_component(srclink, escape = False).decode("ascii")
-				elif name in [ "name" ]:
+				elif name in [ "name", "content" ]:
 					presentation_params[name] = value
 				else:
 					circuit_params[name] = value
