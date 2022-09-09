@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -47,7 +47,7 @@ class ExecRenderer(BaseRenderer):
 	def render(self, property_dict):
 		cmd = property_dict["cmd"]
 		try:
-			proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+			proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE, check = True)
 		except PermissionError as e:
 			raise FailedToExecuteSubprocessException("Could not execute '%s' (%s)." % (str(cmd), str(e))) from e
 

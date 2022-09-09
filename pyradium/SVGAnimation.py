@@ -73,7 +73,7 @@ class SVGAnimation():
 					tag = SVGLayerTag(tag)
 					tags.add(tag)
 				except ValueError as e:
-					_log.warning(f"Unknown layer tag in %s layer %s: %s", self._svg_filename, layer_id, tag)
+					_log.warning("Unknown layer tag in %s layer %s: %s", self._svg_filename, layer_id, tag)
 		return tags
 
 	def _show_layer(self, layer_id):

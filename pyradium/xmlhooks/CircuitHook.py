@@ -43,7 +43,7 @@ class CircuitHook(BaseHook):
 			match content:
 				case "image":
 					if name is None:
-						raise MalformedXMLInputException(f"s:circuit requires an image by 'content' parameter, but does not name the circuit.")
+						raise MalformedXMLInputException("s:circuit requires an image by 'content' parameter, but does not name the circuit.")
 
 					filename = f"circuit_{name}.svg"
 					try:

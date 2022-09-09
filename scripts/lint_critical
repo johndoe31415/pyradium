@@ -87,6 +87,7 @@ def ignore_finding(finding):
 		"broad-except",
 		"too-many-nested-blocks",
 		"useless-super-delegation",
+		"consider-using-max-builtin",
 	])
 	if finding["symbol"] in ignore_symbols:
 		return True
@@ -113,6 +114,10 @@ if len(critical_findings) > 0:
 	print(f"Error: {len(critical_findings)} critical findings found.", file = sys.stderr)
 	for finding in critical_findings:
 		print_finding(finding)
+	with open("/tmp/fixfile", "w") as f:
+		for finding in critical_findings:
+			print(f"{finding['path']}:{finding['line']}:{finding['message']}", file = f)
+	print("Vim quickfix file written: vi -q /tmp/fixfile")
 	sys.exit(1)
 else:
 	print("No critical linter findings found.")

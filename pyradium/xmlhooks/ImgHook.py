@@ -35,7 +35,7 @@ class ImgHook(BaseHook):
 		for child_node in node.childNodes:
 			if (child_node.nodeType == child_node.ELEMENT_NODE) and (child_node.tagName == "s:format"):
 				if not (child_node.hasAttribute("name") and child_node.hasAttribute("value")):
-					raise InvalidTransformationException(f"s:format element needs a 'name' and 'value' attribute.")
+					raise InvalidTransformationException("s:format element needs a 'name' and 'value' attribute.")
 				name = child_node.getAttribute("name")
 				value = child_node.getAttribute("value")
 

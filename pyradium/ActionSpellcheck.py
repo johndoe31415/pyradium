@@ -138,3 +138,4 @@ class ActionSpellcheck(BaseAction):
 			cmd = [ "vi", "-c", ":set errorformat=%s" % (vim_errorformat), "-c", ":cf %s" % (self._args.outfile) ]
 			_log.info("Running: %s", CmdlineEscape().cmdline(cmd))
 			subprocess.check_call(cmd)
+		return 0

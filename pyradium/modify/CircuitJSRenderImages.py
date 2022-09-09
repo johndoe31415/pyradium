@@ -186,3 +186,4 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 		self._app.router.add_route("GET", "/ws", self._websocket_handler)
 		aiohttp.web.run_app(self._app, host = local_hostname, port = self._args.websocket_port)
+		return 0

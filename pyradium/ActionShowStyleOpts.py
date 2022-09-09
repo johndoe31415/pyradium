@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -40,7 +40,6 @@ class ActionShowStyleOpts(BaseAction):
 
 		if "parameters" not in config:
 			print("Template has no parameters.")
-			return 0
-
-		parameters = StyleParameters(config["parameters"])
-		parameters.print()
+		else:
+			parameters = StyleParameters(config["parameters"])
+			parameters.print()

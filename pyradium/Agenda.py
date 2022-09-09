@@ -123,7 +123,7 @@ class Agenda():
 			elif item.spec_type == "weight":
 				weight_sum += item.value
 		if weight_sum == 0:
-			raise UnresolvableWeightedEntryException(f"Sum of weights is zero.")
+			raise UnresolvableWeightedEntryException("Sum of weights is zero.")
 		if relative_time > total_time:
 			raise UnresolvableWeightedEntryException(f"Unresolvable weighted exception: relative time within enclosed absolute time bracket too long relative {cls._hmstr(relative_time)} but total time only {cls._hmstr(total_time)}")
 

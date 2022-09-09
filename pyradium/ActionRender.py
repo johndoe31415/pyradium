@@ -50,7 +50,7 @@ class ActionRender(BaseAction):
 		sources += self._args.re_render_watch
 		sources = [ source for source in sources if os.path.exists(source) ]
 		cmd += sources
-		proc = subprocess.run(cmd)
+		proc = subprocess.run(cmd, check = False)
 		if proc.returncode not in [ 0, 1 ]:
 			raise CallingProcessException("inotifywait returned with returncode %d." % (proc.returncode))
 
