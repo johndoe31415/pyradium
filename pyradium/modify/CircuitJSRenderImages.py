@@ -36,6 +36,7 @@ from pyradium.CmdlineEscape import CmdlineEscape
 from .BaseModifyCommand import BaseModifyCommand
 
 _log = logging.getLogger(__spec__.name)
+_empty_circuit_urlcomponent = "CQAgjCAMB0l3BWcMBMcUHYMGZIA4UA2ATmIxAUgpABZsKBTAWjDACgg"
 
 @BaseModifyCommand.register
 class CircuitJSRenderImages(BaseModifyCommand):
@@ -94,12 +95,12 @@ class CircuitJSRenderImages(BaseModifyCommand):
 		await asyncio.sleep(0.5)
 
 		try:
-
 			circuit_params = None
 			for (cno, circuit) in enumerate(self._circuits, 1):
 				_log.debug("Processing circuit %d of %d: %s", cno, len(self._circuits), circuit.get_presentation_parameter("name"))
 				if circuit.circuit_params() != circuit_params:
 					circuit_params = circuit.circuit_params()
+					circuit_params["ctz"] = _empty_circuit_urlcomponent
 					_log.debug("Circuit parameters changed, forcing reload of circuit simulator")
 					await tx_rx({ "cmd": "reload", "args": circuit_params })
 
@@ -174,8 +175,13 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 		local_hostname = "127.0.0.1"
 		local_uri = f"ws://{local_hostname}:{self._args.websocket_port}/ws"
+		initial_config_args = {
+			"ctz":	_empty_circuit_urlcomponent,
+		}
 		query = {
-			"ws":	local_uri,
+			"ws":			local_uri,
+			"src":			f"circuitjs.html?{urllib.parse.urlencode(initial_config_args)}",
+			"autoshutoff":	"1",
 		}
 		self._target_uri = f"{self._args.circuitjs_uri}?{urllib.parse.urlencode(query)}"
 		if self._args.no_xdg_open:
