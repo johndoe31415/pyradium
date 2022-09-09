@@ -30,6 +30,19 @@ lint_cmd += [ "--ignore-long-lines", ".*" ]
 lint_cmd += [ "-f", "json", "pyradium" ]
 findings = json.loads(subprocess.run(lint_cmd, check = False, capture_output = True).stdout)
 
+class LineGetter():
+	def __init__(self):
+		self._filename = None
+		self._content = None
+
+	def get(self, filename, lineno):
+		if self._filename != filename:
+			with open(filename) as f:
+				self._content = f.read().split("\n")
+			self._filename = filename
+		return self._content[lineno - 1]
+lget = LineGetter()
+
 def print_finding(finding):
 	print(f"{finding['path']} {finding['line']} MOC (\"{finding['module']}\", \"{finding['obj']}\", \"{finding['message-id']}\"), {finding['symbol']}: {finding['message']}")
 
@@ -59,6 +72,21 @@ def ignore_finding(finding):
 		"multiple-statements",
 		"too-many-branches",
 		"too-many-public-methods",
+		"attribute-defined-outside-init",
+		"unspecified-encoding",
+		"unused-variable",
+		"fixme",
+		"unused-argument",
+		"too-many-instance-attributes",
+		"no-else-return",
+		"arguments-renamed",
+		"redefined-outer-name",
+		"too-many-locals",
+		"useless-super-delegation",
+		"no-else-raise",
+		"broad-except",
+		"too-many-nested-blocks",
+		"useless-super-delegation",
 	])
 	if finding["symbol"] in ignore_symbols:
 		return True
@@ -68,6 +96,12 @@ def ignore_finding(finding):
 		"raise-missing-from",
 		"anomalous-backslash-in-string",
 		"wrong-import-order",
+		"inconsistent-return-statements",
+		"logging-fstring-interpolation",
+		"f-string-without-interpolation",
+		"consider-using-max-builtin",
+		"subprocess-run-check",
+#		"consider-using-f-string",
 	])
 	if finding["symbol"] in always_report_symbols:
 		return False
