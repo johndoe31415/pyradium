@@ -24,7 +24,10 @@ import sys
 import json
 import subprocess
 
-lint_cmd = [ "pylint", "--disable=R,C,W", "-f", "json", "pyradium" ]
+lint_cmd = [ "pylint" ]
+lint_cmd += [ "--indent-string", "\\t" ]
+lint_cmd += [ "--ignore-long-lines", ".*" ]
+lint_cmd += [ "-f", "json", "pyradium" ]
 findings = json.loads(subprocess.run(lint_cmd, check = False, capture_output = True).stdout)
 
 def print_finding(finding):
@@ -42,7 +45,34 @@ def ignore_finding(finding):
 	])
 	if moc in ignore_mocs:
 		return True
-	return False
+
+	ignore_symbols = set([
+		"missing-function-docstring",
+		"missing-module-docstring",
+		"missing-class-docstring",
+		"invalid-name",
+		"duplicate-code",
+		"too-few-public-methods",
+		"superfluous-parens",
+		"too-many-arguments",
+		"protected-access",
+		"multiple-statements",
+		"too-many-branches",
+		"too-many-public-methods",
+	])
+	if finding["symbol"] in ignore_symbols:
+		return True
+
+	always_report_symbols = set([
+		"unused-import",
+		"raise-missing-from",
+		"anomalous-backslash-in-string",
+		"wrong-import-order",
+	])
+	if finding["symbol"] in always_report_symbols:
+		return False
+
+	return not finding["message-id"].startswith("E")
 
 critical_findings = [ finding for finding in findings if not ignore_finding(finding) ]
 if len(critical_findings) > 0:
