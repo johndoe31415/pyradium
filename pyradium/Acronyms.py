@@ -21,6 +21,7 @@
 
 import json
 import collections
+from pyradium.Exceptions import MalformedJSONInputException
 
 ResolvedAcronym = collections.namedtuple("ResolvedAcronym", [ "acronym_id", "acronym", "text", "uri" ])
 
@@ -53,7 +54,10 @@ class Acronyms():
 		if filename in self._loaded_files:
 			return
 		with open(filename) as f:
-			acronyms = json.load(f)
+			try:
+				acronyms = json.load(f)
+			except json.decoder.JSONDecodeError as e:
+				raise MalformedJSONInputException(f"Acronym JSON file {filename} is malformed: {str(e)}") from e
 		for (acronym_id, acronym_data) in acronyms.items():
 			resolved_acronym = ResolvedAcronym(acronym_id = acronym_id, acronym = acronym_data.get("acronym", acronym_id), text = acronym_data["text"], uri = acronym_data.get("uri"))
 			self._acronyms[acronym_id] = resolved_acronym
