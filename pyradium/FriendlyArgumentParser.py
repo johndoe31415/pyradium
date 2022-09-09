@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	FriendlyArgumentParser - Argument parser with default help pages
-#	Copyright (C) 2011-2012 Johannes Bauer
+#	Copyright (C) 2011-2022 Johannes Bauer
 #
 #	This file is part of pycommon.
 #
@@ -39,7 +39,7 @@ class FriendlyArgumentParser(argparse.ArgumentParser):
 		if self.__silent_error:
 			raise Exception(msg)
 		else:
-			for line in textwrap.wrap("Error: %s" % (msg), subsequent_indent = "  "):
+			for line in textwrap.wrap(f"Error: {msg}", subsequent_indent = "  "):
 				print(line, file = sys.stderr)
 			print(file = sys.stderr)
 			self.print_help(file = sys.stderr)

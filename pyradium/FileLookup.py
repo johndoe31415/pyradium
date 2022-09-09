@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -37,9 +37,9 @@ class FileLookup():
 			if os.path.isfile(path):
 				return path
 		if len(self._paths) == 0:
-			raise FailedToLookupFileException("No such file: %s (no directories given to look up)" % (filename))
+			raise FailedToLookupFileException(f"No such file: {filename} (no directories given to look up)")
 		else:
-			raise FailedToLookupFileException("No such file: %s (looked in %s)" % (filename, ", ".join(self._paths)))
+			raise FailedToLookupFileException(f"No such file: {filename} (looked in {', '.join(self._paths)})")
 
 	def __iter__(self):
 		yield from self._paths

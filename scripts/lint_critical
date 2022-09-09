@@ -102,7 +102,7 @@ def ignore_finding(finding):
 		"f-string-without-interpolation",
 		"consider-using-max-builtin",
 		"subprocess-run-check",
-#		"consider-using-f-string",
+		#"consider-using-f-string",
 	])
 	if finding["symbol"] in always_report_symbols:
 		return False

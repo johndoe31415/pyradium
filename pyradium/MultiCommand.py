@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	MultiCommand - Provide an openssl-style multi-command abstraction
-#	Copyright (C) 2011-2021 Johannes Bauer
+#	Copyright (C) 2011-2022 Johannes Bauer
 #
 #	This file is part of pycommon.
 #
@@ -44,16 +44,16 @@ class MultiCommand():
 	def register(self, commandname, description, parsergenerator, **kwargs):
 		supported_kwargs = set(("aliases", "action", "visible"))
 		if len(set(kwargs.keys()) - supported_kwargs) > 0:
-			raise Exception("Unsupported kwarg found. Supported: %s" % (", ".join(sorted(list(supported_kwargs)))))
+			raise ValueError(f"Unsupported kwarg found. Supported: {', '.join(sorted(list(supported_kwargs)))}")
 
 		if (commandname in self._commands) or (commandname in self._aliases):
-			raise Exception("Command '%s' already registered." % (commandname))
+			raise Exception(f"Command '{commandname}' already registered.")
 
 		aliases = kwargs.get("aliases", [ ])
 		action = kwargs.get("action")
 		for alias in aliases:
 			if (alias in self._commands) or (alias in self._aliases):
-				raise Exception("Alias '%s' already registered." % (alias))
+				raise Exception(f"Alias '{alias}' already registered.")
 			self._aliases[alias] = commandname
 
 		cmd = self.RegisteredCommand(commandname, description, parsergenerator, action, aliases, visible = kwargs.get("visible", True))
@@ -63,8 +63,8 @@ class MultiCommand():
 	def _show_syntax(self, msg = None):
 		output_file = sys.stderr if (msg is not None) else sys.stdout
 		if msg is not None:
-			print("Error: %s" % (msg), file = output_file)
-		print("usage: %s [command] [options]" % (sys.argv[0]), file = output_file)
+			print(f"Error: {msg}", file = output_file)
+		print(f"usage: {sys.argv[0]} [command] [options]", file = output_file)
 		print(file = output_file)
 		if self._description is not None:
 			print(self._description, file = output_file)
