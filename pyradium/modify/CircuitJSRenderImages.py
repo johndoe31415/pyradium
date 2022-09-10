@@ -70,7 +70,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 		ws = aiohttp.web.WebSocketResponse()
 		await ws.prepare(request)
 
-		async def tx_rx(msg, expect_response = True):
+		async def tx_rx(msg, expect_response = True, wait_for_event = None):
 			self._msgid += 1
 			used_msgid = self._msgid
 			msg["msgid"] = used_msgid
@@ -78,21 +78,25 @@ class CircuitJSRenderImages(BaseModifyCommand):
 			await ws.send_json(msg)
 			while expect_response:
 				answer = await ws.receive_json()
-				if ("msgid" in answer) and (answer["msgid"] == used_msgid):
+				if (wait_for_event is None) and ("msgid" in answer) and (answer["msgid"] == used_msgid):
 					_log.trace("Response: %s", answer)
+					return answer
+				if (wait_for_event is not None) and (answer["type"] == "event") and (answer["code"] == wait_for_event):
+					_log.trace("Response event: %s", answer)
 					return answer
 				else:
 					_log.trace("Response with different/no message ID: %s", answer)
 
 
 
-		# Wait for connection to become available; otherwise, reloading too
-		# soon has no effect.
-		await tx_rx({ "cmd": "wait_available" })
-
-		# TODO: This is not a pretty hack. But apparently the JS portion is
-		# not fully ready even when it shows it's ready at startup.
-		await asyncio.sleep(0.5)
+		# We do not know if the simulator is available yet. Test it out
+		status = await tx_rx({ "cmd": "status" })
+		if status["status"] == "error":
+			# Initially, simulator is not available yet. Wait for it to become available.
+			while True:
+				answer = await ws.receive_json()
+				if (answer["type"] == "event") and (answer["code"] == "reload_complete"):
+					break
 
 		try:
 			circuit_params = None
@@ -102,14 +106,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 					circuit_params = circuit.circuit_params()
 					circuit_params["ctz"] = _empty_circuit_urlcomponent
 					_log.debug("Circuit parameters changed, forcing reload of circuit simulator")
-					await tx_rx({ "cmd": "reload", "args": circuit_params })
-
-					# Wait for the simulator to become available again
-					await tx_rx({ "cmd": "wait_available" })
-
-					# TODO: This is not a pretty hack. But apparently the JS portion is
-					# not fully ready even when it shows it's ready at startup.
-					await asyncio.sleep(0.5)
+					await tx_rx({ "cmd": "reload", "args": circuit_params }, wait_for_event = "reload_complete")
 
 				# Load circuit
 				await tx_rx({ "cmd": "circuit_import", "circuit": circuit.circuit_text })
