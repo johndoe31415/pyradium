@@ -34,6 +34,7 @@ class CircuitJSCircuit():
 		"selectColor":		"#2c3e50",
 	}
 	_DEFAULT_URI = "https://www.falstad.com/circuit/circuitjs.html"
+	_RESET_CONFIG = "$ 1 5e-6 10.2 50 5 50 5e-11"
 
 	def __init__(self, circuit_text: str | None = None, circuit_params: dict | None = None, uri: str = _DEFAULT_URI, presentation_params: dict | None = None, display_content: list | None = None, original_xml_node = None):
 		self._circuit = None
@@ -44,6 +45,12 @@ class CircuitJSCircuit():
 		self._display_content = display_content if (display_content is not None) else [ ]
 		self._original_xml_node = original_xml_node
 
+	def reset_presentation_parameters(self):
+		if self._circuit is None:
+			self._circuit = [ self._RESET_CONFIG ]
+		else:
+			self._circuit[0] = self._RESET_CONFIG
+
 	@property
 	def circuit_text(self):
 		if self._circuit is None:
@@ -51,14 +58,17 @@ class CircuitJSCircuit():
 		else:
 			return "\n".join(self._circuit) + "\n"
 
+	def _parse_text(self, text):
+		text = text.strip("\r\n")
+		text = [ line.strip(" \t\r\n") for line in text.split("\n") ]
+		return text
+
 	@circuit_text.setter
 	def circuit_text(self, value):
 		if value is None:
 			self._circuit = None
 		else:
-			value = value.strip("\r\n")
-			value = [ line.strip(" \t\r\n") for line in value.split("\n") ]
-			self._circuit = value
+			self._circuit = self._parse_text(value)
 
 	@property
 	def display_content(self):
@@ -129,8 +139,17 @@ class CircuitJSCircuit():
 
 	def _replace_source_node(self, replacement):
 		present_nodes = self._find_circuit_nodes()
+		first_node = present_nodes[0] if (len(present_nodes) > 0) else None
+
+		if (len(present_nodes) == 1) and (replacement.getAttribute("src") == first_node.getAttribute("src")):
+			current_text = XMLTools.inner_text(first_node)
+			replacement_text = XMLTools.inner_text(replacement)
+			if self._parse_text(current_text) == self._parse_text(replacement_text):
+				# Nothing needs to change.
+				return False
+
 		if len(present_nodes) > 0:
-			XMLTools.replace_node(present_nodes[0], replacement)
+			XMLTools.replace_node(first_node, replacement)
 			for node in present_nodes[1:]:
 				XMLTools.remove_node(node)
 		else:

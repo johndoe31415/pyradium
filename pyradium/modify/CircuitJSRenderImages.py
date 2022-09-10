@@ -64,6 +64,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 		parser.add_argument("--no-shutdown", action = "store_true", help = "Keep CircuitJS running after everything is rendered; do not cause it to shut down.")
 		parser.add_argument("--only-circuit", metavar = "name", action = "append", default = [ ], help = "Only process circuits with the given name. Can be specified multiple times. If not specified, all circuits are affected.")
 		parser.add_argument("-w", "--write-back", metavar = "{" + ",".join(choice.value for choice in _WriteBack) + "}", choices = _WriteBack, type = _WriteBack, default = "no", help = "This option not only reads out the circuit after it has settled, but it also writes those changes back to the XML presentation file. This can either happen inline (directly as text) or as an external file reference.")
+		parser.add_argument("-s", "--simulation-change", choices = [ "reset_params" ], action = "append", default = [ ], help = "Manipulate the circuit in a defined way. Right now there is only 'reset_params' supported, which resets timestep/simulation speed to the initial defaults. Can be supplied multiple times.")
 		parser.add_argument("-o", "--output-dir", metavar = "path", default = "circuits/", help = "Output directory to store the circuit SVGs into.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")
@@ -145,17 +146,21 @@ class CircuitJSRenderImages(BaseModifyCommand):
 				if self._args.capture_circuit or (self._args.write_back != _WriteBack.NoWriteback):
 					# The circuit may have modified after it's settled. Retrieve it if user requests it.
 					exported_circuit = await tx_rx({ "cmd": "circuit_export" })
-					exported_circuit = exported_circuit["data"]
+					circuit.circuit_text = exported_circuit["data"]
+					for change in self._args.simulation_change:
+						if change == "reset_params":
+							circuit.reset_presentation_parameters()
+						else:
+							raise NotImplementedError(change)
 
 					if self._args.capture_circuit or (self._args.write_back == _WriteBack.ExternalFile):
 						local_filename_circuit = f"circuit_{circuit.get_presentation_parameter('name')}.txt"
 						output_filename_circuit = f"{self._args.output_dir}/{local_filename_circuit}"
 						with open(output_filename_circuit, "w") as f:
-							f.write(exported_circuit)
+							f.write(circuit.circuit_text)
 
 					# Modify the presentation DOM
 					if self._args.write_back == _WriteBack.Inline:
-						circuit.circuit_text = exported_circuit
 						self._dom_modified = circuit.modify_dom_source_inline() or self._dom_modified
 					elif self._args.write_back == _WriteBack.ExternalFile:
 						self._dom_modified = circuit.modify_dom_source_external_file(local_filename_circuit) or self._dom_modified
@@ -217,7 +222,10 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 		if self._dom_modified:
 			rnd_filename = FileTools.base_random_file_on(self._args.infile)
+			_log.debug("Writing modified presentation XML using tempfile %s", rnd_filename)
 			with open(rnd_filename, "w") as f:
 				self._dom.writexml(f)
 			shutil.move(rnd_filename, self._args.infile)
+		else:
+			_log.debug("Presentation has not changed, not saving.")
 		return 0
