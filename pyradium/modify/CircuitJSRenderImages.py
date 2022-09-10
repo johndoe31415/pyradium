@@ -115,6 +115,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 			for (cno, circuit) in enumerate(self._circuits, 1):
 				_log.info("Processing circuit %d of %d: %s", cno, len(self._circuits), circuit.get_presentation_parameter("name"))
 				if circuit.circuit_params() != circuit_params:
+					# TODO: Disregard "ctz" here.
 					circuit_params = circuit.circuit_params()
 					circuit_params["ctz"] = _empty_circuit_urlcomponent
 					_log.debug("Circuit parameters changed, forcing reload of circuit simulator")
