@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
 import json
 import hashlib
 import subprocess
@@ -271,3 +272,18 @@ class HashTools():
 	@classmethod
 	def hash_file(cls, filename):
 		return cls.hash_files([ filename ])
+
+class FileTools():
+	@classmethod
+	def base_random_file_on(cls, filename):
+		dirname = os.path.dirname(filename)
+		basename = os.path.basename(filename)
+		while True:
+			if dirname == "":
+				rndname = f".{basename}_{os.urandom(8).hex()}"
+			elif dirname == "/":
+				rndname = f"/.{basename}_{os.urandom(8).hex()}"
+			else:
+				rndname = f"{dirname}/.{basename}_{os.urandom(8).hex()}"
+			if not os.path.exists(rndname):
+				return rndname

@@ -23,6 +23,8 @@ import subprocess
 import logging
 import os
 import contextlib
+import enum
+import shutil
 import urllib.parse
 try:
 	import aiohttp.web
@@ -30,13 +32,19 @@ except ModuleNotFoundError:
 	aiohttp = None
 import asyncio
 from pyradium.Presentation import Presentation
-from pyradium.Tools import XMLTools
+from pyradium.Tools import XMLTools, FileTools
 from pyradium.CircuitJS import CircuitJSCircuit
 from pyradium.CmdlineEscape import CmdlineEscape
+from pyradium.FileLookup import FileLookup
 from .BaseModifyCommand import BaseModifyCommand
 
 _log = logging.getLogger(__spec__.name)
 _empty_circuit_urlcomponent = "CQAgjCAMB0l3BWcMBMcUHYMGZIA4UA2ATmIxAUgpABZsKBTAWjDACgg"
+
+class _WriteBack(enum.Enum):
+	NoWriteback = "no"
+	Inline = "inline"
+	ExternalFile = "extfile"
 
 @BaseModifyCommand.register
 class CircuitJSRenderImages(BaseModifyCommand):
@@ -46,6 +54,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 	@classmethod
 	def _gen_parser(cls, parser):
+		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, circuits are located which are referenced from the presentation. Can be issued multiple times.")
 		parser.add_argument("-u", "--circuitjs-uri", metavar = "uri", default = "http://127.0.0.1:8123/circuitws.html", help = "URI that the websocket CircuitJS is hosted at. Defaults to %(default)s.")
 		parser.add_argument("--websocket-port", metavar = "port", type = int, default = 3424, help = "Run websocket server on localhost at this port. Defaults to %(default)d.")
 		parser.add_argument("-c", "--capture-circuit", action = "store_true", help = "Not only capture the SVG files, but also the circuits itself.")
@@ -53,6 +62,8 @@ class CircuitJSRenderImages(BaseModifyCommand):
 		parser.add_argument("--no-xdg-open", action = "store_true", help = "Do not call xdg-open automatically to start the process.")
 		parser.add_argument("--no-svg-postprocessing", action = "store_true", help = "Do not call Inkscape to adapt the returned SVG canvas size.")
 		parser.add_argument("--no-shutdown", action = "store_true", help = "Keep CircuitJS running after everything is rendered; do not cause it to shut down.")
+		parser.add_argument("--only-circuit", metavar = "name", action = "append", default = [ ], help = "Only process circuits with the given name. Can be specified multiple times. If not specified, all circuits are affected.")
+		parser.add_argument("-w", "--write-back", metavar = "{" + ",".join(choice.value for choice in _WriteBack) + "}", choices = _WriteBack, type = _WriteBack, default = "no", help = "This option not only reads out the circuit after it has settled, but it also writes those changes back to the XML presentation file. This can either happen inline (directly as text) or as an external file reference.")
 		parser.add_argument("-o", "--output-dir", metavar = "path", default = "circuits/", help = "Output directory to store the circuit SVGs into.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")
@@ -101,7 +112,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 		try:
 			circuit_params = None
 			for (cno, circuit) in enumerate(self._circuits, 1):
-				_log.debug("Processing circuit %d of %d: %s", cno, len(self._circuits), circuit.get_presentation_parameter("name"))
+				_log.info("Processing circuit %d of %d: %s", cno, len(self._circuits), circuit.get_presentation_parameter("name"))
 				if circuit.circuit_params() != circuit_params:
 					circuit_params = circuit.circuit_params()
 					circuit_params["ctz"] = _empty_circuit_urlcomponent
@@ -131,13 +142,23 @@ class CircuitJSRenderImages(BaseModifyCommand):
 					_log.debug("Fitting SVG to canvas: %s", CmdlineEscape().cmdline(cmd))
 					subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 
-				if self._args.capture_circuit:
+				if self._args.capture_circuit or (self._args.write_back != _WriteBack.NoWriteback):
 					# The circuit may have modified after it's settled. Retrieve it if user requests it.
 					exported_circuit = await tx_rx({ "cmd": "circuit_export" })
-					output_filename_circuit = f"{self._args.output_dir}/circuit_{circuit.get_presentation_parameter('name')}.txt"
-					with open(output_filename_circuit, "w") as f:
-						f.write(exported_circuit["data"])
+					exported_circuit = exported_circuit["data"]
 
+					if self._args.capture_circuit or (self._args.write_back == _WriteBack.ExternalFile):
+						local_filename_circuit = f"circuit_{circuit.get_presentation_parameter('name')}.txt"
+						output_filename_circuit = f"{self._args.output_dir}/{local_filename_circuit}"
+						with open(output_filename_circuit, "w") as f:
+							f.write(exported_circuit)
+
+					# Modify the presentation DOM
+					if self._args.write_back == _WriteBack.Inline:
+						circuit.circuit_text = exported_circuit
+						self._dom_modified = circuit.modify_dom_source_inline() or self._dom_modified
+					elif self._args.write_back == _WriteBack.ExternalFile:
+						self._dom_modified = circuit.modify_dom_source_external_file(local_filename_circuit) or self._dom_modified
 
 		finally:
 			if not self._args.no_shutdown:
@@ -149,17 +170,21 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 	def _parse_circuits(self):
 		circuits = [ ]
-		(dom, presentation) = Presentation.parse_xml(self._args.infile)
+		(self._dom, presentation) = Presentation.parse_xml(self._args.infile)
 		for slide in XMLTools.findall(presentation, "slide"):
 			for circuit_node in XMLTools.findall(slide, "s:circuit"):
-				circuit = CircuitJSCircuit.from_xml(circuit_node)
-				if circuit.has_presentation_parameter("name"):
-					circuits.append(circuit)
+				circuit = CircuitJSCircuit.from_xml(circuit_node, find_file_function = self._lookup.lookup)
+				name = circuit.get_presentation_parameter("name")
+				if name is not None:
+					if (len(self._args.only_circuit) == 0) or (name in self._args.only_circuit):
+						circuits.append(circuit)
 				else:
-					_log.warning("Unnamed circuit will not be rendered to SVG.")
+					_log.warning("Unnamed circuit will not be considered.")
 		return circuits
 
 	def run(self):
+		self._lookup = FileLookup(self._args.include_dir)
+		self._dom_modified = False
 		self._connection = False
 		self._msgid = 0
 		self._circuits = self._parse_circuits()
@@ -189,4 +214,10 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 		self._app.router.add_route("GET", "/ws", self._websocket_handler)
 		aiohttp.web.run_app(self._app, host = local_hostname, port = self._args.websocket_port)
+
+		if self._dom_modified:
+			rnd_filename = FileTools.base_random_file_on(self._args.infile)
+			with open(rnd_filename, "w") as f:
+				self._dom.writexml(f)
+			shutil.move(rnd_filename, self._args.infile)
 		return 0

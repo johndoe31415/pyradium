@@ -35,12 +35,14 @@ class CircuitJSCircuit():
 	}
 	_DEFAULT_URI = "https://www.falstad.com/circuit/circuitjs.html"
 
-	def __init__(self, circuit: list[str] | None = None, circuit_params: dict | None = None, uri: str = _DEFAULT_URI, presentation_params: dict | None = None, display_content: list | None = None):
-		self._circuit = circuit
+	def __init__(self, circuit_text: str | None = None, circuit_params: dict | None = None, uri: str = _DEFAULT_URI, presentation_params: dict | None = None, display_content: list | None = None, original_xml_node = None):
+		self._circuit = None
+		self.circuit_text = circuit_text
 		self._circuit_params = circuit_params if (circuit_params is not None) else { }
 		self._uri = uri
 		self._presentation_params = presentation_params if (presentation_params is not None) else { }
 		self._display_content = display_content if (display_content is not None) else [ ]
+		self._original_xml_node = original_xml_node
 
 	@property
 	def circuit_text(self):
@@ -48,6 +50,15 @@ class CircuitJSCircuit():
 			return None
 		else:
 			return "\n".join(self._circuit) + "\n"
+
+	@circuit_text.setter
+	def circuit_text(self, value):
+		if value is None:
+			self._circuit = None
+		else:
+			value = value.strip("\r\n")
+			value = [ line.strip(" \t\r\n") for line in value.split("\n") ]
+			self._circuit = value
 
 	@property
 	def display_content(self):
@@ -75,7 +86,7 @@ class CircuitJSCircuit():
 
 	@classmethod
 	def from_xml(cls, xml_node, no_defaults: bool = False, find_file_function = None):
-		circuit = None
+		circuit_text = None
 		if no_defaults:
 			circuit_params = { }
 		else:
@@ -92,25 +103,52 @@ class CircuitJSCircuit():
 				if name == "uri":
 					uri = value
 				elif name == "src":
-					circuit = value
+					circuit_text = value
 				elif name == "srclink":
 					parsed_url = urllib.parse.urlparse(value)
 					query = urllib.parse.parse_qs(parsed_url.query)
 					if "ctz" not in query:
 						raise MissingParameterException(f"The URI provided as a 'srclink' for the 's:circuit' tag is missing the ctz= portion in its query string: {value}")
 					srclink = query["ctz"][0]
-					circuit = lzstr.LZStringDecompressor.decompress_from_url_component(srclink, escape = False).decode("ascii")
+					circuit_text = lzstr.LZStringDecompressor.decompress_from_url_component(srclink, escape = False).decode("ascii")
 				elif name in [ "name", "content" ]:
 					presentation_params[name] = value
 				else:
 					circuit_params[name] = value
 			else:
 				display_content.append(child_node)
+		return cls(circuit_text = circuit_text, circuit_params = circuit_params, uri = uri, presentation_params = presentation_params, display_content = display_content, original_xml_node = xml_node)
 
-		if circuit is not None:
-			circuit = circuit.strip("\r\n")
-			circuit = [ line.strip(" \t\r\n") for line in circuit.split("\n") ]
-		return cls(circuit = circuit, circuit_params = circuit_params, uri = uri, presentation_params = presentation_params, display_content = display_content)
+	def _find_circuit_nodes(self):
+		found = [ ]
+		for node in XMLTools.findall(self._original_xml_node, "s:param"):
+			name = node.getAttribute("name")
+			if name in [ "src", "srclink" ]:
+				found.append(node)
+		return found
+
+	def _replace_source_node(self, replacement):
+		present_nodes = self._find_circuit_nodes()
+		if len(present_nodes) > 0:
+			XMLTools.replace_node(present_nodes[0], replacement)
+			for node in present_nodes[1:]:
+				XMLTools.remove_node(node)
+		else:
+			self._original_xml_node.appendChild(replacement)
+		return True
+
+	def modify_dom_source_inline(self):
+		replacement = self._original_xml_node.ownerDocument.createElement("s:param")
+		replacement.setAttribute("name", "src")
+		indented_text = "\n\t\t\t\t" + self.circuit_text.rstrip("\n").replace("\n", "\n\t\t\t\t") + "\n\t\t\t"
+		replacement.appendChild(self._original_xml_node.ownerDocument.createTextNode(indented_text))
+		return self._replace_source_node(replacement)
+
+	def modify_dom_source_external_file(self, filename):
+		replacement = self._original_xml_node.ownerDocument.createElement("s:param")
+		replacement.setAttribute("name", "src")
+		replacement.setAttribute("src", filename)
+		return self._replace_source_node(replacement)
 
 	def __str__(self):
 		args = [ ]
