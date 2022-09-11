@@ -34,7 +34,7 @@ class CircuitJSCircuit():
 		"selectColor":		"#2c3e50",
 	}
 	_DEFAULT_URI = "https://www.falstad.com/circuit/circuitjs.html"
-	_RESET_CONFIG = "$ 1 5e-6 10.2 50 5 50 5e-11"
+	_RESET_CONFIG = "$ 0 5e-6 10.2 50 5 50 5e-11"
 
 	def __init__(self, circuit_text: str | None = None, circuit_params: dict | None = None, uri: str = _DEFAULT_URI, presentation_params: dict | None = None, display_content: list | None = None, original_xml_node = None):
 		self._circuit = None
