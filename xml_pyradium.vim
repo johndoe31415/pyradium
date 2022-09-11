@@ -19,14 +19,21 @@ function PyradiumTemplateHelperCommand(cmd)
 endfunction
 
 " Add a menu
-:amenu 500.10 &pyradium.&Code :call PyradiumTemplateHelperCommand("code")<Enter>
-:amenu 500.20 &pyradium.&Terminal :call PyradiumTemplateHelperCommand("term")<Enter>
-:amenu 500.30 &pyradium.&Sectiontitle :call PyradiumTemplateHelperCommand("sectiontitle")<Enter>
-:amenu 500.40 &pyradium.&Quote :call PyradiumTemplateHelperCommand("quote")<Enter>
-:amenu 500.50 &pyradium.&Image :call PyradiumTemplateHelperCommand("img")<Enter>
-:amenu 500.60 &pyradium.&Plot :call PyradiumTemplateHelperCommand("plot")<Enter>
-:amenu 500.70 &pyradium.&Graphviz :call PyradiumTemplateHelperCommand("graphviz")<Enter>
-:amenu 500.80 &pyradium.&Animation :call PyradiumTemplateHelperCommand("anim")<Enter>
+:amenu 500.10 &pyradium.&Slide.&Main\title :call PyradiumTemplateHelperCommand("slide_title")<Enter>
+:amenu 500.20 &pyradium.&Slide.&Table\ of\ contents :call PyradiumTemplateHelperCommand("slide_toc")<Enter>
+:amenu 500.30 &pyradium.&Slide.&Sectiontitle :call PyradiumTemplateHelperCommand("slide_sectiontitle")<Enter>
+:amenu 500.40 &pyradium.&Slide.&Left/right :call PyradiumTemplateHelperCommand("slide_leftright")<Enter>
+:amenu 500.50 &pyradium.&Slide.&Quote :call PyradiumTemplateHelperCommand("slide_quote")<Enter>
+:amenu 500.60 &pyradium.&Slide.&Final :call PyradiumTemplateHelperCommand("slide_final")<Enter>
+:amenu 500.70 &pyradium.&Slide.&Acronyms :call PyradiumTemplateHelperCommand("slide_acronyms")<Enter>
+:amenu 500.80 &pyradium.&Slide.F&eedback :call PyradiumTemplateHelperCommand("slide_feedback")<Enter>
+:amenu 500.90 &pyradium.&Textblock.&Code :call PyradiumTemplateHelperCommand("textblock_code")<Enter>
+:amenu 500.100 &pyradium.&Textblock.&Terminal :call PyradiumTemplateHelperCommand("textblock_term")<Enter>
+:amenu 500.110 &pyradium.&Image.&Still\ image :call PyradiumTemplateHelperCommand("image_img")<Enter>
+:amenu 500.120 &pyradium.&Image.&Animation :call PyradiumTemplateHelperCommand("image_anim")<Enter>
+:amenu 500.130 &pyradium.&Image.&Plot :call PyradiumTemplateHelperCommand("image_plot")<Enter>
+:amenu 500.140 &pyradium.&Image.&Graphviz :call PyradiumTemplateHelperCommand("image_graphviz")<Enter>
+:amenu 500.150 &pyradium.&Other.&CircuitJS :call PyradiumTemplateHelperCommand("other_circuitjs")<Enter>
 
 " Add specific keybindings
 vmap <C-S-b> :s/\%V.*\%V./<b>&<\/b><Enter>:noh<Enter>

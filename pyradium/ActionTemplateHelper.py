@@ -22,37 +22,88 @@
 from .BaseAction import BaseAction
 
 _KNOWN_TEMPLATES = {
-	"img": """<s:img src="X" />""",
-	"plot": """<s:plot src="X" />""",
-	"graphviz": """<s:graphviz src="X" />""",
-
-	"anim": """
-	<slide type="animation">
-		<s:var name="heading" value="X" />
-		<s:var name="filename" value="X.svg" />
-	</slide>
+	"slide_title": """
+	<slide type="title"/>
 	""",
 
-	"code": """
-		<s:code lang="X"><![CDATA[
-		]]></s:code>
+	"slide_toc": """
+	<slide type="toc"/>
 	""",
 
-	"term": """
-		<s:term prompt="$ "><![CDATA[
-		]]></s:term>
-	""",
-
-	"sectiontitle": """
+	"slide_sectiontitle": """
 	<slide type="sectiontitle">
 		<s:time abs="10 sec" />
 	</slide>
 	""",
 
-	"quote": """
+	"slide_leftright": """
+	<slide type="leftright">
+	<s:var name="heading" value="" />
+		<s:content name="left">
+			Left
+		</s:content>
+		<s:content name="right">
+			Right
+		</s:content>
+	</slide>
+	""",
+
+	"slide_quote": """
 	<slide type="quote">
-        X
-		<s:var name="author" value="X" />
+		<s:time abs="15 sec"/>
+		Quote
+		<s:var name="author" value="Author"/>
+	</slide>
+	""",
+
+	"slide_final": """
+	<slide type="final">
+		<s:time rel="0" />
+	</slide>
+	""",
+
+	"slide_acronyms": """
+	<slide type="acronyms">
+		<s:time rel="0" />
+	</slide>
+	""",
+
+	"slide_feedback": """
+	<slide type="feedback">
+		<s:time rel="0" />
+		<s:var name="endpoint" value="https://my_server.com/feedback/submit" />
+	</slide>
+	""",
+
+	"textblock_code": """
+		<s:code lang="X"><![CDATA[
+		]]></s:code>
+	""",
+
+	"textblock_term": """
+		<s:term prompt="$ "><![CDATA[
+		]]></s:term>
+	""",
+
+
+	"image_img": """<s:img src="X" />""",
+	"image_anim": """
+	<slide type="animation">
+		<s:var name="heading" value="X" />
+		<s:var name="filename" value="X.svg" />
+	</slide>
+	""",
+	"image_plot": """<s:plot src="X" />""",
+	"image_graphviz": """<s:graphviz src="X" />""",
+
+	"other_circuitjs": """
+	<slide>
+		<s:var name="heading" value="Title"/>
+		<s:circuit>
+			<s:param name="name" value="X"/>
+			<s:param name="content" value="image"/>
+			<s:param name="src" src="circuit_X.txt"/>
+		</s:circuit>
 	</slide>
 	""",
 }
