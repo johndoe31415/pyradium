@@ -131,7 +131,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 				t1 = await tx_rx({ "cmd": "status" })
 
 				# Then make a snapshot of the SVG
-				svg = await tx_rx({ "cmd": "get_svg" })
+				svg = await tx_rx({ "cmd": "get_svg" }, wait_for_event = "svg_rendered")
 
 				# Create the output SVG file
 				output_filename_svg = f"{self._args.output_dir}/circuit_{circuit.get_presentation_parameter('name')}.svg"
