@@ -154,3 +154,15 @@ th, td {
 	text-align: left;
 	border-bottom: 1px solid #ddd;
 }
+
+tr.no-border-bottom th, tr.no-border-bottom td {
+	border-bottom: none;
+}
+
+tr.fat-border-bottom th, tr.fat-border-bottom td {
+	border-bottom: 3px solid #ddd;
+}
+
+th.border-right, td.border-right {
+	border-right: 1px solid #ddd;
+}
