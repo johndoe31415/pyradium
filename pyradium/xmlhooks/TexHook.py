@@ -21,6 +21,7 @@
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
+from pyradium.StyleDict import StyleDict
 
 @XMLHookRegistry.register_hook
 class TexHook(BaseHook):
@@ -52,11 +53,18 @@ class TexHook(BaseHook):
 
 		img_node = node.ownerDocument.createElement("img")
 		img_node.setAttribute("src", uri)
-		if properties["long"]:
-			img_node.setAttribute("style", "width: %dpx; margin-top: 5px" % (width_px))
-		else:
-			img_node.setAttribute("style", "width: %dpx; margin-bottom: %dpx; margin-top: 5px" % (width_px, -baseline_px + 1))
 		img_node.setAttribute("alt", properties["formula"])
+
+		img_style = StyleDict()
+		img_style["width"] = f"{width_px}px"
+		img_style["margin-top"] = "5px"
+		if not properties["long"]:
+			img_style["margin-bottom"] = f"{-baseline_px + 1}px"
+		if node.hasAttribute("indent"):
+			indent = float(node.getAttribute("indent"))
+			indent_px = round(indent * 50)
+			img_style["margin-left"] = f"{indent_px}px"
+		img_style.to_node(img_node)
 
 		if not wrap_in_div:
 			replacement_node = img_node

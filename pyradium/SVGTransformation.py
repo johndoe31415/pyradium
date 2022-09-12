@@ -22,49 +22,7 @@
 import xml.dom.minidom
 from .Tools import XMLTools
 from .Exceptions import InvalidTransformationException
-
-class SVGStyle():
-	def __init__(self, style_dict = None):
-		assert((style_dict is None) or isinstance(style_dict, dict))
-		self._style = style_dict
-
-	@classmethod
-	def from_style_str(cls, style_str):
-		style_dict = { }
-		for style_item in style_str.split(";"):
-			style_item = style_item.strip()
-			if style_item == "":
-				continue
-			style_item = style_item.split(":", maxsplit = 1)
-			if len(style_item) == 2:
-				(key, value) = style_item
-				key = key.strip()
-				value = value.strip()
-				style_dict[key] = value
-		return cls(style_dict)
-
-	@classmethod
-	def from_node(cls, node):
-		return cls.from_style_str(node.getAttribute("style"))
-
-	@property
-	def is_visible(self):
-		if "display" in self._style:
-			hidden = (self["display"] == "none")
-			return not hidden
-		return True
-
-	def serialize(self):
-		return ";".join("%s:%s" % (key, value) for (key, value) in self._style.items())
-
-	def __setitem__(self, key, value):
-		self._style[key] = value
-
-	def __getitem__(self, key):
-		return self._style.get(key)
-
-	def __str__(self):
-		return "SVGStyle<%s>" % (str(self._style))
+from .StyleDict import StyleDict
 
 class SVGLayer():
 	def __init__(self, group_node):
@@ -80,12 +38,12 @@ class SVGLayer():
 
 	@property
 	def is_visible(self):
-		return SVGStyle.from_node(self._node).is_visible
+		return StyleDict.from_node(self._node).is_visible
 
 	def modify_style(self, callback):
-		style = SVGStyle.from_node(self._node)
+		style = StyleDict.from_node(self._node)
 		callback(style)
-		self._node.setAttribute("style", style.serialize())
+		style.to_node(self._node)
 
 	def hide(self):
 		def _callback(style):
