@@ -40,7 +40,7 @@ vmap <C-S-b> :s/\%V.*\%V./<b>&<\/b><Enter>:noh<Enter>
 vmap <C-S-i> :s/\%V.*\%V./<i>&<\/i><Enter>:noh<Enter>
 vmap <C-S-a> :s/\%V.*\%V./<a href="">&<\/a><Enter>:noh<Enter>
 vmap <C-S-q> :s/\%V.*\%V./<s:enq>&<\/s:enq><Enter>:noh<Enter>
-vmap <C-S-l> :s/\%V.*\%V./<s:tex>&<\/s:tex><Enter>:noh<Enter>
+vmap <expr> <C-S-l> mode(1) ==# 'v' ? (':s/\%V.*\%V./<s:tex>&<\/s:tex><Enter>:noh<Enter>') : (':s/\%V\(\s*\)\(.*\)\%V/\1<s:tex long="1">\2<\/s:tex><Enter>:noh<Enter>')
 vmap <C-S-t> :s/\%V.*\%V./<s:tt>&<\/s:tt><Enter>:noh<Enter>
 vmap <C-S-p> :s/\(\s*\)\(.*\)$/\1<li>\2<\/li>/g<Enter>:noh<Enter>
 imap <C-S-a> <s:ar>-)</s:ar>
