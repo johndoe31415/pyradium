@@ -47,7 +47,7 @@ class StyleDict():
 		if (len(self._style) == 0) and node.hasAttribute("style"):
 			node.removeAttribute("style")
 		else:
-			return node.setAttribute("style", self.serialize())
+			node.setAttribute("style", self.serialize())
 
 	@property
 	def is_visible(self):
