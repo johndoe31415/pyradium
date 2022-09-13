@@ -21,10 +21,28 @@
 
 import logging
 from pyradium.Controller import BaseController
-from pyradium.Exceptions import UsageException
+from pyradium.Exceptions import UsageException, MalformedXMLInputException
 from pyradium.SVGTransformation import SVGTransformation
 
 _log = logging.getLogger(__spec__.name)
+
+def _parse_frame_range(frame_range_str):
+	if frame_range_str is None:
+		return None
+	frames = set()
+	try:
+		for element in frame_range_str.split(","):
+			element = element.split("-")
+			if len(element) == 1:
+				frames.add(int(element[0]))
+			elif len(element) == 2:
+				(from_frame, to_frame) = (int(element[0]), int(element[1]))
+				frames |= set(range(from_frame, to_frame + 1))
+			else:
+				raise MalformedXMLInputException("Do not understand how to parse frame range in animation: {element}")
+	except ValueError as e:
+		raise MalformedXMLInputException("Frame element in animation is not a string: {str(e)}") from e
+	return frames
 
 class AnimationController(BaseController):
 	_VALID_ANIMATION_MODES = [ "compose", "compose-all", "replace" ]
@@ -41,6 +59,7 @@ class AnimationController(BaseController):
 			animation_mode = "compose"
 		if animation_mode not in self._VALID_ANIMATION_MODES:
 			raise UsageException("An 'animation' type slide needs to have a mode set to any of %s, but found: %s" % (", ".join(self._VALID_ANIMATION_MODES), animation_mode))
+		frame_range = _parse_frame_range(self.slide.get_xml_slide_var("range"))
 
 		full_filename = self.rendered_presentation.renderer.lookup_include(filename)
 
@@ -120,6 +139,13 @@ class AnimationController(BaseController):
 					"image": local_filename,
 				})
 			previous_layer_id = layer_id
+
+		if frame_range is not None:
+			filtered_slide_var_list = [ ]
+			for (frame_no, frame) in enumerate(additional_slide_var_list, 1):
+				if frame_no in frame_range:
+					filtered_slide_var_list.append(frame)
+			additional_slide_var_list = filtered_slide_var_list
 
 		if len(additional_slide_var_list) == 0:
 			_log.warning("SVG animation from %s rendered into no slides.", filename)
