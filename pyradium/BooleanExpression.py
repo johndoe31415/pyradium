@@ -143,7 +143,7 @@ class BooleanExpressionParser():
 			while (self._index < len(self._string)) and (self._parse_escaped_long_literal() or self._parse_short_literal() or self._parse_inverted() or self._parse_special_char() or self._parse_text() or self._parse_parenthesis()):
 				have_terms = True
 		if not have_terms:
-			raise InvalidBooleanExpressionException(f"Expression has no terms")
+			raise InvalidBooleanExpressionException("Expression has no terms")
 		return have_terms
 
 	def parse(self):
