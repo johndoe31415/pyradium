@@ -102,7 +102,7 @@ _KNOWN_TEMPLATES = {
 		<s:circuit>
 			<s:param name="name" value="X"/>
 			<s:param name="content" value="image"/>
-			<s:param name="src" src="circuit_X.txt"/>
+			<s:param name="src" value="*"/>
 		</s:circuit>
 	</slide>
 	""",

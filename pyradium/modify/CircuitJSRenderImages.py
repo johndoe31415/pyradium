@@ -155,7 +155,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 							raise NotImplementedError(change)
 
 					if self._args.capture_circuit or (self._args.write_back == _WriteBack.ExternalFile):
-						local_filename_circuit = f"circuit_{circuit.get_presentation_parameter('name')}.txt"
+						local_filename_circuit = circuit.automatic_filename
 						output_filename_circuit = f"{self._args.output_dir}/{local_filename_circuit}"
 						with open(output_filename_circuit, "w") as f:
 							f.write(circuit.circuit_text)
@@ -164,7 +164,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 					if self._args.write_back == _WriteBack.Inline:
 						self._dom_modified = circuit.modify_dom_source_inline() or self._dom_modified
 					elif self._args.write_back == _WriteBack.ExternalFile:
-						self._dom_modified = circuit.modify_dom_source_external_file(local_filename_circuit) or self._dom_modified
+						self._dom_modified = circuit.modify_dom_source_external_file("*") or self._dom_modified
 
 		finally:
 			if not self._args.no_shutdown:

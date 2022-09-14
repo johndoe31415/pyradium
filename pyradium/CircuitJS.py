@@ -58,6 +58,14 @@ class CircuitJSCircuit():
 		else:
 			return "\n".join(self._circuit) + "\n"
 
+	@classmethod
+	def automatic_filename_from_circuit_name(cls, circuit_name):
+		return f"circuit_{circuit_name}.txt"
+
+	@property
+	def automatic_filename(self):
+		return self.automatic_filename_from_circuit_name(self.get_presentation_parameter("name"))
+
 	def _parse_text(self, text):
 		text = text.strip("\r\n")
 		text = [ line.strip(" \t\r\n") for line in text.split("\n") ]
@@ -127,6 +135,15 @@ class CircuitJSCircuit():
 					circuit_params[name] = value
 			else:
 				display_content.append(child_node)
+
+			if circuit_text == "*":
+				# Automatically load from filename
+				if "name" not in presentation_params:
+					raise MissingParameterException("Automatic determination of circuit source requested by using *, but circuit has no 'name' parameter set.")
+				if find_file_function is None:
+					raise MissingParameterException("Automatic determination of circuit source requested by using *, but no way of determining the included files given.")
+				with open(find_file_function(cls.automatic_filename_from_circuit_name(presentation_params["name"]))) as f:
+					circuit_text = f.read()
 		return cls(circuit_text = circuit_text, circuit_params = circuit_params, uri = uri, presentation_params = presentation_params, display_content = display_content, original_xml_node = xml_node)
 
 	def _find_circuit_nodes(self):
