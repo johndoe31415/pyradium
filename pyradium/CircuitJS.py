@@ -183,7 +183,10 @@ class CircuitJSCircuit():
 	def modify_dom_source_external_file(self, filename):
 		replacement = self._original_xml_node.ownerDocument.createElement("s:param")
 		replacement.setAttribute("name", "src")
-		replacement.setAttribute("src", filename)
+		if filename != "*":
+			replacement.setAttribute("src", filename)
+		else:
+			replacement.setAttribute("value", "*")
 		return self._replace_source_node(replacement)
 
 	def __str__(self):
