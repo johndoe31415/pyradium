@@ -25,6 +25,7 @@ import time
 import subprocess
 import json
 import logging
+import traceback
 from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
@@ -130,6 +131,8 @@ class ActionRender(BaseAction):
 			except PyRadiumException as e:
 				render_success = False
 				_log.error("Rendering failed: [%s] %s", e.__class__.__name__, str(e))
+				if _log.isEnabledFor(logging.DEBUG):
+					print(traceback.format_exc())
 			if not self._args.re_render_loop:
 				break
 			if (renderer is None) or (force_wait_secs is not None):
