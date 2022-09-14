@@ -22,3 +22,4 @@
 from .TimeSpecificationTests import TimeSpecificationTests
 from .CmdlineParserTests import CmdlineParserTests
 from .AgendaTests import AgendaTests
+from .BooleanExpressionTests import BooleanExpressionTests
