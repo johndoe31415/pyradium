@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+#	pyradium - HTML presentation/slide show generator
+#	Copyright (C) 2015-2022 Johannes Bauer
+#
+#	This file is part of pyradium.
+#
+#	pyradium is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; this program is ONLY licensed under
+#	version 3 of the License, later versions are explicitly excluded.
+#
+#	pyradium is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with pyradium; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#	Johannes Bauer <JohannesBauer@gmx.de>
+
+import random
+import collections
+
+class SequenceDiagramGenerator():
+	_Signal = collections.namedtuple("Signal", [ "name", "values" ])
+
+	def __init__(self):
+		self._signals = [ ]
+		self._signal_dict = { }
+		self._annotations = collections.defaultdict(dict)
+		self._signal_length = 0
+
+	@property
+	def signal_count(self):
+		return len(self._signals)
+
+	def add_signal(self, name, values):
+		values = [ int(value) for value in values ]
+		signal = self._Signal(name = name, values = values)
+		self._signals.append(signal)
+		self._signal_length = max(self._signal_length, len(signal.values))
+		self._signal_dict[signal.name] = signal
+		return self
+
+	def	add_random_signal(self, name, length, toggle_chance = 25):
+		value = random.randint(0, 1)
+		rndvect = [ ]
+		for i in range(length):
+			if random.randint(0, 100) < toggle_chance:
+				value = int(not value)
+			rndvect.append(value)
+		return self.add_signal(name, rndvect)
+
+	def	add_text_signal(self, name, text):
+		return self.add_signal(name, values)
+
+	def annotate(self, name, index, text = None):
+		self._annotations[name][index] = text
+
+	def append(self, name, value):
+		if name not in self._signal_dict:
+			self.add_signal(name, [ ])
+		signal = self._signal_dict[name]
+		signal.values.append(int(value))
+		self._signal_length = max(self._signal_length, len(signal.values))
+
+	def simulate(self, simulator):
+		prev = { signal.name: None for signal in self._signals }
+		for index in range(self._signal_length):
+			now = { signal.name: signal.values[index] if (index < len(signal.values)) else None for signal in self._signals }
+			simulator.tick(self, index, prev, now)
+			prev = now
+
+	def _format_entry(self, signal, index):
+		value = str(signal.values[index])
+		if index in self._annotations[signal.name]:
+			value += "|"
+			if self._annotations[signal.name][index] is not None:
+				value += f"'{self._annotations[signal.name][index]}'"
+		return value
+
+	def format(self):
+		lines = [ ]
+		max_name_length = max(len(signal.name) for signal in self._signals)
+		max_col_widths = [ max(len(self._format_entry(self._signals[signo], index)) for signo in range(self.signal_count)) for index in range(self._signal_length) ]
+		for signal in self._signals:
+			line = f"{signal.name:{max_name_length}s} = "
+			for index in range(self._signal_length):
+				line += f"{self._format_entry(signal, index):{max_col_widths[index]}s}"
+			lines.append(line)
+		return lines
+
+	def print(self):
+		print("\n".join(self.format()))
+
+class DFlipflop():
+	def __init__(self, initial_state: int = 0, pos_edge: bool = True):
+		self._state = initial_state
+		self._pos_edge = pos_edge
+
+	def tick(self, sdg, index, prev, now):
+		if ((self._pos_edge) and (prev["C"] == 0) and ((now["C"] == 1))) or ((not self._pos_edge) and (prev["C"] == 1) and ((now["C"] == 0))):
+			# We have a clock edge
+			self._state = prev["D"]
+			sdg.annotate("C", index - 1)
+		sdg.append("Q", self._state)
+		sdg.append("!Q", not self._state)
+
+
+class SRFlipflopNAND():
+	def __init__(self, initial_state: int = 0):
+		self._state = initial_state
+
+	def tick(self, sdg, index, prev, now):
+		if (now["!S"] == 0) and (now["!R"] == 0):
+			sdg.append("Q", 1)
+			sdg.append("!Q", 1)
+			if self._state is not None:
+				sdg.annotate("!S", index - 1, "ill")
+			self._state = None
+		elif (now["!S"] == 0) and (now["!R"] == 1):
+			if self._state != 1:
+				sdg.annotate("!S", index - 1, "set")
+			self._state = 1
+			sdg.append("Q", self._state)
+			sdg.append("!Q", not self._state)
+		elif (now["!S"] == 1) and (now["!R"] == 0):
+			if self._state != 0:
+				sdg.annotate("!S", index - 1, "res")
+			self._state = 0
+			sdg.append("Q", self._state)
+			sdg.append("!Q", not self._state)
+		else:
+			if self._state is None:
+				self._state = 0
+				sdg.annotate("!S", index - 1, "undef")
+			sdg.append("Q", self._state)
+			sdg.append("!Q", not self._state)
+
+
+#C = "000001111100000111110000011111000"
+#D = "111111100000000000101011100000000"
+
+sdg = SequenceDiagramGenerator()
+#sdg.add_random_signal("C", 32)
+#sdg.add_random_signal("D", 32)
+#sdg.simulate(DFlipflop())
+sdg.add_random_signal("!S", 32)
+sdg.add_random_signal("!R", 32)
+sdg.simulate(SRFlipflopNAND())
+sdg.print()
