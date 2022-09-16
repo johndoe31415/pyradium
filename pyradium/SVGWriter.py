@@ -48,7 +48,7 @@ class SVGStyle():
 			self._style_dict = StyleDict()
 
 	def __getitem__(self, key):
-		return self._style_dict.get(key)
+		return self._style_dict[key]
 
 	def __setitem__(self, key, value):
 		self._style_dict[key] = value
