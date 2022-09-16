@@ -22,6 +22,7 @@
 import contextlib
 import xml.dom.minidom
 from pyradium.StyleDict import StyleDict
+from pyradium.Tools import XMLTools
 
 class Vector2D():
 	def __init__(self, x = 0, y = 0):
@@ -138,11 +139,28 @@ class SVGPath():
 		self._pos += Vector2D(x, 0)
 		return self
 
+	def vert_rel(self, y):
+		self._append("v", f"{y}")
+		self._pos += Vector2D(0, y)
+		return self
+
 class SVGText():
-	def __init__(self, text_node, textdata_node):
+	def __init__(self, text_node):
 		self._node = text_node
-		self._textdata_node = textdata_node
+		self._node.setAttribute("xml:space", "preserve")
+		self._textdata_node = None
+		try:
+			self._tspan_node = XMLTools.findfirst(self._node, "tspan")
+			try:
+				self._textdata_node = next(XMLTools.findall(self._tspan_node, predicate = lambda node: node.nodeType in [ node.TEXT_NODE, node.CDATA_SECTION_NODE ]))
+			except StopIteration:
+				pass
+		except StopIteration:
+			self._tspan_node = self._node.appendChild(self._node.ownerDocument.createElement("tspan"))
+		if self._textdata_node is None:
+			self._textdata_node = self._tspan_node.appendChild(self._node.ownerDocument.createTextNode(""))
 		self._style = SVGStyle.default_text(self._node)
+		self._tspan_style = SVGStyle(self._tspan_node)
 
 	@property
 	def text(self):
@@ -155,6 +173,18 @@ class SVGText():
 	@property
 	def style(self):
 		return self._style
+
+	@property
+	def tspan_style(self):
+		return self._tspan_style
+
+	@property
+	def font(self):
+		return self.tspan_style["font-family"]
+
+	@font.setter
+	def font(self, value):
+		self.tspan_style["font-family"] = value
 
 class SVGWriter():
 	_NAMESPACES = {
@@ -174,6 +204,7 @@ class SVGWriter():
 			self._root.setAttribute(f"xmlns:{nsname}", nsvalue)
 		self._doc.appendChild(self._root)
 		self._defs = None
+		self._groups = { }
 		self._uid = 0
 
 	def _genid(self):
@@ -189,27 +220,30 @@ class SVGWriter():
 		self._defs.appendChild(def_node)
 		return def_id
 
-	def new_path(self, x, y):
+	def group(self, group_name):
+		if group_name not in self._groups:
+			group = self._root.appendChild(self._doc.createElement("g"))
+			group.setAttribute("inkscape:groupmode", "layer")
+			group.setAttribute("inkscape:label", group_name)
+			self._groups[group_name] = group
+		return self._groups[group_name]
+
+	def new_path(self, x, y, group_name = "default"):
 		path_node = self._doc.createElement("path")
-		self._root.appendChild(path_node)
+		self.group(group_name).appendChild(path_node)
 		svg_path = SVGPath(path_node)
 		svg_path.move_to(x, y)
 		return svg_path
 
-	def new_text_span(self, x, y, width, height, text):
+	def new_text_span(self, x, y, width, height, text, group_name = "default"):
 		rect_node = self._doc.createElement("rect")
 		rect_node.setAttribute("x", str(x))
 		rect_node.setAttribute("y", str(y))
 		rect_node.setAttribute("width", str(width))
 		rect_node.setAttribute("height", str(height))
 		def_id = self._add_definition(rect_node)
-
-		text_node = self._root.appendChild(self._doc.createElement("text"))
-		text_node.setAttribute("xml:space", "preserve")
-		tspan_node = text_node.appendChild(self._doc.createElement("tspan"))
-		textdata_node = tspan_node.appendChild(self._doc.createTextNode(""))
-
-		svg_text = SVGText(text_node, textdata_node)
+		text_node = self.group(group_name).appendChild(self._doc.createElement("text"))
+		svg_text = SVGText(text_node)
 		svg_text.text = text
 		svg_text.style["shape-inside"] = f"url(#{def_id})"
 		return svg_text

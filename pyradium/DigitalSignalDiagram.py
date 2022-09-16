@@ -82,18 +82,28 @@ class DigitalSignalCmd():
 class DigitalSignalDiagram():
 	_Marker = collections.namedtuple("Marker", [ "x", "label" ])
 
-	def __init__(self, xdiv = 10, height = 30, vertical_distance = 10):
-		self._risefall = height / 8
+	def __init__(self, xdiv = 10, height = 30, vertical_distance = 10, marker_extend = 20, clock_ticks = True):
+		self._xdiv = xdiv
 		self._height = height
 		self._vertical_distance = vertical_distance
-		self._xdiv = xdiv
+		self._marker_extend = marker_extend
+		self._clock_ticks = clock_ticks
+		self._risefall = height / 8
 		self._svg = SVGWriter()
 		self._path = None
+		self._plot_count = 0
+		self._clock_ticks = 0
+		if clock_ticks is True:
+			self._svg.group("clock_ticks")
 		self._markers = [ ]
 
 	@property
 	def svg(self):
 		return self._svg
+
+	@property
+	def base_height(self):
+		return ((self._height + self._vertical_distance) * self._plot_count) - self._vertical_distance
 
 	def _transition_middle(self, y, transition_scale = 1):
 		transition_width = transition_scale * self._risefall * (abs(y) / self._height)
@@ -102,10 +112,18 @@ class DigitalSignalDiagram():
 		self._path.line_rel(transition_width, y)
 		self._path.horiz_rel(lead)
 
-	def write_signal_sequence(self, x, y, cmds):
+	def _render_signal_sequence(self, signal_name, x, y, cmds):
 		prev = None
+		self._plot_count += 1
 		abs_y_mid = y + (self._height / 2)
-		self._path = self._svg.new_path(x, abs_y_mid)
+		self._path = self._svg.new_path(x, abs_y_mid, group_name = "signal")
+
+		text_width = 50
+		svg_text = self._svg.new_text_span(x - text_width, abs_y_mid - 6, text_width, 30, signal_name.lstrip("!"), group_name = "signal")
+		svg_text.style["text-align"] = "right"
+		if signal_name.startswith("!"):
+			svg_text.style["text-decoration"] = "overline"
+		svg_text.style["font-family"] = "'Latin Modern Roman'"
 
 		for cur in cmds:
 			if prev is None:
@@ -204,17 +222,34 @@ class DigitalSignalDiagram():
 				case _ as transition:
 					raise NotImplementedError(f"Unsupported digital sequence diagram transition: {transition}")
 			prev = cur
+		self._clock_ticks = max(self._clock_ticks, round(self._path.pos.x / self._xdiv))
 
-	def write_markers(self):
+	def _render_markers(self):
 		for marker in self._markers:
-			path = self._svg.new_path(marker.x, 0)
-			path.line_to(marker.x, 100)
+			have_label = (marker.label is not None) and (marker.label != "")
+			marker_length = self.base_height if (not have_label) else (self.base_height + self._marker_extend)
+
+			path = self._svg.new_path(marker.x, 0, group_name = "marker")
+			path.vert_rel(marker_length)
 			path.style["stroke-width"] = 0.5
 
-			if marker.label != "":
-				svg_text = self._svg.new_text_span(marker.x - 50, 100, 100, 100, marker.label)
+			if have_label:
+				text_width = 100
+				text_height = 50
+
+				svg_text = self._svg.new_text_span(marker.x - (text_width / 2), marker_length, text_width, text_height, marker.label, group_name = "marker")
 				svg_text.style["text-align"] = "center"
 
+	def _render_clock_ticks(self):
+		for tick in range(self._clock_ticks):
+			x = (tick * self._xdiv) + self._xdiv / 2
+			path = self._svg.new_path(x, 0, group_name = "clock_ticks")
+			path.vert_rel(self.base_height)
+			path.style["stroke-width"] = 0.25
+			path.style["stroke"] = "#95a5a6"
+			path.style["stroke-miterlimit"] = 4
+			path.style["stroke-dasharray"] = "0.75,0.25"
+			path.style["stroke-dashoffset"] = 0
 
 	def parse_and_write(self, text):
 		text = text.strip("\r\n")
@@ -227,6 +262,7 @@ class DigitalSignalDiagram():
 			varname = varname.strip("\t ")
 			sequence = sequence.strip("\t ")
 			cmds = DigitalSignalCmd.parse_sequence(sequence)
-			self.write_signal_sequence(0, 50 * varno, cmds)
+			self._render_signal_sequence(varname, 0, (self._height + self._vertical_distance) * varno, cmds)
 			varno += 1
-		self.write_markers()
+		self._render_markers()
+		self._render_clock_ticks()
