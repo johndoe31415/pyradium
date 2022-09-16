@@ -22,6 +22,7 @@
 import enum
 import collections
 import dataclasses
+from pyradium.SVGWriter import SVGWriter
 
 class DigitalSignalType(enum.Enum):
 	Low = "0"
@@ -56,21 +57,23 @@ class DigitalSignalCmd():
 				case "Z":
 					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.HighZ)
 				case "|":
-					marker_text = None
-					while index < len(text):
-						if (text[index] == "'") and (marker_text is None):
-							marker_text = ""
-						elif (text[index] == "'") and (marker_text is not None):
-							break
-						elif marker_text is not None:
-							marker_text += text[index]
+					marker_label = None
+					if (index < len(text)) and (text[index] == "'"):
+						# Label is present
+						marker_label = ""
 						index += 1
-					index += 1
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.Marker, argument = marker_text)
+						while index < len(text):
+							if text[index] == "'":
+								break
+							else:
+								marker_label += text[index]
+							index += 1
+						index += 1
+					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.Marker, argument = marker_label)
 				case "_":
 					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.Empty)
 				case " ":
-					pass
+					continue
 				case _:
 					raise NotImplementedError(f"Unknown character in sequence diagram: {char}")
 			sequence.append(cmd)
@@ -79,14 +82,18 @@ class DigitalSignalCmd():
 class DigitalSignalDiagram():
 	_Marker = collections.namedtuple("Marker", [ "x", "label" ])
 
-	def __init__(self, svg, xdiv = 35, height = 100):
+	def __init__(self, xdiv = 10, height = 30, vertical_distance = 10):
 		self._risefall = height / 8
 		self._height = height
+		self._vertical_distance = vertical_distance
 		self._xdiv = xdiv
-		self._expand = self._xdiv / 5
-		self._svg = svg
+		self._svg = SVGWriter()
 		self._path = None
 		self._markers = [ ]
+
+	@property
+	def svg(self):
+		return self._svg
 
 	def _transition_middle(self, y, transition_scale = 1):
 		transition_width = transition_scale * self._risefall * (abs(y) / self._height)
@@ -204,5 +211,22 @@ class DigitalSignalDiagram():
 			path.line_to(marker.x, 100)
 			path.style["stroke-width"] = 0.5
 
+			if marker.label != "":
+				svg_text = self._svg.new_text_span(marker.x - 50, 100, 100, 100, marker.label)
+				svg_text.style["text-align"] = "center"
 
-			print(marker)
+
+	def parse_and_write(self, text):
+		text = text.strip("\r\n")
+		varno = 0
+		for line in text.split("\n"):
+			line = line.strip("\r\n \t")
+			if line == "":
+				continue
+			(varname, sequence) = line.split("=", maxsplit = 1)
+			varname = varname.strip("\t ")
+			sequence = sequence.strip("\t ")
+			cmds = DigitalSignalCmd.parse_sequence(sequence)
+			self.write_signal_sequence(0, 50 * varno, cmds)
+			varno += 1
+		self.write_markers()
