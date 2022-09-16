@@ -152,7 +152,7 @@ class SVGText():
 		try:
 			self._tspan_node = XMLTools.findfirst(self._node, "tspan")
 			try:
-				self._textdata_node = next(XMLTools.findall(self._tspan_node, predicate = lambda node: node.nodeType in [ node.TEXT_NODE, node.CDATA_SECTION_NODE ]))
+				self._textdata_node = next(XMLTools.findall_text(self._tspan_node))
 			except StopIteration:
 				pass
 		except StopIteration:
