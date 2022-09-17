@@ -43,16 +43,13 @@ _TEX_TEMPLATE = r"""
 """
 
 class LatexFormulaRenderer(BaseRenderer):
+	_NAME = "latex"
 	_Baseline = collections.namedtuple("Baseline", [ "image_width", "image_height", "upper", "lower", "mid" ])
 
 	def __init__(self, rendering_dpi = 600):
 		super().__init__()
 		self._rendering_dpi = rendering_dpi
 		self._debug_draw_baselines = False
-
-	@property
-	def name(self):
-		return "latex"
 
 	@property
 	def properties(self):

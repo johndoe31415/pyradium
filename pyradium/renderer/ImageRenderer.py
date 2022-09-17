@@ -31,12 +31,7 @@ from pyradium.SVGTransformation import SVGTransformation
 _log = logging.getLogger(__spec__.name)
 
 class ImageRenderer(BaseRenderer):
-	def __init__(self):
-		super().__init__()
-
-	@property
-	def name(self):
-		return "img"
+	_NAME = "img"
 
 	@property
 	def properties(self):

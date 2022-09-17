@@ -25,12 +25,7 @@ from pyradium.RendererCache import BaseRenderer
 from pyradium.Exceptions import FailedToExecuteSubprocessException
 
 class ExecRenderer(BaseRenderer):
-	def __init__(self):
-		super().__init__()
-
-	@property
-	def name(self):
-		return "exec"
+	_NAME = "exec"
 
 	@property
 	def properties(self):

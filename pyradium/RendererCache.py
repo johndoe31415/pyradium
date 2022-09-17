@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -31,10 +31,13 @@ RenderedResult = collections.namedtuple("RenderedResult", [ "key", "keyhash", "f
 
 class BaseRenderer():
 	RendererResult = collections.namedtuple("RendererResult", [ "key", "data" ])
+	_NAME = None
 
 	@property
 	def name(self):
-		raise NotImplementedError(__class__.__name__)
+		if self._NAME is None:
+			raise NotImplementedError(__class__.__name__)
+		return self._NAME
 
 	@property
 	def properties(self):

@@ -27,12 +27,7 @@ from pyradium.RendererCache import BaseRenderer
 _log = logging.getLogger(__spec__.name)
 
 class GraphvizRenderer(BaseRenderer):
-	def __init__(self):
-		super().__init__()
-
-	@property
-	def name(self):
-		return "graphviz"
+	_NAME = "graphviz"
 
 	@property
 	def properties(self):

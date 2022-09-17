@@ -28,14 +28,8 @@ from pyradium.RendererCache import BaseRenderer
 _log = logging.getLogger(__spec__.name)
 
 class PlotRenderer(BaseRenderer):
+	_NAME = "plot"
 	_SET_TERMINAL_RE = re.compile(r"^\s*set\s+terminal.*$", flags = re.MULTILINE)
-
-	def __init__(self):
-		super().__init__()
-
-	@property
-	def name(self):
-		return "plot"
 
 	@property
 	def properties(self):
