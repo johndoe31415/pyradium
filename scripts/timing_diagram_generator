@@ -148,24 +148,24 @@ class SRFlipflopNAND():
 			sdg.append("Q", 1)
 			sdg.append("!Q", 1)
 			if self._state is not None:
-				sdg.annotate("S", index - 1, "ill")
+				sdg.annotate("S", index - 1)
 			self._state = None
 		elif (now["S"] == 0) and (now["R"] == 1):
 			if self._state != 1:
-				sdg.annotate("S", index - 1, "set")
+				sdg.annotate("S", index - 1, "S")
 			self._state = 1
 			sdg.append("Q", self._state)
 			sdg.append("!Q", not self._state)
 		elif (now["S"] == 1) and (now["R"] == 0):
 			if self._state != 0:
-				sdg.annotate("S", index - 1, "res")
+				sdg.annotate("S", index - 1, "R")
 			self._state = 0
 			sdg.append("Q", self._state)
 			sdg.append("!Q", not self._state)
 		else:
 			if self._state is None:
 				self._state = 0
-				sdg.annotate("S", index - 1, "undef")
+				sdg.annotate("S", index - 1, "🗲")
 			sdg.append("Q", self._state)
 			sdg.append("!Q", not self._state)
 
@@ -180,7 +180,9 @@ class TimingDiagramGenerator():
 		self._args = args
 		self._predetermined = { }
 		for param in self._args.param:
+			param = param.replace(" ", "")
 			(name, value) = param.split("=")
+			value = "".join([ x for x in value if x in "01" ])
 			self._predetermined[name] = value
 
 	def run(self):
