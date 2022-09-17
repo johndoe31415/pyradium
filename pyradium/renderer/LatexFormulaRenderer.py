@@ -24,7 +24,7 @@ import tempfile
 import subprocess
 import logging
 import collections
-from pyradium.RendererCache import BaseRenderer
+from .BaseRenderer import BaseRenderer
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Exceptions import InvalidTeXException
 
@@ -42,6 +42,7 @@ _TEX_TEMPLATE = r"""
 \end{document}
 """
 
+@BaseRenderer.register
 class LatexFormulaRenderer(BaseRenderer):
 	_NAME = "latex"
 	_Baseline = collections.namedtuple("Baseline", [ "image_width", "image_height", "upper", "lower", "mid" ])

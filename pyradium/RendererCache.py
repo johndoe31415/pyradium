@@ -26,28 +26,9 @@ import datetime
 import collections
 import json
 from .ExtendedJSONEncoder import ExtendedJSONEncoder
+from pyradium.Exceptions import RendererRegistryException
 
 RenderedResult = collections.namedtuple("RenderedResult", [ "key", "keyhash", "from_cache", "data" ])
-
-class BaseRenderer():
-	RendererResult = collections.namedtuple("RendererResult", [ "key", "data" ])
-	_NAME = None
-
-	@property
-	def name(self):
-		if self._NAME is None:
-			raise NotImplementedError(__class__.__name__)
-		return self._NAME
-
-	@property
-	def properties(self):
-		return { "version": 0 }
-
-	def rendering_key(self, property_dict):
-		return None
-
-	def render(self, property_dict):
-		raise NotImplementedError(__class__.__name__)
 
 class RendererCache():
 	def __init__(self, renderer):
@@ -104,25 +85,3 @@ class RendererCache():
 			if attempt_cache:
 				self._store(key, keyhash, object_data)
 			return RenderedResult(key = key, keyhash = keyhash, from_cache = False, data = object_data)
-
-if __name__ == "__main__":
-	class DebugRenderer(BaseRenderer):
-		@property
-		def name(self):
-			return "debug"
-
-		@property
-		def properties(self):
-			return { "version": 1 }
-
-		def render(self, property_dict):
-			return {
-				"text":		property_dict["letter"] * property_dict["count"],
-				"bytes":	b"foobar" * 1000,
-			}
-
-	cache = RendererCache(DebugRenderer())
-	print("Result = ", cache.render({
-		"letter":	"Q",
-		"count":	10,
-	}))

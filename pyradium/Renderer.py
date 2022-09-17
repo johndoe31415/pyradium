@@ -26,13 +26,8 @@ import mako.exceptions
 import markupsafe
 import pyradium
 from pyradium.Controller import ControllerManager
-from pyradium.renderer.LatexFormulaRenderer import LatexFormulaRenderer
-from pyradium.renderer.ImageRenderer import ImageRenderer
-from pyradium.renderer.ExecRenderer import ExecRenderer
-from pyradium.renderer.PlotRenderer import PlotRenderer
-from pyradium.renderer.GraphvizRenderer import GraphvizRenderer
+from pyradium.renderer.BaseRenderer import BaseRenderer
 from .Acronyms import Acronyms
-from .RendererCache import RendererCache
 from .RenderedPresentation import RenderedPresentation
 from .Exceptions import TemplateErrorException, MalformedStyleConfigurationException, UnknownSlideTypeException
 from .Slide import RenderSlideDirective
@@ -42,19 +37,23 @@ from .StyleParameters import StyleParameters
 
 _log = logging.getLogger(__spec__.name)
 
+class CustomRenderers():
+	def __init__(self):
+		self._static_instances = {
+			"acronym":	Acronyms(),
+		}
+
+	def __getitem__(self, name):
+		if name in self._static_instances:
+			return self._static_instances[name]
+		return BaseRenderer.instanciate(name)
+
 class Renderer():
 	def __init__(self, presentation, rendering_params):
 		self._rendered_slides = [ ]
 		self._presentation = presentation
 		self._rendering_params = rendering_params
-		self._custom_renderers = {
-			"latex":	RendererCache(LatexFormulaRenderer()),
-			"img":		RendererCache(ImageRenderer()),
-			"exec":		RendererCache(ExecRenderer()),
-			"plot":		RendererCache(PlotRenderer()),
-			"graphviz":	RendererCache(GraphvizRenderer()),
-			"acronym":	Acronyms(),
-		}
+		self._custom_renderers = CustomRenderers()
 		self._lookup = mako.lookup.TemplateLookup(list(self._get_mako_lookup_directories()), strict_undefined = True, input_encoding = "utf-8", default_filters = [ "h" ])
 		self._template_config_filename = self.lookup_styled_template_file("configuration.json")
 		with open(self._template_config_filename) as f:
@@ -68,7 +67,7 @@ class Renderer():
 			try:
 				PresentationFeature(feature_name)
 			except ValueError as e:
-				raise MalformedStyleConfigurationException("The stylesheet file %s contains an unknown feature in config[\"dependencies\"][\"feature\"]: %s" % (self._template_config_filename, feature_name)) from e
+				raise MalformedStyleConfigurationException(f"The stylesheet file {self._template_config_filename} contains an unknown feature in config[\"dependencies\"][\"feature\"]: {feature_name}") from e
 
 	def _parse_style_parameters(self):
 		params = StyleParameters(self._template_config.get("parameters", { }))

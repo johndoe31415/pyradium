@@ -37,6 +37,7 @@ class TimeSpecificationError(SlideException): pass
 class UsageException(SlideException): pass
 
 class XMLHookRegistryException(PyRadiumException): pass
+class RendererRegistryException(PyRadiumException): pass
 
 class InvalidTransformationException(PyRadiumException): pass
 

@@ -23,10 +23,11 @@ import re
 import logging
 import subprocess
 from pyradium.Tools import HashTools
-from pyradium.RendererCache import BaseRenderer
+from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
 
+@BaseRenderer.register
 class PlotRenderer(BaseRenderer):
 	_NAME = "plot"
 	_SET_TERMINAL_RE = re.compile(r"^\s*set\s+terminal.*$", flags = re.MULTILINE)

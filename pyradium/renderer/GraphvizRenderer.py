@@ -22,10 +22,11 @@
 import logging
 import subprocess
 from pyradium.Tools import HashTools
-from pyradium.RendererCache import BaseRenderer
+from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
 
+@BaseRenderer.register
 class GraphvizRenderer(BaseRenderer):
 	_NAME = "graphviz"
 

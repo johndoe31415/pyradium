@@ -24,12 +24,13 @@ import tempfile
 import subprocess
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
-from pyradium.RendererCache import BaseRenderer
+from .BaseRenderer import BaseRenderer
 from pyradium.Exceptions import UsageException, ImageRenderingException
 from pyradium.SVGTransformation import SVGTransformation
 
 _log = logging.getLogger(__spec__.name)
 
+@BaseRenderer.register
 class ImageRenderer(BaseRenderer):
 	_NAME = "img"
 

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2022 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -18,3 +18,9 @@
 #	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
+
+from .ExecRenderer import ExecRenderer
+from .GraphvizRenderer import GraphvizRenderer
+from .ImageRenderer import ImageRenderer
+from .LatexFormulaRenderer import LatexFormulaRenderer
+from .PlotRenderer import PlotRenderer
