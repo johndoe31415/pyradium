@@ -252,6 +252,11 @@ class ImageTools():
 		image_info = json.loads(subprocess.check_output([ "convert", filename, "json:-" ]))[0]
 		return image_info
 
+	@classmethod
+	def svg_canvas_size_to_object(cls, filename):
+		cmd = [ "inkscape", "-g", "--verb=FitCanvasToDrawing;FileSave;FileQuit", filename ]
+		subprocess.check_call(cmd)
+
 class HashTools():
 	@classmethod
 	def _update_file(cls, hashfnc, f):

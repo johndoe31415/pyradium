@@ -19,8 +19,10 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from .BaseRenderer import BaseRenderer
 from .ExecRenderer import ExecRenderer
 from .GraphvizRenderer import GraphvizRenderer
 from .ImageRenderer import ImageRenderer
 from .LatexFormulaRenderer import LatexFormulaRenderer
 from .PlotRenderer import PlotRenderer
+from .DigitalTimingDiagramRenderer import DigitalTimingDiagramRenderer

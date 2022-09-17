@@ -24,7 +24,7 @@ import collections
 import dataclasses
 from pyradium.SVGWriter import SVGWriter
 
-class DigitalSignalType(enum.Enum):
+class DigitalTimingType(enum.Enum):
 	Low = "0"
 	High = "1"
 	LowHigh = ":"
@@ -34,8 +34,8 @@ class DigitalSignalType(enum.Enum):
 	Empty = " "
 
 @dataclasses.dataclass
-class DigitalSignalCmd():
-	cmdtype: DigitalSignalType
+class DigitalTimingCmd():
+	cmdtype: DigitalTimingType
 	argument: "typing.Any" = None
 
 	@classmethod
@@ -47,15 +47,15 @@ class DigitalSignalCmd():
 			index += 1
 			match char:
 				case "0":
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.Low)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.Low)
 				case "1":
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.High)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.High)
 				case ":":
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.LowHigh)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.LowHigh)
 				case "!":
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.LowHighTransition)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.LowHighTransition)
 				case "Z":
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.HighZ)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.HighZ)
 				case "|":
 					marker_label = None
 					if (index < len(text)) and (text[index] == "'"):
@@ -69,9 +69,9 @@ class DigitalSignalCmd():
 								marker_label += text[index]
 							index += 1
 						index += 1
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.Marker, argument = marker_label)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.Marker, argument = marker_label)
 				case "_":
-					cmd = DigitalSignalCmd(cmdtype = DigitalSignalType.Empty)
+					cmd = DigitalTimingCmd(cmdtype = DigitalTimingType.Empty)
 				case " ":
 					continue
 				case _:
@@ -79,7 +79,7 @@ class DigitalSignalCmd():
 			sequence.append(cmd)
 		return sequence
 
-class DigitalSignalDiagram():
+class DigitalTimingDiagram():
 	_Marker = collections.namedtuple("Marker", [ "x", "label" ])
 
 	def __init__(self, xdiv = 10, height = 30, vertical_distance = 10, marker_extend = 20, clock_ticks = True):
@@ -128,28 +128,28 @@ class DigitalSignalDiagram():
 		for cur in cmds:
 			if prev is None:
 				prev = cur
-				if prev.cmdtype in [ DigitalSignalType.Low, DigitalSignalType.LowHigh, DigitalSignalType.LowHighTransition ]:
+				if prev.cmdtype in [ DigitalTimingType.Low, DigitalTimingType.LowHigh, DigitalTimingType.LowHighTransition ]:
 					self._path.move_rel(0, self._height / 2)
-				elif prev.cmdtype in [ DigitalSignalType.High ]:
+				elif prev.cmdtype in [ DigitalTimingType.High ]:
 					self._path.move_rel(0, -self._height / 2)
 
 			match (prev.cmdtype, cur.cmdtype):
-				case (DigitalSignalType.Low, DigitalSignalType.Low) | (DigitalSignalType.High, DigitalSignalType.High) | (DigitalSignalType.HighZ, DigitalSignalType.HighZ):
+				case (DigitalTimingType.Low, DigitalTimingType.Low) | (DigitalTimingType.High, DigitalTimingType.High) | (DigitalTimingType.HighZ, DigitalTimingType.HighZ):
 					self._path.horiz_rel(self._xdiv)
 
-				case (DigitalSignalType.Low, DigitalSignalType.High):
+				case (DigitalTimingType.Low, DigitalTimingType.High):
 					self._transition_middle(-self._height)
 
-				case (DigitalSignalType.High, DigitalSignalType.Low):
+				case (DigitalTimingType.High, DigitalTimingType.Low):
 					self._transition_middle(self._height)
 
-				case (DigitalSignalType.Low, DigitalSignalType.HighZ) | (DigitalSignalType.HighZ, DigitalSignalType.High):
+				case (DigitalTimingType.Low, DigitalTimingType.HighZ) | (DigitalTimingType.HighZ, DigitalTimingType.High):
 					self._transition_middle(-self._height / 2)
 
-				case (DigitalSignalType.High, DigitalSignalType.HighZ) | (DigitalSignalType.HighZ, DigitalSignalType.Low):
+				case (DigitalTimingType.High, DigitalTimingType.HighZ) | (DigitalTimingType.HighZ, DigitalTimingType.Low):
 					self._transition_middle(self._height / 2)
 
-				case (DigitalSignalType.LowHigh, DigitalSignalType.LowHigh) | (DigitalSignalType.LowHighTransition, DigitalSignalType.LowHigh):
+				case (DigitalTimingType.LowHigh, DigitalTimingType.LowHigh) | (DigitalTimingType.LowHighTransition, DigitalTimingType.LowHigh):
 					with self._path.returnto():
 						# High to high
 						self._path.move_rel(0, -self._height)
@@ -157,14 +157,14 @@ class DigitalSignalDiagram():
 					# Low to low
 					self._path.horiz_rel(self._xdiv)
 
-				case (DigitalSignalType.High, DigitalSignalType.LowHigh):
+				case (DigitalTimingType.High, DigitalTimingType.LowHigh):
 					with self._path.returnto():
 						# High to high
 						self._path.horiz_rel(self._xdiv)
 					# High to low
 					self._transition_middle(self._height)
 
-				case (DigitalSignalType.Low, DigitalSignalType.LowHigh):
+				case (DigitalTimingType.Low, DigitalTimingType.LowHigh):
 					with self._path.returnto():
 						# Low to high
 						self._transition_middle(-self._height)
@@ -172,7 +172,7 @@ class DigitalSignalDiagram():
 					self._path.horiz_rel(self._xdiv)
 
 
-				case (DigitalSignalType.LowHigh, DigitalSignalType.High):
+				case (DigitalTimingType.LowHigh, DigitalTimingType.High):
 					with self._path.returnto():
 						# High to high
 						self._path.move_rel(0, -self._height)
@@ -180,7 +180,7 @@ class DigitalSignalDiagram():
 					# Low to low
 					self._transition_middle(-self._height)
 
-				case (DigitalSignalType.LowHigh, DigitalSignalType.Low):
+				case (DigitalTimingType.LowHigh, DigitalTimingType.Low):
 					with self._path.returnto():
 						# High to low
 						self._path.move_rel(0, -self._height)
@@ -188,14 +188,14 @@ class DigitalSignalDiagram():
 					# Low to low
 					self._path.horiz_rel(self._xdiv)
 
-				case (DigitalSignalType.HighZ, DigitalSignalType.LowHigh):
+				case (DigitalTimingType.HighZ, DigitalTimingType.LowHigh):
 					with self._path.returnto():
 						# HighZ to High
 						self._transition_middle(-self._height / 2)
 					# HighZ to Low
 					self._transition_middle(self._height / 2)
 
-				case (DigitalSignalType.LowHigh, DigitalSignalType.HighZ):
+				case (DigitalTimingType.LowHigh, DigitalTimingType.HighZ):
 					with self._path.returnto():
 						# Low to HighZ
 						self._transition_middle(-self._height / 2)
@@ -203,18 +203,18 @@ class DigitalSignalDiagram():
 					self._path.move_rel(0, -self._height)
 					self._transition_middle(self._height / 2)
 
-				case (DigitalSignalType.LowHigh, DigitalSignalType.LowHighTransition) | (DigitalSignalType.LowHighTransition, DigitalSignalType.LowHighTransition):
+				case (DigitalTimingType.LowHigh, DigitalTimingType.LowHighTransition) | (DigitalTimingType.LowHighTransition, DigitalTimingType.LowHighTransition):
 					with self._path.returnto():
 						self._transition_middle(-self._height, transition_scale = 2)
 					self._path.move_rel(0, -self._height)
 					self._transition_middle(self._height, transition_scale = 2)
 
-				case (_, DigitalSignalType.Empty):
+				case (_, DigitalTimingType.Empty):
 					self._path.move_to(self._path.pos.x, abs_y_mid)
 					prev = None
 					continue
 
-				case (_, DigitalSignalType.Marker):
+				case (_, DigitalTimingType.Marker):
 					mid_x = self._path.pos.x
 					self._markers.append(self._Marker(x = mid_x + self._xdiv / 2, label = cur.argument))
 					continue
@@ -261,7 +261,7 @@ class DigitalSignalDiagram():
 			(varname, sequence) = line.split("=", maxsplit = 1)
 			varname = varname.strip("\t ")
 			sequence = sequence.strip("\t ")
-			cmds = DigitalSignalCmd.parse_sequence(sequence)
+			cmds = DigitalTimingCmd.parse_sequence(sequence)
 			self._render_signal_sequence(varname, 0, (self._height + self._vertical_distance) * varno, cmds)
 			varno += 1
 		self._render_markers()

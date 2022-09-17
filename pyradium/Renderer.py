@@ -26,7 +26,7 @@ import mako.exceptions
 import markupsafe
 import pyradium
 from pyradium.Controller import ControllerManager
-from pyradium.renderer.BaseRenderer import BaseRenderer
+from pyradium.renderer import BaseRenderer
 from .Acronyms import Acronyms
 from .RenderedPresentation import RenderedPresentation
 from .Exceptions import TemplateErrorException, MalformedStyleConfigurationException, UnknownSlideTypeException

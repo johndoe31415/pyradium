@@ -19,8 +19,23 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .TimeSpecificationTests import TimeSpecificationTests
-from .CmdlineParserTests import CmdlineParserTests
-from .AgendaTests import AgendaTests
-from .BooleanExpressionTests import BooleanExpressionTests
-from .RendererTests import RendererTests
+import unittest
+from pyradium.RendererCache import RendererCache
+from pyradium.renderer import BaseRenderer
+
+class RendererTests(unittest.TestCase):
+	def test_dtg1(self):
+		renderer = BaseRenderer.instanciate("dtg")
+		renderer.render({
+			"data": """
+				C  = 00000|1111100000|1111100000|11111000
+				D  = 11111 1100000000 0001010111 00000000
+				Q  = 00000 1111111111 0000000000 11111111
+					!Q = 11111 0000000000 1111111111 00000000
+			""",
+			"xdiv": 10,
+			"height": 30,
+			"vertical_distance": 10,
+			"marker_extend": 20,
+			"clock_ticks": True,
+		})
