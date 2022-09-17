@@ -248,6 +248,9 @@ class SVGWriter():
 		svg_text.style["shape-inside"] = f"url(#{def_id})"
 		return svg_text
 
-	def write(self, filename):
+	def write(self, f):
+		self._doc.writexml(f)
+
+	def writefile(self, filename):
 		with open(filename, "w") as f:
-			self._doc.writexml(f)
+			self.write(f)
