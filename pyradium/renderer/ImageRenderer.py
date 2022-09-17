@@ -43,7 +43,7 @@ class ImageRenderer(BaseRenderer):
 		}
 
 	def _render_raw_svg(self, content, max_dimension, svg_transform = None):
-		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".svg") as input_file, tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".png") as output_file:
+		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".svg", mode = "wb") as input_file, tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".png") as output_file:
 			input_file.write(content)
 			input_file.flush()
 
@@ -64,7 +64,7 @@ class ImageRenderer(BaseRenderer):
 			return self._render_raw_svg(content, max_dimension)
 		else:
 			# Transform SVG before rendering it
-			with tempfile.NamedTemporaryFile(prefix = "pyradium_svg_", suffix = ".svg", mode = "w") as svg_file:
+			with tempfile.NamedTemporaryFile(prefix = "pyradium_svg_", suffix = ".svg", mode = "wb") as svg_file:
 				# First write the unmodified file to the tempfile
 				svg_file.write(content)
 				svg_file.flush()
@@ -75,7 +75,7 @@ class ImageRenderer(BaseRenderer):
 				svg.apply_all(svg_transform)
 				svg.write(transformed_svg)
 
-				transformed_content = transformed_svg.getvalue()
+				transformed_content = transformed_svg.getvalue().encode("utf-8")
 				return self._render_raw_svg(transformed_content, max_dimension)
 
 	def _render_raster_bitmap(self, content, mimetype, max_dimension):
@@ -123,6 +123,7 @@ class ImageRenderer(BaseRenderer):
 		else:
 			# Literal content specitication
 			content = property_dict["value"]
+			assert(isinstance(content, bytes))
 
 		if mimetype == "image/svg+xml":
 			(extension, img_data) = self._render_svg(content, max_dimension, svg_transform = property_dict.get("svg_transform"))
