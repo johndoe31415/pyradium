@@ -258,6 +258,8 @@ class ImageTools():
 		subprocess.check_call(cmd)
 
 class HashTools():
+	_HASHFNC = hashlib.md5
+
 	@classmethod
 	def _update_file(cls, hashfnc, f):
 		while True:
@@ -268,7 +270,7 @@ class HashTools():
 
 	@classmethod
 	def hash_files(cls, filenames):
-		hashfnc = hashlib.md5()
+		hashfnc = HashTools._HASHFNC()
 		for filename in filenames:
 			with open(filename, "rb") as f:
 				cls._update_file(hashfnc, f)
@@ -277,6 +279,10 @@ class HashTools():
 	@classmethod
 	def hash_file(cls, filename):
 		return cls.hash_files([ filename ])
+
+	@classmethod
+	def hash_data(cls, data: bytes):
+		return HashTools._HASHFNC(data).hexdigest()
 
 class FileTools():
 	@classmethod

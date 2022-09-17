@@ -353,6 +353,16 @@
 		</ul>
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Digital Timing Diagram"/>
+		<s:dtg>
+			C  = 00000|1111100000|1111100000|11111000
+			D  = 11111 1100000000 0001010111 00000000
+			Q  = 00000 1111111111 0000000000 11111111
+			!Q = 11111 0000000000 1111111111 00000000
+		</s:dtg>
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0"/>
 	</slide>

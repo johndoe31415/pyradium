@@ -21,6 +21,7 @@
 
 import logging
 import tempfile
+import mimetypes
 import subprocess
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
@@ -40,65 +41,94 @@ class ImageRenderer(BaseRenderer):
 			"version":			1,
 		}
 
-	def _render_raw_svg(self, src, max_dimension, svg_transform = None):
-		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".png") as output_file:
-			svg_info = ImageTools.get_image_info(src)
+	def _render_raw_svg(self, content, max_dimension, svg_transform = None):
+		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".svg") as input_file, tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".png") as output_file:
+			input_file.write(content)
+			input_file.flush()
+
+			svg_info = ImageTools.get_image_info(input_file.name)
 			if svg_info["image"]["geometry"]["width"] > svg_info["image"]["geometry"]["height"]:
 				scale_param = "-w"
 			else:
 				scale_param = "-h"
-			cmd = [ "inkscape", "-o", output_file.name, scale_param, str(max_dimension), src ]
+			cmd = [ "inkscape", "-o", output_file.name, scale_param, str(max_dimension), input_file.name ]
 			_log.debug("Rendering SVG: %s", CmdlineEscape().cmdline(cmd))
 			subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 			extension = "png"
 			img_data = output_file.read()
 		return (extension, img_data)
 
-	def _render_svg(self, src, max_dimension, svg_transform = None):
+	def _render_svg(self, content, max_dimension, svg_transform = None):
 		if svg_transform is None:
-			return self._render_raw_svg(src, max_dimension)
+			return self._render_raw_svg(content, max_dimension)
 		else:
 			# Transform SVG before rendering it
-			svg = SVGTransformation(src)
-			svg.apply_all(svg_transform)
-			with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = ".svg", mode = "w") as transformed_svg:
+			with tempfile.NamedTemporaryFile(prefix = "pyradium_svg_", suffix = ".svg", mode = "w") as svg_file:
+				# First write the unmodified file to the tempfile
+				svg_file.write(content)
+				svg_file.flush()
+
+				# Then perform the transformation and write it back
+				transformed_svg = io.StringIO()
+				svg = SVGTransformation(svg_file.name)
+				svg.apply_all(svg_transform)
 				svg.write(transformed_svg)
-				transformed_svg.flush()
-				return self._render_raw_svg(transformed_svg.name, max_dimension)
 
-	def _render_raster_bitmap(self, src, max_dimension):
+				transformed_content = transformed_svg.getvalue()
+				return self._render_raw_svg(transformed_content, max_dimension)
+
+	def _render_raster_bitmap(self, content, mimetype, max_dimension):
 		# Resize using ImageMagick
-		if src.lower().endswith(".jpg") or src.lower().endswith(".jpeg"):
-			extension = "jpg"
-		else:
-			extension = "png"
+		extension = "jpg" if (mimetype == "image/jpeg") else "png"
 
-		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = "." + extension) as output_file:
-			cmd = [ "convert", "-geometry", ">%dx%d" % (max_dimension, max_dimension), src, output_file.name ]
+		with tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = mimetypes.guess_extension(mimetype)) as input_file, tempfile.NamedTemporaryFile(prefix = "pyradium_img_", suffix = "." + extension) as output_file:
+			input_file.write(content)
+			input_file.flush()
+
+			cmd = [ "convert", "-geometry", ">%dx%d" % (max_dimension, max_dimension), input_file.name, output_file.name ]
 			_log.debug("Rendering raster image: %s", CmdlineEscape().cmdline(cmd))
 			try:
 				subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 			except subprocess.CalledProcessError as e:
-				raise ImageRenderingException(f"Failed to render {src} while trying to execute: {CmdlineEscape().cmdline(cmd)}") from e
+				raise ImageRenderingException(f"Failed to render {input_file.name} while trying to execute: {CmdlineEscape().cmdline(cmd)}") from e
 			img_data = output_file.read()
 		return (extension, img_data)
 
 	def rendering_key(self, property_dict):
-		src = property_dict["src"]
+		if "src" in property_dict:
+			# Specification as filename
+			srchash = HashTools.hash_file(property_dict["src"])
+		else:
+			# Literal specification as data
+			srchash = HashTools.hash_data(property_dict["value"])
 		return {
-			"srchash":		HashTools.hash_file(src),
+			"srchash":		srchash,
 		}
 
-	def render(self, property_dict):
-		src = property_dict["src"]
-		max_dimension = property_dict["max_dimension"]
+	def _determine_mimetype(self, property_dict):
+		if "filetype" in property_dict:
+			filename = f"x.{property_dict['filetype']}"
+			return mimetypes.guess_type(filename)[0]
+		else:
+			return mimetypes.guess_type(property_dict["src"])[0]
 
-		if src.lower().endswith(".svg"):
-			(extension, img_data) = self._render_svg(src, max_dimension, svg_transform = property_dict.get("svg_transform"))
+	def render(self, property_dict):
+		max_dimension = property_dict["max_dimension"]
+		mimetype = self._determine_mimetype(property_dict)
+
+		if "src" in property_dict:
+			with open(property_dict, "rb") as f:
+				content = f.read()
+		else:
+			# Literal content specitication
+			content = property_dict["value"]
+
+		if mimetype == "image/svg+xml":
+			(extension, img_data) = self._render_svg(content, max_dimension, svg_transform = property_dict.get("svg_transform"))
 		else:
 			if "svg_transform" in property_dict:
 				raise UsageException("SVG transformation requested, but source file is not in SVG format: %s / %s" % (src, str(property_dict)))
-			(extension, img_data) = self._render_raster_bitmap(src, max_dimension)
+			(extension, img_data) = self._render_raster_bitmap(content, mimetype, max_dimension)
 
 		image = {
 			"extension":	extension,

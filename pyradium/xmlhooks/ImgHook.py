@@ -21,7 +21,7 @@
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.Exceptions import InvalidTransformationException
+from pyradium.Exceptions import InvalidTransformationException, MalformedXMLInputException
 
 @XMLHookRegistry.register_hook
 class ImgHook(BaseHook):
@@ -59,10 +59,25 @@ class ImgHook(BaseHook):
 	def handle(cls, rendered_presentation, node):
 		transformations = cls._parse_transformations(node)
 
+		if node.hasAttribute("src") and node.hasAttribute("value"):
+			raise MalformedXMLInputException("Image node may not have both 'src' and 'value' attribute.")
+		elif not node.hasAttribute("src") and not node.hasAttribute("value"):
+			raise MalformedXMLInputException("Image node needs at least a 'src' or 'value' node.")
+		elif node.hasAttribute("value") and not node.hasAttribute("filetype"):
+			raise MalformedXMLInputException("Image node with a 'value' literal specification also needs a 'filetype' attribute to specify how to interpret the data.")
+
 		properties = {
-			"src":				rendered_presentation.renderer.lookup_include(node.getAttribute("src")),
 			"max_dimension":	rendered_presentation.renderer.rendering_params.image_max_dimension,
 		}
+		if node.hasAttribute("src"):
+			properties["src"] = rendered_presentation.renderer.lookup_include(node.getAttribute("src"))
+		else:
+			# Literal specification as value
+			properties["value"] = node.getAttribute("value").encode("utf-8")
+
+		if node.hasAttribute("filetype"):
+			properties["filetype"] = node.getAttribute("filetype")
+
 		if len(transformations) > 0:
 			properties["svg_transform"] = transformations
 		img_renderer = rendered_presentation.renderer.get_custom_renderer("img")
