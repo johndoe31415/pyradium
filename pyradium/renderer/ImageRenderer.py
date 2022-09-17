@@ -24,9 +24,9 @@ import tempfile
 import subprocess
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
-from .BaseRenderer import BaseRenderer
 from pyradium.Exceptions import UsageException, ImageRenderingException
 from pyradium.SVGTransformation import SVGTransformation
+from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
 

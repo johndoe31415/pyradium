@@ -21,8 +21,8 @@
 
 import subprocess
 from pyradium.Tools import HashTools
-from .BaseRenderer import BaseRenderer
 from pyradium.Exceptions import FailedToExecuteSubprocessException
+from .BaseRenderer import BaseRenderer
 
 @BaseRenderer.register
 class ExecRenderer(BaseRenderer):

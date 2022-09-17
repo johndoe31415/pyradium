@@ -26,7 +26,6 @@ import datetime
 import collections
 import json
 from .ExtendedJSONEncoder import ExtendedJSONEncoder
-from pyradium.Exceptions import RendererRegistryException
 
 RenderedResult = collections.namedtuple("RenderedResult", [ "key", "keyhash", "from_cache", "data" ])
 

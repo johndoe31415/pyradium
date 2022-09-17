@@ -24,9 +24,9 @@ import tempfile
 import subprocess
 import logging
 import collections
-from .BaseRenderer import BaseRenderer
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Exceptions import InvalidTeXException
+from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
 

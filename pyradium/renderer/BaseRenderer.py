@@ -21,6 +21,7 @@
 
 import collections
 from pyradium.RendererCache import RendererCache
+from pyradium.Exceptions import RendererRegistryException
 
 class BaseRenderer():
 	RendererResult = collections.namedtuple("RendererResult", [ "key", "data" ])
