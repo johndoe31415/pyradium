@@ -20,7 +20,6 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import unittest
-from pyradium.RendererCache import RendererCache
 from pyradium.renderer import BaseRenderer
 
 class RendererTests(unittest.TestCase):
