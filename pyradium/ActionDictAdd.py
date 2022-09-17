@@ -47,7 +47,7 @@ class ActionDictAdd(BaseAction):
 			return
 
 		print()
-		print(f"Finding {self._current_finding + 1} of len(self._findings):")
+		print(f"Finding {self._current_finding + 1} of {len(self._findings)}:")
 		print(match["msg"])
 		print(f"Offense: > {data['offense']} <")
 		print("   [A]dd word to dictionary")
