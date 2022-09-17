@@ -118,7 +118,7 @@ class ImageRenderer(BaseRenderer):
 		mimetype = self._determine_mimetype(property_dict)
 
 		if "src" in property_dict:
-			with open(property_dict, "rb") as f:
+			with open(property_dict["src"], "rb") as f:
 				content = f.read()
 		else:
 			# Literal content specitication
