@@ -19,13 +19,8 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import shutil
-import xml.dom.minidom
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.CmdlineParser import CmdlineParser
-from pyradium.Exceptions import FailedToLookupFileException, MalformedXMLInputException
-from pyradium.CmdlineEscape import CmdlineEscape
 
 @XMLHookRegistry.register_hook
 class DigitalTimingDiagramHook(BaseHook):

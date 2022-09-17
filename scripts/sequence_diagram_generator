@@ -22,6 +22,7 @@
 
 import random
 import collections
+from pyradium.FriendlyArgumentParser import FriendlyArgumentParser
 
 class SequenceDiagramGenerator():
 	_Signal = collections.namedtuple("Signal", [ "name", "values" ])

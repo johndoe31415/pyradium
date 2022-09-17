@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import io
 import logging
 import tempfile
 import mimetypes
@@ -127,7 +128,7 @@ class ImageRenderer(BaseRenderer):
 			(extension, img_data) = self._render_svg(content, max_dimension, svg_transform = property_dict.get("svg_transform"))
 		else:
 			if "svg_transform" in property_dict:
-				raise UsageException("SVG transformation requested, but source file is not in SVG format: %s / %s" % (src, str(property_dict)))
+				raise UsageException(f"SVG transformation requested, but source file does not have SVG mimetype: {mimetype} / {str(property_dict)}")
 			(extension, img_data) = self._render_raster_bitmap(content, mimetype, max_dimension)
 
 		image = {
