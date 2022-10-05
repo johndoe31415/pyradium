@@ -39,6 +39,8 @@ class BooleanExpressionParser():
 		"*":	SpecialCharacter.LogicalAnd,
 	}
 	_LITERAL_CHARS = set(string.ascii_uppercase + string.ascii_lowercase)
+	_LONG_LITERAL_CHARS = set(string.ascii_uppercase + string.ascii_lowercase + string.digits + "_")
+	_TEXT_CHARS = set(" =," + string.digits)
 
 	def __init__(self, string):
 		self._index = 0
@@ -91,7 +93,7 @@ class BooleanExpressionParser():
 
 	def _parse_long_literal(self):
 		result = ""
-		while self.char in self._LITERAL_CHARS:
+		while self.char in self._LONG_LITERAL_CHARS:
 			result += self.char
 			self._advance()
 		if result == "":
@@ -135,7 +137,7 @@ class BooleanExpressionParser():
 		return self._parse_simple_char("special", self._SPECIAL_CHARS, lookup = lambda c: self._SPECIAL_CHARS[c])
 
 	def _parse_text(self):
-		return self._parse_simple_char("text", " =01")
+		return self._parse_simple_char("text", self._TEXT_CHARS)
 
 	def _parse_expression(self):
 		with self._nested("expr"):
@@ -148,8 +150,11 @@ class BooleanExpressionParser():
 
 	def parse(self):
 		self._parse_expression()
-		if len(self._string) != self._index:
-			raise InvalidBooleanExpressionException(f"Trailing unparsed data: {self.remaining}")
+		try:
+			if len(self._string) != self._index:
+				raise InvalidBooleanExpressionException(f"Trailing unparsed data: {self.remaining}")
+		except InvalidBooleanExpressionException as e:
+			raise InvalidBooleanExpressionException(f"Error parsing Boolean formula {self._string}: {str(e)}")
 		return self._result
 
 
@@ -157,15 +162,23 @@ class TexBooleanExpressionPrinter():
 	def __init__(self, invert_by_overline = True):
 		self._invert_by_overline = invert_by_overline
 
-	def _print(self, node):
+	def _print(self, node, sibling = None):
 		if isinstance(node, list):
+			prev = None
 			for child in node:
-				yield from self._print(child)
+				yield from self._print(child, sibling = prev)
+				prev = child
 			return
 		match node.etype:
 			case "literal":
 				yield r"\textnormal{"
-				yield node.content
+				if "_" not in node.content:
+					yield node.content
+				else:
+					(prefix, suffix) = node.content.split("_", maxsplit = 1)
+					yield prefix
+					yield "}_{"
+					yield suffix
 				yield "}"
 
 			case "text":
@@ -173,6 +186,8 @@ class TexBooleanExpressionPrinter():
 
 			case "invert":
 				if self._invert_by_overline:
+					if (sibling is not None) and (sibling.etype == "invert"):
+						yield r"\ "
 					yield r"\overline{"
 					if node.content[0].etype == "parenthesis":
 						# Don't display parenthesis
