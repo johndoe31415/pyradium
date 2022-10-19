@@ -398,6 +398,7 @@ class XMLSpellchecker():
 				else:
 					column += 1
 			offense = chunk.text[chunk_offset : chunk_offset + match["length"]]
+			offense = offense.replace("\n", "")
 			spellcheck_result = self._SpellcheckResult(offense = offense, chunk = chunk, chunk_offset = chunk_offset, group = group, group_offset = group_offset, match = match, row = row, column = column)
 			yield spellcheck_result
 
