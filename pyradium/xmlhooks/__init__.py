@@ -42,3 +42,4 @@ from .CircuitHook import CircuitHook
 from .GraphvizHook import GraphvizHook
 from .BoolHook import BoolHook
 from .DigitalTimingDiagramHook import DigitalTimingDiagramHook
+from .AgendaHook import AgendaHook
