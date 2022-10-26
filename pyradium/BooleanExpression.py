@@ -154,7 +154,7 @@ class BooleanExpressionParser():
 			if len(self._string) != self._index:
 				raise InvalidBooleanExpressionException(f"Trailing unparsed data: {self.remaining}")
 		except InvalidBooleanExpressionException as e:
-			raise InvalidBooleanExpressionException(f"Error parsing Boolean formula {self._string}: {str(e)}")
+			raise InvalidBooleanExpressionException(f"Error parsing Boolean formula {self._string}: {str(e)}") from e
 		return self._result
 
 

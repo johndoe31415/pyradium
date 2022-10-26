@@ -24,11 +24,11 @@ import subprocess
 import logging
 import xml.dom.minidom
 import pyradium
+from pyradium.Agenda import Agenda
 from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
-from pyradium.Agenda import Agenda
 from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, MalformedJSONInputException
 
 _log = logging.getLogger(__spec__.name)
