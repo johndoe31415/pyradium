@@ -73,7 +73,7 @@ class BooleanExpressionTests(unittest.TestCase):
 
 	def test_tex_default_inverted_literal(self):
 		tree = BooleanExpressionParser("X!Y!Z").parse()
-		self.assertEqual(self._tex_default.print(tree), r"\textnormal{X}\overline{\textnormal{Y}}\overline{\textnormal{Z}}")
+		self.assertEqual(self._tex_default.print(tree), r"\textnormal{X}\overline{\textnormal{Y}}\ \overline{\textnormal{Z}}")
 
 	def test_tex_default_logical_or(self):
 		tree = BooleanExpressionParser("X | Y").parse()
@@ -85,7 +85,7 @@ class BooleanExpressionTests(unittest.TestCase):
 
 	def test_tex_default_complex(self):
 		tree = BooleanExpressionParser("X = (A!B!C) | !(ABC) | ![ABC] & X!YZ | (A & (B | !C))").parse()
-		self.assertEqual(self._tex_default.print(tree), r"\textnormal{X} = (\textnormal{A}\overline{\textnormal{B}}\overline{\textnormal{C}}) \vee \overline{\textnormal{A}\textnormal{B}\textnormal{C}} \vee \overline{\textnormal{ABC}} \wedge \textnormal{X}\overline{\textnormal{Y}}\textnormal{Z} \vee (\textnormal{A} \wedge (\textnormal{B} \vee \overline{\textnormal{C}}))")
+		self.assertEqual(self._tex_default.print(tree), r"\textnormal{X} = (\textnormal{A}\overline{\textnormal{B}}\ \overline{\textnormal{C}}) \vee \overline{\textnormal{A}\textnormal{B}\textnormal{C}} \vee \overline{\textnormal{ABC}} \wedge \textnormal{X}\overline{\textnormal{Y}}\textnormal{Z} \vee (\textnormal{A} \wedge (\textnormal{B} \vee \overline{\textnormal{C}}))")
 
 	def test_tex_default_realworld_1(self):
 		tree = BooleanExpressionParser("[CLK] = 1").parse()
@@ -97,11 +97,11 @@ class BooleanExpressionTests(unittest.TestCase):
 
 	def test_tex_default_realworld_3(self):
 		tree = BooleanExpressionParser("Z = !(!A!B!C | ![foo])").parse()
-		self.assertEqual(self._tex_default.print(tree), r"\textnormal{Z} = \overline{\overline{\textnormal{A}}\overline{\textnormal{B}}\overline{\textnormal{C}} \vee \overline{\textnormal{foo}}}")
+		self.assertEqual(self._tex_default.print(tree), r"\textnormal{Z} = \overline{\overline{\textnormal{A}}\ \overline{\textnormal{B}}\ \overline{\textnormal{C}} \vee \overline{\textnormal{foo}}}")
 
 	def test_tex_default_realworld_4(self):
 		tree = BooleanExpressionParser("[CLK] = AB!C!D | A!B!D & (A | BD) | !(A | BC)").parse()
-		self.assertEqual(self._tex_default.print(tree), r"\textnormal{CLK} = \textnormal{A}\textnormal{B}\overline{\textnormal{C}}\overline{\textnormal{D}} \vee \textnormal{A}\overline{\textnormal{B}}\overline{\textnormal{D}} \wedge (\textnormal{A} \vee \textnormal{B}\textnormal{D}) \vee \overline{\textnormal{A} \vee \textnormal{B}\textnormal{C}}")
+		self.assertEqual(self._tex_default.print(tree), r"\textnormal{CLK} = \textnormal{A}\textnormal{B}\overline{\textnormal{C}}\ \overline{\textnormal{D}} \vee \textnormal{A}\overline{\textnormal{B}}\ \overline{\textnormal{D}} \wedge (\textnormal{A} \vee \textnormal{B}\textnormal{D}) \vee \overline{\textnormal{A} \vee \textnormal{B}\textnormal{C}}")
 
 	def test_tex_no_overline_realworld_4(self):
 		tree = BooleanExpressionParser("[CLK] = AB!C!D | A!B!D & (A | BD) | !(A | BC)").parse()
