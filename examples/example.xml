@@ -10,6 +10,13 @@
 		<format>
 			<date>%d.%m.%Y</date>
 		</format>
+		<agenda>
+			14:00
+			+0:15		First part
+			+0:05		Short pause
+			*			Second part
+			14:30
+		</agenda>
 	</meta>
 
 	<acronyms src="acronyms.json"/>

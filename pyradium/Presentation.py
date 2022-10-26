@@ -28,6 +28,7 @@ from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
+from pyradium.Agenda import Agenda
 from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, MalformedJSONInputException
 
 _log = logging.getLogger(__spec__.name)
@@ -113,7 +114,10 @@ class Presentation():
 		return cls(meta, content, sources)
 
 	def _validate_metadata(self):
-		pass
+		if self._meta is None:
+			return
+		if "agenda" in self._meta:
+			self._meta["agenda"] = Agenda.parse(text = self._meta["agenda"])
 
 	def _determine_sha256(self, filename):
 		with open(filename, "rb") as f:
