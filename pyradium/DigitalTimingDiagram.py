@@ -87,13 +87,13 @@ class DigitalTimingDiagram():
 		self._height = height
 		self._vertical_distance = vertical_distance
 		self._marker_extend = marker_extend
-		self._clock_ticks = clock_ticks
+		self._render_clock_ticks = clock_ticks
 		self._risefall = height / 8
 		self._svg = SVGWriter()
 		self._path = None
 		self._plot_count = 0
 		self._clock_ticks = 0
-		if clock_ticks is True:
+		if self._render_clock_ticks:
 			self._svg.group("clock_ticks")
 		self._markers = [ ]
 
@@ -240,7 +240,10 @@ class DigitalTimingDiagram():
 				svg_text = self._svg.new_text_span(marker.x - (text_width / 2), marker_length, text_width, text_height, marker.label, group_name = "marker")
 				svg_text.style["text-align"] = "center"
 
-	def _render_clock_ticks(self):
+	def _do_render_clock_ticks(self):
+		if not self._render_clock_ticks:
+			return
+
 		for tick in range(self._clock_ticks):
 			x = (tick * self._xdiv) + self._xdiv / 2
 			path = self._svg.new_path(x, 0, group_name = "clock_ticks")
@@ -265,4 +268,4 @@ class DigitalTimingDiagram():
 			self._render_signal_sequence(varname, 0, (self._height + self._vertical_distance) * varno, cmds)
 			varno += 1
 		self._render_markers()
-		self._render_clock_ticks()
+		self._do_render_clock_ticks()

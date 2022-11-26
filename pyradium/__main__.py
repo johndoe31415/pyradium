@@ -36,7 +36,9 @@ from .ActionDumpMetadata import ActionDumpMetadata
 from .ActionSpellcheck import ActionSpellcheck
 from .ActionDictAdd import ActionDictAdd
 from .ActionTemplateHelper import ActionTemplateHelper
+from .ActionStandalone import ActionStandalone
 from .modify.BaseModifyCommand import BaseModifyCommand
+from .standalone.BaseStandaloneCommand import BaseStandaloneCommand
 from .Enums import PresentationFeature
 from .GlobalConfig import GlobalConfig
 
@@ -155,6 +157,13 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("template_name", help = "Name of the template to insert.")
 	mc.register("template-helper", "Show different templates on stdout; used in conjunction with vim plugins", genparser, action = ActionTemplateHelper)
+
+	standalone_commands = list(sorted(BaseStandaloneCommand.get_supported_cmd_list()))
+	if len(standalone_commands) > 0:
+		def genparser(parser):
+			parser.add_argument("subcommand", choices = standalone_commands, help = "Name of subcommand to call.")
+			parser.add_argument("params", nargs = argparse.REMAINDER, help = "Arguments for the respective sub-command.")
+		mc.register("standalone", "Standalone a presentation through one of many sub-commands", genparser, action = ActionStandalone)
 
 	return mc.run(sys.argv[1:])
 
