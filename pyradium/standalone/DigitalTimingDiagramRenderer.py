@@ -21,8 +21,8 @@
 
 import os
 import logging
-from .BaseStandaloneCommand import BaseStandaloneCommand
 from pyradium.DigitalTimingDiagram import DigitalTimingDiagram
+from .BaseStandaloneCommand import BaseStandaloneCommand
 
 _log = logging.getLogger(__spec__.name)
 
