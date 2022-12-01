@@ -33,6 +33,7 @@ class DigitalTimingDiagramRenderer(BaseStandaloneCommand):
 
 	@classmethod
 	def _gen_parser(cls, parser):
+		parser.add_argument("-H", "--low-high-lines", action = "store_true", help = "Render LOW/HIGH horizontal lines.")
 		parser.add_argument("-x", "--xdiv-size", metavar = "pixels", type = float, default = 10, help = "Defines the size of the X division in pixels. Defaults to %(default).1f.")
 		parser.add_argument("-y", "--height", metavar = "pixels", type = float, default = 30, help = "Defines the bar height in pixels. Defaults to %(default).1f.")
 		parser.add_argument("-n", "--no-clock-ticks", action = "store_true", help = "Do not draw clock tick marks.")
@@ -49,7 +50,7 @@ class DigitalTimingDiagramRenderer(BaseStandaloneCommand):
 		with open(self._args.infile) as f:
 			dtd_text = f.read()
 
-		dtd = DigitalTimingDiagram(xdiv = self._args.xdiv_size, height = self._args.height, clock_ticks = not self._args.no_clock_ticks)
+		dtd = DigitalTimingDiagram(xdiv = self._args.xdiv_size, height = self._args.height, clock_ticks = not self._args.no_clock_ticks, low_high_lines = self._args.low_high_lines)
 		dtd.parse_and_write(dtd_text)
 		dtd.svg.writefile(self._args.outfile_svg)
 		return 0

@@ -82,17 +82,20 @@ class DigitalTimingCmd():
 class DigitalTimingDiagram():
 	_Marker = collections.namedtuple("Marker", [ "x", "label" ])
 
-	def __init__(self, xdiv = 10, height = 30, vertical_distance = 10, marker_extend = 20, clock_ticks = True):
+	def __init__(self, xdiv = 10, height = 30, vertical_distance = 10, marker_extend = 20, clock_ticks = True, low_high_lines = False):
 		self._xdiv = xdiv
 		self._height = height
 		self._vertical_distance = vertical_distance
 		self._marker_extend = marker_extend
 		self._render_clock_ticks = clock_ticks
+		self._low_high_lines = low_high_lines
 		self._risefall = height / 8
 		self._svg = SVGWriter()
 		self._path = None
 		self._plot_count = 0
 		self._clock_ticks = 0
+		if self._low_high_lines:
+			self._svg.group("low_high_horizontal")
 		if self._render_clock_ticks:
 			self._svg.group("clock_ticks")
 		self._markers = [ ]
@@ -254,6 +257,21 @@ class DigitalTimingDiagram():
 			path.style["stroke-dasharray"] = "0.75,0.25"
 			path.style["stroke-dashoffset"] = 0
 
+	def _do_render_low_high_lines(self):
+		x_width = self._clock_ticks * self._xdiv
+		for plot in range(self._plot_count):
+			y_high = (self._height + self._vertical_distance) * plot
+			y_low = y_high + self._height
+			for y in [ y_low, y_high ]:
+				path = self._svg.new_path(0, y, group_name = "low_high_horizontal")
+				path.horiz_rel(x_width)
+
+				path.style["stroke-width"] = 0.5
+				path.style["stroke"] = "#95a5a6"
+				path.style["stroke-miterlimit"] = 4
+				path.style["stroke-dasharray"] = "0.75,0.25"
+				path.style["stroke-dashoffset"] = 0
+
 	def parse_and_write(self, text):
 		text = text.strip("\r\n")
 		varno = 0
@@ -269,3 +287,4 @@ class DigitalTimingDiagram():
 			varno += 1
 		self._render_markers()
 		self._do_render_clock_ticks()
+		self._do_render_low_high_lines()
