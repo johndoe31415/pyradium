@@ -279,6 +279,8 @@ class DigitalTimingDiagram():
 			line = line.strip("\r\n \t")
 			if line == "":
 				continue
+			if line.startswith("#"):
+				continue
 			(varname, sequence) = line.split("=", maxsplit = 1)
 			varname = varname.strip("\t ")
 			sequence = sequence.strip("\t ")
