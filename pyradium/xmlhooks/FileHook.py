@@ -43,7 +43,12 @@ class FileHook(BaseHook):
 
 		replacement_node = node.ownerDocument.createElement("a")
 		replacement_node.setAttribute("href", local_link)
-		for child in list(node.childNodes):
-			replacement_node.appendChild(child)
+
+		if len(node.childNodes) == 0:
+			# Include the literal file basename as text
+			replacement_node.appendChild(node.ownerDocument.createTextNode(basename))
+		else:
+			for child in list(node.childNodes):
+				replacement_node.appendChild(child)
 
 		return replacement_node
