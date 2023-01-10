@@ -17,6 +17,7 @@
 			*			Second part
 			14:30
 		</agenda>
+		<filename-key>4864c5ba-8450-4819-9fb5-2d255aea3016</filename-key>
 	</meta>
 
 	<acronyms src="acronyms.json"/>
@@ -368,6 +369,11 @@
 			Q  = 00000 1111111111 0000000000 11111111
 			!Q = 11111 0000000000 1111111111 00000000
 		</s:dtg>
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="File inclusion"/>
+		<s:file src="acronyms.json">Files can be included as well!</s:file>
 	</slide>
 
 	<slide type="final">

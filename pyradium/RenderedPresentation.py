@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -20,6 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import shutil
 import contextlib
 from .GenericTOC import GenericTOC
 from .OrderedSet import OrderedSet
@@ -154,6 +155,13 @@ class RenderedPresentation():
 		source_filename = self.renderer.lookup_template_file(rel_filename)
 		with open(source_filename, "rb") as f:
 			self.add_file(rel_filename, f.read(), target_directory)
+
+	def copy_abs_file(self, src_abs_filename, dest_rel_filename):
+		dest_filename = f"{self._deploy_directory}/{dest_rel_filename}"
+		dest_directory = os.path.dirname(dest_filename)
+		with contextlib.suppress(FileExistsError):
+			os.makedirs(dest_directory)
+		shutil.copy(src_abs_filename, dest_filename)
 
 	def handle_dependencies(self, dependencies):
 		if dependencies is None:
