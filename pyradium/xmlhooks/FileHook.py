@@ -37,12 +37,14 @@ class FileHook(BaseHook):
 		src_filename = rendered_presentation.renderer.lookup_include(node.getAttribute("src"))
 		basename = os.path.basename(src_filename)
 		filename_hash = hashlib.md5((basename + filename_key).encode("utf-8")).hexdigest()
-		target_filename = f"{rendered_presentation.renderer.rendering_params.resource_uri}/incfiles/{filename_hash}/{basename}"
-		local_link = f"{target_filename}"
+		if rendered_presentation.renderer.rendering_params.resource_uri != "":
+			target_filename = f"{rendered_presentation.renderer.rendering_params.resource_uri}/incfiles/{filename_hash}/{basename}"
+		else:
+			target_filename = f"incfiles/{filename_hash}/{basename}"
 		rendered_presentation.copy_abs_file(src_filename, target_filename)
 
 		replacement_node = node.ownerDocument.createElement("a")
-		replacement_node.setAttribute("href", local_link)
+		replacement_node.setAttribute("href", target_filename)
 
 		if len(node.childNodes) == 0:
 			# Include the literal file basename as text
