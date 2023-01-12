@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -25,7 +25,7 @@ import subprocess
 import logging
 import collections
 from pyradium.CmdlineEscape import CmdlineEscape
-from pyradium.Exceptions import InvalidTeXException
+from pyradium.Exceptions import InvalidTeXException, ImageRenderingException
 from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
@@ -92,16 +92,19 @@ class LatexFormulaRenderer(BaseRenderer):
 				content = r"$" + baseline + property_dict["formula"] + r"$"
 			with open(tex_filename, "w") as tex_file:
 				tex_file.write(_TEX_TEMPLATE % { "content": content })
-			_log.debug("Rendering LaTeX formula: %s in directory %s", content, tex_dir)
+			_log.debug("Rendering TeX formula: %s in directory %s", content, tex_dir)
 			try:
 				subprocess.check_call([ "pdflatex", "-interaction=nonstopmode", "-output-directory=%s" % (tex_dir), tex_filename ], stdout = _log.subproc_target, stderr = _log.subproc_target)
 			except subprocess.CalledProcessError as e:
-				raise InvalidTeXException("Invalid TeX in source: %s" % property_dict["formula"]) from e
+				raise InvalidTeXException(f"Invalid TeX in source: {property_dict['formula']}") from e
 
 			# Then render the PDF to PNG
 			cmd = [ "convert", "-define", "profile:skip=ICC", "-density", str(self._rendering_dpi), "-trim", "+repage", pdf_filename, png_filename ]
 			_log.trace("Converting PDF to PNG in %d dpi: %s", self._rendering_dpi, CmdlineEscape().cmdline(cmd))
-			subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+			try:
+				subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+			except subprocess.CalledProcessError as e:
+				raise ImageRenderingException(f"Rasterizing of PDF to PNG failed for TeX formula: {property_dict['formula']}") from e
 
 			_log.trace("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s", left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename)
 			baseline = self._get_baseline_info(png_filename, eval_baseline_at_x)
@@ -110,7 +113,10 @@ class LatexFormulaRenderer(BaseRenderer):
 			# Then crop the image finally and capture cropping metadata along the way
 			crop_meta = json.loads(subprocess.check_output([ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", png_filename, "json:-" ]))[0]
 			cmd = [ "convert", "-crop", "+%d+0" % (left_crop_pixel_safe), "-trim", "+repage", "-strip", png_filename, "png:-" ]
-			png_data = subprocess.check_output(cmd)
+			try:
+				png_data = subprocess.check_output(cmd)
+			except subprocess.CalledProcessError as e:
+				raise ImageRenderingException(f"Postprocessing rendered formula PNG failed for TeX formula: {property_dict['formula']}") from e
 			_log.trace("Final crop to output size: %s", CmdlineEscape().cmdline(cmd))
 			if _log.isEnabledFor(logging.SINGLESTEP):
 				with open(tex_dir + "/processed_01_crop_meta.json", "w") as f:
