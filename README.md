@@ -305,5 +305,19 @@ Ctrl-Shift-A for links, etc.):
 $ mkdir -p ~/.vim/after/ftplugin/ && cp xml_pyradium.vim ~/.vim/after/ftplugin/xml_pyradium.vim
 ```
 
+## Configuration file
+You can set a global pyradium JSON configuration file in
+`~/.config/pyradium/configuration.json`. Currently, this only allows to specify
+a default LanguageTool installation (either a JAR filename or a URI to use).
+Example:
+
+```json
+{
+	"spellcheck": {
+		"jar": "/opt/LanguageTool-6.0/languagetool-server.jar"
+	}
+}
+```
+
 ## License
 pyradium is licensed under the GNU GPL-3.
