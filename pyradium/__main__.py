@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -163,7 +163,7 @@ def main():
 		def genparser(parser):
 			parser.add_argument("subcommand", choices = standalone_commands, help = "Name of subcommand to call.")
 			parser.add_argument("params", nargs = argparse.REMAINDER, help = "Arguments for the respective sub-command.")
-		mc.register("standalone", "Standalone a presentation through one of many sub-commands", genparser, action = ActionStandalone)
+		mc.register("standalone", "Run one of various standalong tools through sub-commands", genparser, action = ActionStandalone)
 
 	return mc.run(sys.argv[1:])
 
