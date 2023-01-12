@@ -79,6 +79,7 @@ class LatexFormulaRenderer(BaseRenderer):
 			tex_filename = tex_dir + "/formula.tex"
 			pdf_filename = tex_dir + "/formula.pdf"
 			png_filename = tex_dir + "/formula.png"
+			gs_png_filename = tex_dir + "/formula_ghostscript.png"
 
 			# Crop 3mm off the left side (1mm baseline bar + 2mm space)
 			baseline = r"\rule{1mm}{1pt} \hspace{2mm}"
@@ -98,13 +99,24 @@ class LatexFormulaRenderer(BaseRenderer):
 			except subprocess.CalledProcessError as e:
 				raise InvalidTeXException(f"Invalid TeX in source: {property_dict['formula']}") from e
 
-			# Then render the PDF to PNG
-			cmd = [ "convert", "-define", "profile:skip=ICC", "-density", str(self._rendering_dpi), "-trim", "+repage", pdf_filename, png_filename ]
+			# Then render the PDF to PNG using Ghostscript. ImageMagick's
+			# default system policy in policy.xml refuses to perform this
+			# conversion for us and if we preload a custom temporary policy
+			# file using MAGICK_CONFIGURE_PATH, it still takes the most
+			# restrictive of the union of all policy files.
+			cmd = [ "gs", "-dSAFER", f"-r{self._rendering_dpi}", "-sDEVICE=pngalpha", f"-o{gs_png_filename}", pdf_filename ]
 			_log.trace("Converting PDF to PNG in %d dpi: %s", self._rendering_dpi, CmdlineEscape().cmdline(cmd))
 			try:
 				subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 			except subprocess.CalledProcessError as e:
-				raise ImageRenderingException(f"Rasterizing of PDF to PNG failed for TeX formula: {property_dict['formula']}") from e
+				raise ImageRenderingException(f"Rasterizing of PDF to PNG failed for TeX formula \"{property_dict['formula']}\" attempting to run: {CmdlineEscape().cmdline(cmd)}") from e
+
+			cmd = [ "convert", "-define", "profile:skip=ICC", "-trim", "+repage", gs_png_filename, png_filename ]
+			_log.trace("Cropping Ghostscript-rendered image: %s", self._rendering_dpi, CmdlineEscape().cmdline(cmd))
+			try:
+				subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+			except subprocess.CalledProcessError as e:
+				raise ImageRenderingException(f"Croping of PNG image failed for TeX formula \"{property_dict['formula']}\" attempting to run: {CmdlineEscape().cmdline(cmd)}") from e
 
 			_log.trace("Crop on left side: %d (choosing %d to be on safe side); evaluating baseline at x = %d; filename %s", left_crop_pixel, left_crop_pixel_safe, eval_baseline_at_x, png_filename)
 			baseline = self._get_baseline_info(png_filename, eval_baseline_at_x)
