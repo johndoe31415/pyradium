@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -22,6 +22,7 @@
 import subprocess
 from pyradium.Tools import HashTools
 from pyradium.Exceptions import FailedToExecuteSubprocessException
+from pyradium.CmdlineEscape import CmdlineEscape
 from .BaseRenderer import BaseRenderer
 
 @BaseRenderer.register
@@ -43,12 +44,12 @@ class ExecRenderer(BaseRenderer):
 	def render(self, property_dict):
 		cmd = property_dict["cmd"]
 		try:
-			proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE, check = True)
+			proc = subprocess.run(cmd, stdout = subprocess.PIPE, stderr = subprocess.PIPE, check = False)
 		except PermissionError as e:
-			raise FailedToExecuteSubprocessException("Could not execute '%s' (%s)." % (str(cmd), str(e))) from e
+			raise FailedToExecuteSubprocessException(f"Could not execute s:exec because of {type(e).__name__}: {CmdlineEscape().cmdline(cmd)}") from e
 
 		if proc.returncode != 0:
-			raise FailedToExecuteSubprocessException("Could not execute '%s': returncode %d." % (str(cmd), proc.returncode))
+			raise FailedToExecuteSubprocessException(f"Failed to execute s:exec, returncode {proc.returncode}: {CmdlineEscape().cmdline(cmd)}")
 
 		result = {
 			"cmd":			cmd,
