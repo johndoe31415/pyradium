@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -37,15 +37,25 @@ class ActionDictAdd(BaseAction):
 			if answer in valid_answers:
 				return answer
 
+	def _has_exception(self, finding):
+		return self._dictionary.has_exception(offense = finding["offense"], context = finding["ctx"], rule_id = finding["rule"]) or self._temporary_exceptions.has_exception(offense = finding["offense"], context = finding["ctx"], rule_id = finding["rule"])
+
+	def _advance_finding(self, increment = 1, skip_over_exceptions = True):
+		while 0 <= self._current_finding < len(self._findings):
+			self._current_finding += increment
+			if not skip_over_exceptions:
+				break
+			if not (0 <= self._current_finding < len(self._findings)):
+				break
+			(match, data) = self._findings[self._current_finding]
+			if not self._has_exception(data):
+				# Already handeled the same finding in this session, do not handle it again
+				break
+
 	def _handle_current_finding(self):
 		if self._current_finding < 0:
 			self._current_finding = 0
 		(match, data) = self._findings[self._current_finding]
-		if self._dictionary.has_exception(offense = data["offense"], context = data["ctx"], rule_id = data["rule"]):
-			# Already handeled the same finding in this session, do not handle it again
-			self._current_finding += 1
-			return
-
 		print()
 		print(f"Finding {self._current_finding + 1} of {len(self._findings)}:")
 		print(match["msg"])
@@ -54,8 +64,10 @@ class ActionDictAdd(BaseAction):
 		print("   Add word to [g]lobal dictionary (for all languages, e.g., names)")
 		print("   Add specific [c]ontext to dictionary")
 		print("   Jump to [p]previous finding")
-		print("   Do [n]othing with this match (default)")
-		answer = self._choice("Your choice: ", [ "a", "g", "c", "p", "n" ], default_answer = "n")
+		print("   Jump to previous finding [e]ven if it has been ignored")
+		print("   Do nothing with this match [i]nstance")
+		print("   Do [n]othing with this match and all similar matches (default)")
+		answer = self._choice("Your choice: ", [ "a", "g", "c", "p", "e", "i", "n" ], default_answer = "n")
 		if answer in [ "a", "g", "c" ]:
 			exception_type = {
 				"a": SpellcheckExceptionType.RuleWord,
@@ -63,11 +75,15 @@ class ActionDictAdd(BaseAction):
 				"c": SpellcheckExceptionType.RuleContext,
 			}[answer]
 			self._dictionary.add_exception(offense = data["offense"], context = data["ctx"], rule_id = data["rule"], exception_type = exception_type)
-			self._current_finding += 1
-		elif answer == "n":
-			self._current_finding += 1
+			self._advance_finding()
+		elif answer in [ "i", "n" ]:
+			if answer == "n":
+				self._temporary_exceptions.add_exception(offense = data["offense"], context = data["ctx"], rule_id = data["rule"], exception_type = SpellcheckExceptionType.RuleWord)
+			self._advance_finding()
 		elif answer == "p":
-			self._current_finding -= 1
+			self._advance_finding(increment = -1)
+		elif answer == "e":
+			self._advance_finding(increment = -1, skip_over_exceptions = False)
 		else:
 			raise NotImplementedError(answer)
 
@@ -76,6 +92,7 @@ class ActionDictAdd(BaseAction):
 			self._handle_current_finding()
 
 	def run(self):
+		self._temporary_exceptions = SpellcheckDictionary("/dev/null", initially_create = False)
 		self._dictionary = SpellcheckDictionary.open_global_dict()
 		self._current_finding = 0
 		self._findings = [ ]

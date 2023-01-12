@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -34,21 +34,24 @@ class SpellcheckExceptionType(enum.IntEnum):
 	RuleContext = 2
 
 class SpellcheckDictionary():
-	def __init__(self, filename):
+	def __init__(self, filename, initially_create = True):
 		self._filename = filename
 		self._modified = False
 
-		try:
-			with open(self._filename) as f:
-				self._entries = json.load(f, object_pairs_hook = collections.OrderedDict)
-		except FileNotFoundError:
+		if initially_create:
+			try:
+				with open(self._filename) as f:
+					self._entries = json.load(f, object_pairs_hook = collections.OrderedDict)
+			except FileNotFoundError:
+				self._entries = collections.OrderedDict()
+				self.write()
+				_log.info("Creating empty dictionary: %s", self._filename)
+			except json.decoder.JSONDecodeError as e:
+				self._entries = collections.OrderedDict()
+				self.write()
+				_log.warning("Creating empty dictionary because it was malformed JSON: %s (%s)", self._filename, str(e))
+		else:
 			self._entries = collections.OrderedDict()
-			self.write()
-			_log.info("Creating empty dictionary: %s", self._filename)
-		except json.decoder.JSONDecodeError as e:
-			self._entries = collections.OrderedDict()
-			self.write()
-			_log.warning("Creating empty dictionary because it was malformed JSON: %s (%s)", self._filename, str(e))
 
 	@classmethod
 	def open_global_dict(cls):
