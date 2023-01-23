@@ -18,6 +18,8 @@
 			14:30
 		</agenda>
 		<filename-key>4864c5ba-8450-4819-9fb5-2d255aea3016</filename-key>
+		<variables>my_vars1.json</variables>
+		<variables>my_vars2.json</variables>
 	</meta>
 
 	<acronyms src="acronyms.json"/>

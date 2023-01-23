@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -194,7 +194,7 @@ class XMLTools():
 		return False
 
 	@classmethod
-	def xml_to_dict(cls, node):
+	def xml_to_dict(cls, node, multikeys = None):
 		if node is None:
 			return None
 		if cls.has_sub_elements(node):
@@ -203,7 +203,13 @@ class XMLTools():
 				if child.nodeType == node.ELEMENT_NODE:
 					key = child.tagName
 					value = cls.xml_to_dict(child)
-					result[key] = value
+					if (multikeys is None) or (key not in multikeys):
+						result[key] = value
+					else:
+						if key not in result:
+							result[key] = [ value ]
+						else:
+							result[key].append(value)
 			return result
 		else:
 			return cls.inner_text(node)
@@ -245,6 +251,18 @@ class JSONTools():
 			return { key: cls.round_dict_floats(value, digits = digits) for (key, value) in obj.items() }
 		else:
 			return obj
+
+	@classmethod
+	def merge_dicts(cls, obj1, obj2):
+		assert(isinstance(obj1, dict))
+		assert(isinstance(obj2, dict))
+		result = obj1
+		for (key, value) in obj2.items():
+			if (key in result) and isinstance(result[key], dict) and isinstance(value, dict):
+				result[key] = cls.merge_dicts(result[key], value)
+			else:
+				result[key] = value
+		return result
 
 class ImageTools():
 	@classmethod

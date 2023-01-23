@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,17 +19,18 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import json
 import hashlib
 import subprocess
 import logging
 import xml.dom.minidom
 import pyradium
 from pyradium.Agenda import Agenda
-from .Tools import XMLTools
+from .Tools import XMLTools, JSONTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
-from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, MalformedJSONInputException
+from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException
 
 _log = logging.getLogger(__spec__.name)
 
@@ -38,10 +39,11 @@ class Presentation():
 		"https://github.com/johndoe31415/pyradium":		"s",
 	}
 
-	def __init__(self, meta, content, sources):
+	def __init__(self, meta, content, sources, variables):
 		self._meta = meta
 		self._content = content
 		self._sources = sources
+		self._variables = variables
 		self._validate_metadata()
 
 	@property
@@ -55,6 +57,10 @@ class Presentation():
 	@property
 	def sources(self):
 		return self._sources
+
+	@property
+	def variables(self):
+		return self._variables
 
 	@classmethod
 	def _merge_metadata(cls, meta_dict, injected_dict):
@@ -78,6 +84,31 @@ class Presentation():
 		return (dom, presentation)
 
 	@classmethod
+	def _parse_variables(cls, json_filenames: list[str] | None, rendering_parameters):
+		variables = { }
+
+		if (json_filenames is not None) and (len(json_filenames) > 0) and (rendering_parameters is None):
+			_log.warning("Ingored variables directive because no include directories are known: %s", str(json_filenames))
+			return variables
+
+		for filename in json_filenames:
+			lookup_filename = rendering_parameters.include_dirs.lookup(filename)
+			try:
+				with open(lookup_filename) as f:
+					variable = json.load(f)
+			except FileNotFoundError as e:
+				raise JSONFileNotFoundException(f"Cannot load variable data from {lookup_filename}: {str(e)}") from e
+			except json.decoder.JSONDecodeError as e:
+				raise MalformedJSONInputException(f"Cannot parse variable data from {lookup_filename}: {str(e)}") from e
+
+			if not isinstance(variable, dict):
+				raise MalformedJSONInputException(f"Data type error after parsing {lookup_filename}: expected root node of type dict, but got \"{type(variable).__name__}\"")
+
+			variables = JSONTools.merge_dicts(variables, variable)
+		print(variables)
+		return variables
+
+	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
 		(dom, presentation) = cls.parse_xml(filename)
 		meta = None
@@ -88,7 +119,7 @@ class Presentation():
 				continue
 
 			if child.tagName == "meta":
-				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")))
+				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")), multikeys = [ "variables" ])
 			elif child.tagName == "slide":
 				if not XMLTools.get_bool_attr(child, "hide"):
 					content.append(RenderSlideDirective(child))
@@ -111,7 +142,11 @@ class Presentation():
 				_log.warning("Ignored unknown tag '%s'.", child.tagName)
 		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
 			meta = cls._merge_metadata(meta, rendering_parameters.injected_metadata)
-		return cls(meta, content, sources)
+		if meta is not None:
+			variables = cls._parse_variables(meta.get("variables"), rendering_parameters = rendering_parameters)
+		else:
+			variables = { }
+		return cls(meta, content, sources, variables)
 
 	def _validate_metadata(self):
 		if self._meta is None:

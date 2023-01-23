@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -26,6 +26,7 @@ class ConfigurationException(PyRadiumException): pass
 class CallingProcessException(PyRadiumException): pass
 
 class XMLFileNotFoundException(PyRadiumException): pass
+class JSONFileNotFoundException(PyRadiumException): pass
 class MalformedJSONInputException(PyRadiumException): pass
 class MalformedXMLInputException(PyRadiumException): pass
 class MalformedStyleConfigurationException(PyRadiumException): pass
