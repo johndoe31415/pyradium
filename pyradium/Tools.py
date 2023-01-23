@@ -271,7 +271,7 @@ class JSONTools():
 			try:
 				return eval(expression, sub_environment)
 			except Exception as e:
-				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {str(e)}")
+				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {str(e)}") from e
 		elif isinstance(value, list):
 			return [ cls.recursive_format_substitution(item, sub_environment) for item in value ]
 		elif isinstance(value, dict):

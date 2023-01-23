@@ -29,6 +29,7 @@ from pyradium.Agenda import Agenda
 from .Tools import XMLTools, JSONTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
+from .VariableSubstitutionHelper import VariableSubstitutionHelper
 from .Acronyms import AcronymDirective
 from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException, MalformedFormatStringInputException
 
@@ -84,34 +85,62 @@ class Presentation():
 		return (dom, presentation)
 
 	@classmethod
-	def _parse_variables(cls, json_filenames: list[str] | None, rendering_parameters):
+	def _parse_variable_from_file(cls, json_filename: str, rendering_parameters):
+		lookup_filename = rendering_parameters.include_dirs.lookup(json_filename)
+		try:
+			with open(lookup_filename) as f:
+				variable = json.load(f)
+		except FileNotFoundError as e:
+			raise JSONFileNotFoundException(f"Cannot load variable data from {lookup_filename}: {str(e)}") from e
+		except json.decoder.JSONDecodeError as e:
+			raise MalformedJSONInputException(f"Cannot parse variable data from {lookup_filename}: {str(e)}") from e
+
+		if not isinstance(variable, dict):
+			raise MalformedJSONInputException(f"Data type error after parsing {lookup_filename}: expected root node of type dict, but got \"{type(variable).__name__}\"")
+		return variable
+
+	@classmethod
+	def _parse_variable_from_literal_data(cls, json_data: str):
+		try:
+			variable = json.loads(json_data)
+		except json.decoder.JSONDecodeError as e:
+			raise MalformedJSONInputException(f"Cannot parse literal variable data from {json_data}: {str(e)}") from e
+		return variable
+
+	@classmethod
+	def _parse_variables(cls, variables_node, rendering_parameters):
 		variables = { }
-
-		if (json_filenames is not None) and (len(json_filenames) > 0) and (rendering_parameters is None):
-			_log.warning("Ingored variables directive because no include directories are known: %s", str(json_filenames))
-			return variables
-
-		for filename in json_filenames:
-			lookup_filename = rendering_parameters.include_dirs.lookup(filename)
-			try:
-				with open(lookup_filename) as f:
-					variable = json.load(f)
-			except FileNotFoundError as e:
-				raise JSONFileNotFoundException(f"Cannot load variable data from {lookup_filename}: {str(e)}") from e
-			except json.decoder.JSONDecodeError as e:
-				raise MalformedJSONInputException(f"Cannot parse variable data from {lookup_filename}: {str(e)}") from e
-
-			if not isinstance(variable, dict):
-				raise MalformedJSONInputException(f"Data type error after parsing {lookup_filename}: expected root node of type dict, but got \"{type(variable).__name__}\"")
-
+		for variable_node in XMLTools.findall_generator(variables_node, "variable"):
+			if variable_node.hasAttribute("src"):
+				json_filename = variable_node.getAttribute("src")
+				if rendering_parameters is not None:
+					variable = cls._parse_variable_from_file(json_filename, rendering_parameters)
+				else:
+					_log.warning("Ingored variables directive because no include directories are known: %s", json_filename)
+					continue
+			else:
+				variable = cls._parse_variable_from_literal_data(XMLTools.inner_text(variable_node))
 			variables = JSONTools.merge_dicts(variables, variable)
 		return variables
+
+	@classmethod
+	def _substitute_variables(cls, target, variables):
+		sub_vars = {
+			"v":	variables,
+			"h":	VariableSubstitutionHelper,
+		}
+		try:
+			target = JSONTools.recursive_format_substitution(target, sub_vars)
+		except Exception as e:
+			raise MalformedFormatStringInputException(f"Unable to complete subsitution of target because of {e.__class__.__name__}: {str(e)}") from e
+		return target
 
 	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
 		(dom, presentation) = cls.parse_xml(filename)
 		meta = None
 		content = [ ]
+		variables = { }
 		sources = [ filename ]
 		for child in presentation.childNodes:
 			if child.nodeType != child.ELEMENT_NODE:
@@ -119,6 +148,8 @@ class Presentation():
 
 			if child.tagName == "meta":
 				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")), multikeys = [ "variables" ])
+			elif child.tagName == "variables":
+				variables = JSONTools.merge_dicts(variables, cls._parse_variables(child, rendering_parameters))
 			elif child.tagName == "slide":
 				if not XMLTools.get_bool_attr(child, "hide"):
 					content.append(RenderSlideDirective(child))
@@ -139,24 +170,15 @@ class Presentation():
 				content.append(AcronymDirective(child))
 			else:
 				_log.warning("Ignored unknown tag '%s'.", child.tagName)
+
 		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
-			meta = cls._merge_metadata(meta, rendering_parameters.injected_metadata)
+			# Inject metadata as last step
+			meta = JSONTools.merge_dicts(meta, rendering_parameters.injected_metadata)
 
-		if meta is not None:
-			variables = cls._parse_variables(meta.get("variables"), rendering_parameters = rendering_parameters)
-
-		else:
-			variables = { }
+		_log.trace("Presentation variables: %s", str(variables))
 
 		# Then format the metadata strings using the format variables
-		sub_vars = {
-			"v":	variables,
-		}
-		_log.trace("Substitution variables: %s", str(sub_vars))
-		try:
-			meta = JSONTools.recursive_format_substitution(meta, sub_vars)
-		except Exception as e:
-			raise MalformedFormatStringInputException(f"Unable to complete subsitution of metadata because of {e.__class__.__name__}: {str(e)}") from e
+		meta = cls._substitute_variables(meta, variables)
 		return cls(meta, content, sources, variables)
 
 	def _validate_metadata(self):

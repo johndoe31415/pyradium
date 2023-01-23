@@ -5,7 +5,7 @@
 		<author>Jean-Luc Picard</author>
 		<fullauthor>Jean-Luc Picard, Retired Starfleet Admiral</fullauthor>
 		<affiliation>Starfleet</affiliation>
-		<date>{v['basedate']}</date>
+		<date>{h.date_add(h.date_parse(v['basedate']), 7 * v['week']).strftime("%A, %Y-%m-%d")}</date>
 		<presentation-time>0:30</presentation-time>
 		<agenda>
 			14:00
@@ -15,9 +15,17 @@
 			14:30
 		</agenda>
 		<filename-key>4864c5ba-8450-4819-9fb5-2d255aea3016</filename-key>
-		<variables>my_vars1.json</variables>
-		<variables>my_vars2.json</variables>
 	</meta>
+
+	<variables>
+		<variable src="my_vars1.json" />
+		<variable src="my_vars2.json" />
+		<variable>
+		{
+			"week":	3
+		}
+		</variable>
+	</variables>
 
 	<acronyms src="acronyms.json"/>
 
