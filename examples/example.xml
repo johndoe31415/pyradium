@@ -378,6 +378,16 @@
 		<s:file src="acronyms.json">Files can be included as well!</s:file>
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Variable substitution"/>
+		<ul>
+			<li>foo = <s:sub name="foo" /></li>
+			<li>bar = <s:sub name="bar" /></li>
+			<li><s:sub>v["koo"]["blah"]</s:sub></li>
+			<li><s:sub>v["koo"]["blah"] * 123</s:sub></li>
+		</ul>
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0"/>
 	</slide>

@@ -1,3 +1,6 @@
 {
-	"foo": "variable foo"
+	"foo": "variable foo",
+	"koo": {
+		"blah": 1234
+	}
 }

@@ -54,6 +54,8 @@ class UnknownParameterException(PyRadiumException): pass
 class MissingParameterException(PyRadiumException): pass
 class InvalidBooleanExpressionException(PyRadiumException): pass
 class NoAgendaException(PyRadiumException): pass
+class NoSuchVariableException(PyRadiumException): pass
+class CodeExecutionFailedException(PyRadiumException): pass
 
 class AcronymException(PyRadiumException): pass
 class InvalidAcronymFileException(AcronymException): pass

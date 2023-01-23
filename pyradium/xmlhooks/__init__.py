@@ -44,3 +44,4 @@ from .BoolHook import BoolHook
 from .DigitalTimingDiagramHook import DigitalTimingDiagramHook
 from .AgendaHook import AgendaHook
 from .FileHook import FileHook
+from .VariableSubstitutionHook import VariableSubstitutionHook

@@ -105,7 +105,6 @@ class Presentation():
 				raise MalformedJSONInputException(f"Data type error after parsing {lookup_filename}: expected root node of type dict, but got \"{type(variable).__name__}\"")
 
 			variables = JSONTools.merge_dicts(variables, variable)
-		print(variables)
 		return variables
 
 	@classmethod
