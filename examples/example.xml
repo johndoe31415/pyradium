@@ -5,11 +5,8 @@
 		<author>Jean-Luc Picard</author>
 		<fullauthor>Jean-Luc Picard, Retired Starfleet Admiral</fullauthor>
 		<affiliation>Starfleet</affiliation>
-		<date>2020-01-01</date>
+		<date>{v['basedate']}</date>
 		<presentation-time>0:30</presentation-time>
-		<format>
-			<date>%d.%m.%Y</date>
-		</format>
 		<agenda>
 			14:00
 			+0:15		First part

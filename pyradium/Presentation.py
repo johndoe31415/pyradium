@@ -30,7 +30,7 @@ from .Tools import XMLTools, JSONTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .Acronyms import AcronymDirective
-from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException
+from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException, MalformedFormatStringInputException
 
 _log = logging.getLogger(__spec__.name)
 
@@ -141,10 +141,22 @@ class Presentation():
 				_log.warning("Ignored unknown tag '%s'.", child.tagName)
 		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
 			meta = cls._merge_metadata(meta, rendering_parameters.injected_metadata)
+
 		if meta is not None:
 			variables = cls._parse_variables(meta.get("variables"), rendering_parameters = rendering_parameters)
+
 		else:
 			variables = { }
+
+		# Then format the metadata strings using the format variables
+		sub_vars = {
+			"v":	variables,
+		}
+		_log.trace("Substitution variables: %s", str(sub_vars))
+		try:
+			meta = JSONTools.recursive_format_substitution(meta, sub_vars)
+		except Exception as e:
+			raise MalformedFormatStringInputException(f"Unable to complete subsitution of metadata because of {e.__class__.__name__}: {str(e)}") from e
 		return cls(meta, content, sources, variables)
 
 	def _validate_metadata(self):

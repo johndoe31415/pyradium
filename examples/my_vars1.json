@@ -2,5 +2,6 @@
 	"foo": "variable foo",
 	"koo": {
 		"blah": 1234
-	}
+	},
+	"basedate":	"2023-01-01"
 }

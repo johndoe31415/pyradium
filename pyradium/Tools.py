@@ -23,7 +23,7 @@ import os
 import json
 import hashlib
 import subprocess
-from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException
+from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidFStringExpressionException
 
 class XMLTools():
 	@classmethod
@@ -263,6 +263,21 @@ class JSONTools():
 			else:
 				result[key] = value
 		return result
+
+	@classmethod
+	def recursive_format_substitution(cls, value, sub_environment: dict):
+		if isinstance(value, str):
+			expression = "f\"\"\"" + value + "\"\"\""
+			try:
+				return eval(expression, sub_environment)
+			except Exception as e:
+				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {str(e)}")
+		elif isinstance(value, list):
+			return [ cls.recursive_format_substitution(item, sub_environment) for item in value ]
+		elif isinstance(value, dict):
+			return { key: cls.recursive_format_substitution(item, sub_environment) for (key, item) in value.items() }
+		else:
+			return value
 
 class ImageTools():
 	@classmethod

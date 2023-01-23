@@ -29,6 +29,7 @@ class XMLFileNotFoundException(PyRadiumException): pass
 class JSONFileNotFoundException(PyRadiumException): pass
 class MalformedJSONInputException(PyRadiumException): pass
 class MalformedXMLInputException(PyRadiumException): pass
+class MalformedFormatStringInputException(PyRadiumException): pass
 class MalformedStyleConfigurationException(PyRadiumException): pass
 
 class SlideException(PyRadiumException): pass
@@ -44,6 +45,7 @@ class InvalidTransformationException(PyRadiumException): pass
 
 class DuplicateOrderException(PyRadiumException): pass
 class InvalidBooleanValueException(PyRadiumException): pass
+class InvalidFStringExpressionException(PyRadiumException): pass
 class InvalidValueNodeException(PyRadiumException): pass
 class FailedToLookupFileException(PyRadiumException): pass
 class InvalidTeXException(PyRadiumException): pass
