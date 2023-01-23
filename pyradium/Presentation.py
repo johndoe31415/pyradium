@@ -173,7 +173,7 @@ class Presentation():
 
 		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
 			# Inject metadata as last step
-			meta = JSONTools.merge_dicts(meta, rendering_parameters.injected_metadata)
+			variables = JSONTools.merge_dicts(variables, rendering_parameters.injected_metadata)
 
 		_log.trace("Presentation variables: %s", str(variables))
 
