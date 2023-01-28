@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -93,6 +93,9 @@ class Acrofile():
 		for (acronym, acro_data) in acronyms.items():
 			acrofile.add_entry(acronym, acro_data)
 		return acrofile
+
+	def __iter__(self):
+		yield from self._acronym_dict.items()
 
 if __name__ == "__main__":
 	af = Acrofile.load_from_file("/tmp/x.json")

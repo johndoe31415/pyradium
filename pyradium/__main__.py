@@ -30,6 +30,7 @@ from .ActionServe import ActionServe
 from .ActionAcroAdd import ActionAcroAdd
 from .ActionAcroScan import ActionAcroScan
 from .ActionAcroSort import ActionAcroSort
+from .ActionAcroTex import ActionAcroTex
 from .ActionPurge import ActionPurge
 from .ActionHashPresentation import ActionHashPresentation
 from .ActionDumpMetadata import ActionDumpMetadata
@@ -115,6 +116,11 @@ def main():
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("acrofile", help = "Acronym database JSON file.")
 	mc.register("acrosort", "Sort an acryonym database", genparser, action = ActionAcroSort, aliases = [ "asort" ])
+
+	def genparser(parser):
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("acrofile", help = "Acronym database JSON file.")
+	mc.register("acrotex", "Convert an acronym database to LaTeX format", genparser, action = ActionAcroTex)
 
 	def genparser(parser):
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
