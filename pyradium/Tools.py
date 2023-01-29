@@ -23,7 +23,7 @@ import os
 import json
 import hashlib
 import subprocess
-from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidFStringExpressionException
+from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidFStringExpressionException, InvalidEvalExpressionException
 
 class XMLTools():
 	@classmethod
@@ -240,6 +240,15 @@ class XMLTools():
 		else:
 			return cls.inner_text(node)
 
+class EvalTools():
+	@classmethod
+	def secure_eval(cls, expression: str, environment: dict):
+		if "__" in expression:
+			raise InvalidEvalExpressionException(f"Eval expression may not contain double underscore: {expression}")
+		environment = dict(environment)
+		environment["__builtins__"] = { }
+		return eval(expression, environment)
+
 class JSONTools():
 	@classmethod
 	def round_dict_floats(cls, obj, digits = 4):
@@ -267,9 +276,12 @@ class JSONTools():
 	@classmethod
 	def recursive_format_substitution(cls, value, sub_environment: dict):
 		if isinstance(value, str):
+			if "\"\"\"" in value:
+				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} may not contain triple quotes")
+
 			expression = "f\"\"\"" + value + "\"\"\""
 			try:
-				return eval(expression, sub_environment)
+				return EvalTools.secure_eval(expression, sub_environment)
 			except Exception as e:
 				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {type(e).__name__}: {str(e)}") from e
 		elif isinstance(value, list):
