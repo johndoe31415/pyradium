@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -24,7 +24,7 @@ import xml.dom.minidom
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
 from pyradium.CmdlineParser import CmdlineParser
-from pyradium.Exceptions import FailedToLookupFileException, MalformedXMLInputException
+from pyradium.Exceptions import FailedToLookupFileException, MalformedXMLInputException, SecurityViolationException
 from pyradium.CmdlineEscape import CmdlineEscape
 
 @XMLHookRegistry.register_hook
@@ -33,6 +33,9 @@ class ExecHook(BaseHook):
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
+		if not rendered_presentation.renderer.rendering_params.trustworthy_source:
+			raise SecurityViolationException("Presentation is rendered in non-trustworthy mode. This disables execution of s:exec hooks.")
+
 		if not node.hasAttribute("cmd"):
 			raise MalformedXMLInputException("An s:exec node must have a 'cmd' attribute.")
 

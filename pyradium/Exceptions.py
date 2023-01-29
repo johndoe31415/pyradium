@@ -60,6 +60,7 @@ class NoSuchVariableException(PyRadiumException): pass
 class CodeExecutionFailedException(PyRadiumException): pass
 class InvalidDateException(PyRadiumException): pass
 class InvalidEvalExpressionException(PyRadiumException): pass
+class SecurityViolationException(PyRadiumException): pass
 
 class AcronymException(PyRadiumException): pass
 class InvalidAcronymFileException(AcronymException): pass

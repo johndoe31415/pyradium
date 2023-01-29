@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -23,7 +23,7 @@ import os
 from .FileLookup import FileLookup
 
 class RenderingParameters():
-	def __init__(self, template_style = "default", template_style_opts = None, honor_pauses = True, collapse_animation = False, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None):
+	def __init__(self, template_style = "default", template_style_opts = None, honor_pauses = True, collapse_animation = False, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None, trustworthy_source = False):
 		self._template_style = template_style
 		self._template_style_opts = template_style_opts
 		if self._template_style_opts is None:
@@ -44,6 +44,7 @@ class RenderingParameters():
 		self._image_max_dimension = image_max_dimension
 		self._presentation_features = set(presentation_features) if (presentation_features is not None) else set()
 		self._injected_metadata = injected_metadata
+		self._trustworthy_source = trustworthy_source
 
 	@property
 	def template_style(self):
@@ -96,3 +97,7 @@ class RenderingParameters():
 	@property
 	def injected_metadata(self):
 		return self._injected_metadata
+
+	@property
+	def trustworthy_source(self):
+		return self._trustworthy_source

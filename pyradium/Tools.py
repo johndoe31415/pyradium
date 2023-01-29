@@ -276,7 +276,7 @@ class JSONTools():
 	@classmethod
 	def format_substitution(cls, fstring: str, sub_environment: dict):
 		if "\"\"\"" in fstring:
-			raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} may not contain triple quotes")
+			raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {fstring} may not contain triple quotes")
 		expression = "f\"\"\"" + fstring + "\"\"\""
 		try:
 			return EvalTools.secure_eval(expression, sub_environment)
