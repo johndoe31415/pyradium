@@ -5,7 +5,7 @@
 		<author>Jean-Luc Picard</author>
 		<fullauthor>Jean-Luc Picard, Retired Starfleet Admiral</fullauthor>
 		<affiliation>Starfleet</affiliation>
-		<date>{h.date_add(h.date_parse(v['basedate']), 7 * v['week']).strftime("%A, %Y-%m-%d")}</date>
+		<date>{h.date_strftime(h.date_add(h.date_parse(v['basedate']), 7 * v['week']), "%A, %Y-%m-%d")}</date>
 		<presentation-time>0:30</presentation-time>
 		<agenda>
 			14:00

@@ -41,3 +41,11 @@ class VariableSubstitutionHelper():
 	@classmethod
 	def date_add(cls, date, delta_days):
 		return date + datetime.timedelta(delta_days)
+
+	@classmethod
+	def date_strftime(cls, dt, format_string):
+		# We actually no not want isinstance() here, because we care
+		# specifically about class identity, not subclasses
+		if not dt.__class__ is datetime.datetime:
+			raise InvalidDateException(f"Unable to strftime: {dt} is not of class datetime.datetime")
+		return dt.strftime(format_string)

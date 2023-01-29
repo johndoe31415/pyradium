@@ -274,16 +274,19 @@ class JSONTools():
 		return result
 
 	@classmethod
+	def format_substitution(cls, fstring: str, sub_environment: dict):
+		if "\"\"\"" in fstring:
+			raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} may not contain triple quotes")
+		expression = "f\"\"\"" + fstring + "\"\"\""
+		try:
+			return EvalTools.secure_eval(expression, sub_environment)
+		except Exception as e:
+			raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {type(e).__name__}: {str(e)}") from e
+
+	@classmethod
 	def recursive_format_substitution(cls, value, sub_environment: dict):
 		if isinstance(value, str):
-			if "\"\"\"" in value:
-				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} may not contain triple quotes")
-
-			expression = "f\"\"\"" + value + "\"\"\""
-			try:
-				return EvalTools.secure_eval(expression, sub_environment)
-			except Exception as e:
-				raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {type(e).__name__}: {str(e)}") from e
+			return cls.format_substitution(value, sub_environment)
 		elif isinstance(value, list):
 			return [ cls.recursive_format_substitution(item, sub_environment) for item in value ]
 		elif isinstance(value, dict):
