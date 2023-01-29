@@ -19,85 +19,48 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import dataclasses
 import os
 from .FileLookup import FileLookup
 
+@dataclasses.dataclass()
 class RenderingParameters():
-	def __init__(self, template_style = "default", template_style_opts = None, honor_pauses = True, collapse_animation = False, extra_template_dirs = None, include_dirs = None, index_filename = "index.html", resource_uri = "", geometry = (1280, 720), image_max_dimension = 1920, presentation_features = None, injected_metadata = None, trustworthy_source = False):
-		self._template_style = template_style
-		self._template_style_opts = template_style_opts
-		if self._template_style_opts is None:
-			self._template_style_opts = [ ]
-		self._honor_pauses = honor_pauses
-		self._collapse_animation = collapse_animation
-		template_dirs = [ os.path.expanduser("~/.config/pyradium/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ]
-		if extra_template_dirs is not None:
-			template_dirs += extra_template_dirs
-		self._template_dirs = FileLookup(template_dirs)
-		if include_dirs is None:
-			self._include_dirs = FileLookup()
-		else:
-			self._include_dirs = FileLookup(include_dirs)
-		self._index_filename = index_filename
-		self._resource_uri = resource_uri
-		self._geometry = geometry
-		self._image_max_dimension = image_max_dimension
-		self._presentation_features = set(presentation_features) if (presentation_features is not None) else set()
-		self._injected_metadata = injected_metadata
-		self._trustworthy_source = trustworthy_source
-
-	@property
-	def template_style(self):
-		return self._template_style
-
-	@property
-	def template_style_opts(self):
-		return self._template_style_opts
-
-	@property
-	def honor_pauses(self):
-		return self._honor_pauses
-
-	@property
-	def collapse_animation(self):
-		return self._collapse_animation
-
-	@property
-	def template_dirs(self):
-		return self._template_dirs
-
-	@property
-	def include_dirs(self):
-		return self._include_dirs
-
-	@property
-	def index_filename(self):
-		return self._index_filename
-
-	@property
-	def resource_uri(self):
-		return self._resource_uri
+	template_style: str = "default"
+	template_style_opts: list[str] | None = None
+	honor_pauses: bool = True
+	collapse_animation: bool = False
+	template_dirs: list[str] | None = dataclasses.field(default = None, init = False)
+	extra_template_dirs: list[str] | None = None
+	include_dirs: list[str] | None = None
+	index_filename: str = "index.html"
+	resource_uri: str = ""
+	geometry: tuple = (1280, 720)
+	image_max_dimension: int = 1920
+	presentation_features: set | None = None
+	injected_metadata: dict | None = None
+	trustworthy_source: bool = False
 
 	@property
 	def geometry_x(self):
-		return self._geometry[0]
+		return self.geometry[0]
 
 	@property
 	def geometry_y(self):
-		return self._geometry[1]
+		return self.geometry[1]
 
-	@property
-	def image_max_dimension(self):
-		return self._image_max_dimension
+	def __post_init__(self):
+		# Initialize default values
+		if self.template_style_opts is None:
+			self.template_style_opts = [ ]
+		if self.extra_template_dirs is None:
+			self.extra_template_dirs = [ ]
+		if self.include_dirs is None:
+			self.include_dirs = [ ]
+		if self.presentation_features is None:
+			self.presentation_features = frozenset()
+		else:
+			self.presentation_features = frozenset(self.presentation_features)
 
-	@property
-	def presentation_features(self):
-		return iter(self._presentation_features)
-
-	@property
-	def injected_metadata(self):
-		return self._injected_metadata
-
-	@property
-	def trustworthy_source(self):
-		return self._trustworthy_source
+		# Compute non-settable variables and initialize wrappers
+		self.template_dirs = FileLookup([ os.path.expanduser("~/.config/pyradium/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ] + self.extra_template_dirs)
+		self.include_dirs = FileLookup(self.include_dirs)
