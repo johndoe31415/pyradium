@@ -34,9 +34,10 @@ class MultiCommand():
 	RegisteredCommand = collections.namedtuple("RegisteredCommand", [ "name", "description", "parsergenerator", "action", "aliases", "visible" ])
 	ParseResult = collections.namedtuple("ParseResults", [ "cmd", "args" ])
 
-	def __init__(self, description = None, trailing_text = None):
+	def __init__(self, description = None, trailing_text = None, run_method = False):
 		self._description = description
 		self._trailing_text = trailing_text
+		self._run_method = run_method
 		self._commands = { }
 		self._aliases = { }
 		self._cmdorder = [ ]
@@ -128,7 +129,10 @@ class MultiCommand():
 		parseresult = self.parse(cmdline, silent)
 		if parseresult.cmd.action is None:
 			raise Exception("Should run command '%s', but no action was registered." % (parseresult.cmd.name))
-		parseresult.cmd.action(parseresult.cmd.name, parseresult.args)
+		result = parseresult.cmd.action(parseresult.cmd.name, parseresult.args)
+		if self._run_method:
+			result = result.run()
+		return result
 
 if __name__ == "__main__":
 	mc = MultiCommand(description = "Run multiple export- and importthings")
@@ -153,4 +157,5 @@ if __name__ == "__main__":
 		parser.add_argument("--verbose", action = "count", default = 0, help = "Increase verbosity. Can be given multiple times.")
 	mc.register("export", "Export some file to somewhere", genparser, action = ExportAction)
 
-	mc.run(sys.argv[1:])
+	returncode = mc.run(sys.argv[1:])
+	sys.exit(returncode or 0)

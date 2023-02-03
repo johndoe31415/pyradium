@@ -57,7 +57,7 @@ def _resource_dir(text):
 
 def main():
 	gc = GlobalConfig.read()
-	mc = MultiCommand(description = "HTML presentation renderer", trailing_text = "version: pyradium v%s" % (pyradium.VERSION))
+	mc = MultiCommand(description = "HTML presentation renderer", trailing_text = "version: pyradium v%s" % (pyradium.VERSION), run_method = True)
 
 	def genparser(parser):
 		parser.add_argument("--image-max-dimension", metavar = "pixels", type = int, default = 1920, help = "When rendering imaages, specifies the maximum dimension they're downsized to. The lower this value, the smaller the output files and the lower the quality. Defaults to %(default)d pixels.")
@@ -175,4 +175,4 @@ def main():
 	return mc.run(sys.argv[1:])
 
 if __name__ == "__main__":
-	main()
+	sys.exit(main())

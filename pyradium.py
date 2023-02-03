@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -27,7 +27,6 @@ class BaseAction():
 		self._args = args
 		if hasattr(self._args, "verbose"):
 			logging.getLoggerClass().set_logging_by_verbosity(self._args.verbose)
-		self.run()
 
 	def run(self):
 		raise NotImplementedError("%s.run" % (self.__class__.__name__))
