@@ -112,7 +112,7 @@ class LatexFormulaRenderer(BaseRenderer):
 				raise ImageRenderingException(f"Rasterizing of PDF to PNG failed for TeX formula \"{property_dict['formula']}\" attempting to run: {CmdlineEscape().cmdline(cmd)}") from e
 
 			cmd = [ "convert", "-define", "profile:skip=ICC", "-trim", "+repage", gs_png_filename, png_filename ]
-			_log.trace("Cropping Ghostscript-rendered image: %s", self._rendering_dpi, CmdlineEscape().cmdline(cmd))
+			_log.trace("Cropping Ghostscript-rendered image: %s", CmdlineEscape().cmdline(cmd))
 			try:
 				subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
 			except subprocess.CalledProcessError as e:
