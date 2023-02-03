@@ -49,7 +49,7 @@ jobs:
         run: rm -fr pyradium-docs/*
 
       - name: Build the example presentation
-        run: ./pyradium.py render -f -I examples/sub examples/example.xml -R pyradium-docs/customfiles:customfiles/ pyradium-docs -vvv
+        run: ./pyradium.py render -f -I examples/sub examples/example.xml -R pyradium-docs/customfiles:customfiles/ pyradium-docs -vvv --trustworthy-source
 
       - name: Commit and push the updated documentation
         run: |
