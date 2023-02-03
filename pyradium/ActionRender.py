@@ -98,10 +98,10 @@ class ActionRender(BaseAction):
 			(resource_dir, resource_uri) = (self._args.outdir, "")
 
 		renderer = None
-		render_success = True
 		while True:
 			force_wait_secs = None
 			try:
+				render_success = False
 				t0 = time.time()
 				rendering_parameters = RenderingParameters(
 						template_style = self._args.template_style,
@@ -122,15 +122,14 @@ class ActionRender(BaseAction):
 				rendered_presentation = renderer.render(resource_directory = resource_dir, deploy_directory = self._args.outdir)
 				t1 = time.time()
 				_log.info("Successfully rendered presentation into directory \"%s\", took %.1f seconds", self._args.outdir, t1 - t0)
+				render_success = True
 			except XMLFileNotFoundException as e:
 				# This can happen when we save an XML file in VIM and inotify
 				# notifies pyradium too quickly (while the file is still not
 				# existent). Then we want to re-render quickly to remedy the issue.
-				render_success = False
 				_log.error("Rendering failed: [%s] %s", e.__class__.__name__, str(e))
 				force_wait_secs = 1
 			except PyRadiumException as e:
-				render_success = False
 				_log.error("Rendering failed: [%s] %s", e.__class__.__name__, str(e))
 				if _log.isEnabledFor(logging.DEBUG):
 					print(traceback.format_exc())
