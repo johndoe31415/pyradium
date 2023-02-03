@@ -26,6 +26,9 @@ jobs:
           pip install -r pyradium.egg-info/requires.txt
           pip install pylint
 
+      - name: Update apt repository list
+        run: sudo apt-get update
+
       - name: Install Linux dependencies
         run: sudo apt-get install texlive texlive-latex-extra ghostscript imagemagick inkscape gnuplot inotify-tools graphviz
 
