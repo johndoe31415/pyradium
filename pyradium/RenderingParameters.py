@@ -21,6 +21,7 @@
 
 import dataclasses
 import os
+from pyradium.svg import SVGValidator, SVGValidatorErrorClass
 from .FileLookup import FileLookup
 
 @dataclasses.dataclass()
@@ -39,6 +40,8 @@ class RenderingParameters():
 	presentation_features: set | None = None
 	injected_metadata: dict | None = None
 	trustworthy_source: bool = False
+	allow_missing_svg_fonts: bool = False
+	svg_validator: None = dataclasses.field(default = None, init = False)
 
 	@property
 	def geometry_x(self):
@@ -64,3 +67,9 @@ class RenderingParameters():
 		# Compute non-settable variables and initialize wrappers
 		self.template_dirs = FileLookup([ os.path.expanduser("~/.config/pyradium/templates"), os.path.dirname(os.path.realpath(__file__)) + "/templates" ] + self.extra_template_dirs)
 		self.include_dirs = FileLookup(self.include_dirs)
+
+		# Initialize SVG validator
+		if self.allow_missing_svg_fonts:
+			self.svg_validator = SVGValidator(check_missing_fonts = SVGValidatorErrorClass.EmitWarning)
+		else:
+			self.svg_validator = SVGValidator(check_missing_fonts = SVGValidatorErrorClass.ThrowException)

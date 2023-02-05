@@ -76,6 +76,7 @@ def main():
 		parser.add_argument("-l", "--re-render-loop", action = "store_true", help = "Stay in a continuous loop, re-rendering the presentation if anything changes.")
 		parser.add_argument("--re-render-watch", metavar = "path", action = "append", default = [ ], help = "By default, all include files and the template directory is being watched for changes. This option gives additional files or directories upon change of which the presentation should be re-rendered.")
 		parser.add_argument("--trustworthy-source", action = "store_true", help = "By default, the presentation source code is considered not trustworthy and therefore primitives which allow remote code execution (like s:exec) are disabled by default. If you know that the source of your presentation is trustworthy and want to allow it to execute arbitrary code, then specify this parameter.")
+		parser.add_argument("--allow-missing-svg-fonts", action = "store_true", help = "If a font is not present on the local system, pyradium aborts instead of rendering an SVG with replaced fonts. This option allows to render the presentation anyways.")
 		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity. Can be specified more than once.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")

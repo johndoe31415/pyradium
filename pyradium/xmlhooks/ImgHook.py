@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -70,7 +70,10 @@ class ImgHook(BaseHook):
 			"max_dimension":	rendered_presentation.renderer.rendering_params.image_max_dimension,
 		}
 		if node.hasAttribute("src"):
-			properties["src"] = rendered_presentation.renderer.lookup_include(node.getAttribute("src"))
+			filename = rendered_presentation.renderer.lookup_include(node.getAttribute("src"))
+			properties["src"] = filename
+			if filename.lower().endswith(".svg"):
+				rendered_presentation.renderer.rendering_params.svg_validator.validate(filename)
 		else:
 			# Literal specification as value
 			properties["value"] = node.getAttribute("value").encode("utf-8")

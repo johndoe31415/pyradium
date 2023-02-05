@@ -21,4 +21,4 @@
 from .SVGStyle import SVGStyle
 from .SVGTransformation import SVGTransformation
 from .SVGWriter import SVGWriter
-from .SVGValidator import SVGValidator
+from .SVGValidator import SVGValidator, SVGValidatorErrorClass

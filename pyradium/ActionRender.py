@@ -116,7 +116,8 @@ class ActionRender(BaseAction):
 						image_max_dimension = self._args.image_max_dimension,
 						presentation_features = presentation_features,
 						injected_metadata = injected_metadata,
-						trustworthy_source = self._args.trustworthy_source)
+						trustworthy_source = self._args.trustworthy_source,
+						allow_missing_svg_fonts = self._args.allow_missing_svg_fonts)
 				presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 				renderer = Renderer(presentation, rendering_parameters)
 				rendered_presentation = renderer.render(resource_directory = resource_dir, deploy_directory = self._args.outdir)
