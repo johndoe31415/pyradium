@@ -29,7 +29,7 @@ from pyradium.Agenda import Agenda
 from .Tools import XMLTools, JSONTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
-from .VariableSubstitutionHelper import VariableSubstitutionHelper
+from .VariableSubstitutionHelper import DateTimeWrapper
 from .Acronyms import AcronymDirective
 from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException, MalformedFormatStringInputException
 
@@ -126,8 +126,8 @@ class Presentation():
 	@classmethod
 	def _substitute_variables(cls, target, variables):
 		sub_vars = {
-			"v":	variables,
-			"h":	VariableSubstitutionHelper,
+			"v":		variables,
+			"datetm":	DateTimeWrapper,
 		}
 		try:
 			target = JSONTools.recursive_format_substitution(target, sub_vars)

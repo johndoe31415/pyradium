@@ -22,30 +22,32 @@
 import datetime
 from .Exceptions import InvalidDateException
 
-class VariableSubstitutionHelper():
-	_ATTEMPT_PARSE_STRINGS = [
+class DateTimeWrapper():
+	_DEFAULT_PARSE_STRINGS = [
 		"%Y-%m-%d",
 		"%m/%d/%Y",
 		"%d.%m.%Y",
 	]
 
+	def __init__(self, dt):
+		self._dt = dt
+
 	@classmethod
-	def date_parse(cls, datespec):
-		for parse_string in cls._ATTEMPT_PARSE_STRINGS:
+	def parse(cls, datespec: str, parse_string: str | None = None):
+		if parse_string is None:
+			parse_strings = cls._DEFAULT_PARSE_STRINGS
+		else:
+			parse_strings = [ parse_string ]
+
+		for parse_string in parse_strings:
 			try:
-				return datetime.datetime.strptime(datespec, parse_string)
+				return cls(datetime.datetime.strptime(datespec, parse_string))
 			except ValueError:
 				pass
 		raise InvalidDateException(f"Unable to parse datespec: {datespec}")
 
-	@classmethod
-	def date_add(cls, date, delta_days):
-		return date + datetime.timedelta(delta_days)
+	def add_days(self, delta_days):
+		return DateTimeWrapper(self._dt + datetime.timedelta(delta_days))
 
-	@classmethod
-	def date_strftime(cls, dt, format_string):
-		# We actually no not want isinstance() here, because we care
-		# specifically about class identity, not subclasses
-		if not dt.__class__ is datetime.datetime:
-			raise InvalidDateException(f"Unable to strftime: {dt} is not of class datetime.datetime")
-		return dt.strftime(format_string)
+	def strftime(self, fmt):
+		return self._dt.strftime(fmt)
