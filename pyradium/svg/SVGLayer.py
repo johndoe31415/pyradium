@@ -18,7 +18,7 @@
 #	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-from .StyleDict import StyleDict
+from .SVGStyle import SVGStyle
 
 class SVGLayer():
 	def __init__(self, group_node):
@@ -34,10 +34,10 @@ class SVGLayer():
 
 	@property
 	def is_visible(self):
-		return StyleDict.from_node(self._node).is_visible
+		return SVGStyle.from_node(self._node).is_visible
 
 	def modify_style(self, callback):
-		style = StyleDict.from_node(self._node)
+		style = SVGStyle.from_node(self._node)
 		callback(style)
 		style.sync_to_node()
 

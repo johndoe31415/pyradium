@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-class StyleDict():
+class SVGStyle():
 	def __init__(self, style_dict: dict | None = None, auto_sync: bool = False, node = None):
 		assert((style_dict is None) or isinstance(style_dict, dict))
 		self._style = style_dict if (style_dict is not None) else { }
@@ -125,4 +125,4 @@ class StyleDict():
 		return self._style.get(key)
 
 	def __str__(self):
-		return f"StyleDict<{self._style}>"
+		return f"SVGStyle<{self._style}>"

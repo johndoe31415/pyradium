@@ -21,7 +21,7 @@
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.svg import StyleDict
+from pyradium.svg import SVGStyle
 
 @XMLHookRegistry.register_hook
 class TexHook(BaseHook):
@@ -55,7 +55,7 @@ class TexHook(BaseHook):
 		img_node.setAttribute("src", uri)
 		img_node.setAttribute("alt", properties["formula"])
 
-		img_style = StyleDict.from_node(img_node)
+		img_style = SVGStyle.from_node(img_node)
 		img_style["width"] = f"{width_px}px"
 		img_style["margin-top"] = "5px"
 		if not properties["long"]:

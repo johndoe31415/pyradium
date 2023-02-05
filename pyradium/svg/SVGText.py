@@ -19,7 +19,7 @@
 #
 
 from pyradium.Tools import XMLTools
-from .StyleDict import StyleDict
+from .SVGStyle import SVGStyle
 
 class SVGText():
 	def __init__(self, text_node):
@@ -36,8 +36,8 @@ class SVGText():
 			self._tspan_node = self._node.appendChild(self._node.ownerDocument.createElement("tspan"))
 		if self._textdata_node is None:
 			self._textdata_node = self._tspan_node.appendChild(self._node.ownerDocument.createTextNode(""))
-		self._style = StyleDict.from_node(self._node, auto_sync = True).default_text()
-		self._tspan_style = StyleDict.from_node(self._tspan_node, auto_sync = True)
+		self._style = SVGStyle.from_node(self._node, auto_sync = True).default_text()
+		self._tspan_style = SVGStyle.from_node(self._tspan_node, auto_sync = True)
 
 	@property
 	def text(self):

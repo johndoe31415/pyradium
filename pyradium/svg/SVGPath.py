@@ -20,13 +20,13 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import contextlib
-from .StyleDict import StyleDict
+from .SVGStyle import SVGStyle
 from .Vector2D import Vector2D
 
 class SVGPath():
 	def __init__(self, path_node):
 		self._node = path_node
-		self._style = StyleDict.from_node(self._node, auto_sync = True).default_path()
+		self._style = SVGStyle.from_node(self._node, auto_sync = True).default_path()
 		self._cmds = [ ]
 		self._pos = Vector2D()
 
