@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -21,7 +21,7 @@
 
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.StyleDict import StyleDict
+from pyradium.svg import StyleDict
 
 @XMLHookRegistry.register_hook
 class TexHook(BaseHook):
@@ -55,7 +55,7 @@ class TexHook(BaseHook):
 		img_node.setAttribute("src", uri)
 		img_node.setAttribute("alt", properties["formula"])
 
-		img_style = StyleDict()
+		img_style = StyleDict.from_node(img_node)
 		img_style["width"] = f"{width_px}px"
 		img_style["margin-top"] = "5px"
 		if not properties["long"]:
@@ -64,7 +64,7 @@ class TexHook(BaseHook):
 			indent = float(node.getAttribute("indent"))
 			indent_px = round(indent * 50)
 			img_style["margin-left"] = f"{indent_px}px"
-		img_style.to_node(img_node)
+		img_style.sync_to_node()
 
 		if not wrap_in_div:
 			replacement_node = img_node

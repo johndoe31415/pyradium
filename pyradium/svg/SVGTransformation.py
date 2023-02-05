@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -20,40 +20,9 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import xml.dom.minidom
-from .Tools import XMLTools
-from .Exceptions import InvalidTransformationException
-from .StyleDict import StyleDict
-
-class SVGLayer():
-	def __init__(self, group_node):
-		self._node = group_node
-
-	@property
-	def label(self):
-		return self._node.getAttribute("inkscape:label")
-
-	@property
-	def layer_id(self):
-		return self._node.getAttribute("id")
-
-	@property
-	def is_visible(self):
-		return StyleDict.from_node(self._node).is_visible
-
-	def modify_style(self, callback):
-		style = StyleDict.from_node(self._node)
-		callback(style)
-		style.to_node(self._node)
-
-	def hide(self):
-		def _callback(style):
-			style["display"] = "none"
-		self.modify_style(_callback)
-
-	def show(self):
-		def _callback(style):
-			style["display"] = "inline"
-		self.modify_style(_callback)
+from pyradium.Tools import XMLTools
+from pyradium.Exceptions import InvalidTransformationException
+from .SVGLayer import SVGLayer
 
 class SVGTransformation():
 	def __init__(self, svg_filename):

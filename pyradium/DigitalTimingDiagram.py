@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -22,7 +22,7 @@
 import enum
 import collections
 import dataclasses
-from pyradium.SVGWriter import SVGWriter
+from pyradium.svg import SVGWriter
 
 class DigitalTimingType(enum.Enum):
 	Low = "0"

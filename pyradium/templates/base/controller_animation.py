@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2022 Johannes Bauer
+#	Copyright (C) 2021-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -22,7 +22,7 @@
 import logging
 from pyradium.Controller import BaseController
 from pyradium.Exceptions import UsageException, MalformedXMLInputException
-from pyradium.SVGTransformation import SVGTransformation
+from pyradium.svg import SVGTransformation
 
 _log = logging.getLogger(__spec__.name)
 

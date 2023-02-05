@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -27,7 +27,7 @@ import subprocess
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
 from pyradium.Exceptions import UsageException, ImageRenderingException
-from pyradium.SVGTransformation import SVGTransformation
+from pyradium.svg import SVGTransformation
 from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
