@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -36,7 +36,6 @@ class DigitalTimingDiagramRenderer(BaseRenderer):
 
 	def render(self, property_dict):
 		# Render to SVG first
-
 		constructor_args_names = [ "xdiv", "height", "vertical_distance", "marker_extend", "clock_ticks" ]
 		constructor_args = { }
 		for arg_name in constructor_args:

@@ -393,6 +393,11 @@
 		</ul>
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="QR code rendering"/>
+		<s:qrcode>https://www.johannes-bauer.com</s:qrcode>
+	</slide>
+
 	<slide type="final">
 		<s:time rel="0"/>
 	</slide>

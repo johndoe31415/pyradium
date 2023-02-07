@@ -19,11 +19,25 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import subprocess
 from .BaseRenderer import BaseRenderer
-from .ExecRenderer import ExecRenderer
-from .GraphvizRenderer import GraphvizRenderer
-from .ImageRenderer import ImageRenderer
-from .LatexFormulaRenderer import LatexFormulaRenderer
-from .PlotRenderer import PlotRenderer
-from .DigitalTimingDiagramRenderer import DigitalTimingDiagramRenderer
-from .QRCodeRenderer import QRCodeRenderer
+
+@BaseRenderer.register
+class QRCodeRenderer(BaseRenderer):
+	_NAME = "qrcode"
+
+	@property
+	def properties(self):
+		return {
+			"version":			1,
+		}
+
+	def render(self, property_dict):
+		# Render QR-Code to SVG
+		cmd = [ "qrencode", "-tsvg", "-m0", property_dict["data"] ]
+		svg_data = subprocess.check_output(cmd)
+
+		result = {
+			"svg":		svg_data,
+		}
+		return result

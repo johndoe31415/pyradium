@@ -19,11 +19,25 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from .BaseRenderer import BaseRenderer
-from .ExecRenderer import ExecRenderer
-from .GraphvizRenderer import GraphvizRenderer
-from .ImageRenderer import ImageRenderer
-from .LatexFormulaRenderer import LatexFormulaRenderer
-from .PlotRenderer import PlotRenderer
-from .DigitalTimingDiagramRenderer import DigitalTimingDiagramRenderer
-from .QRCodeRenderer import QRCodeRenderer
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.Tools import XMLTools
+
+@XMLHookRegistry.register_hook
+class QRCodeHook(BaseHook):
+	_TAG_NAME = "qrcode"
+
+	@classmethod
+	def handle(cls, rendered_presentation, node):
+		# Text to render
+		text = XMLTools.inner_text(node)
+
+		# Render QR-code to SVG
+		qrcode_renderer = rendered_presentation.renderer.get_custom_renderer("qrcode")
+		qrcode_svg = qrcode_renderer.render({
+			"data": text,
+		})
+
+		replacement_node = node.ownerDocument.createElement("s:img")
+		replacement_node.setAttribute("value", qrcode_svg.data["svg"].decode())
+		replacement_node.setAttribute("filetype", "svg")
+		return replacement_node

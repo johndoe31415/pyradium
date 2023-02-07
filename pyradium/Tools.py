@@ -22,6 +22,7 @@
 import os
 import json
 import hashlib
+import tempfile
 import subprocess
 from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidEvalExpressionException
 
@@ -271,6 +272,15 @@ class ImageTools():
 	def svg_canvas_size_to_object(cls, filename):
 		cmd = [ "inkscape", "-g", "--verb=FitCanvasToDrawing;FileSave;FileQuit", filename ]
 		subprocess.check_call(cmd)
+
+	@classmethod
+	def svg_data_canvas_size_to_object(cls, svg_data):
+		with tempfile.NamedTemporaryFile(prefix = "pyradium_svg_", suffix = ".svg") as f:
+			f.write(svg_data)
+			f.flush()
+			cls.svg_canvas_size_to_object(f.name)
+			f.seek(0)
+			return f.read()
 
 class HashTools():
 	_HASHFNC = hashlib.md5
