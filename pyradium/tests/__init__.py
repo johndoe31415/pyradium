@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -24,3 +24,4 @@ from .CmdlineParserTests import CmdlineParserTests
 from .AgendaTests import AgendaTests
 from .BooleanExpressionTests import BooleanExpressionTests
 from .RendererTests import RendererTests
+from .VariableSubstitutionTests import VariableSubstitutionTests

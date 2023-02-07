@@ -26,12 +26,12 @@ import logging
 import xml.dom.minidom
 import pyradium
 from pyradium.Agenda import Agenda
-from .Tools import XMLTools, JSONTools
+from .Tools import XMLTools
 from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
-from .VariableSubstitutionHelper import DateTimeWrapper
+from .VariableSubstitution import VariableSubstitutionContainer
 from .Acronyms import AcronymDirective
-from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException, MalformedFormatStringInputException
+from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException
 
 _log = logging.getLogger(__spec__.name)
 
@@ -120,20 +120,8 @@ class Presentation():
 					continue
 			else:
 				variable = cls._parse_variable_from_literal_data(XMLTools.inner_text(variable_node))
-			variables = JSONTools.merge_dicts(variables, variable)
+			variables = VariableSubstitutionContainer.merge_dicts(variables, variable)
 		return variables
-
-	@classmethod
-	def _substitute_variables(cls, target, variables):
-		sub_vars = {
-			"v":		variables,
-			"datetm":	DateTimeWrapper,
-		}
-		try:
-			target = JSONTools.recursive_format_substitution(target, sub_vars)
-		except Exception as e:
-			raise MalformedFormatStringInputException(f"Unable to complete subsitution of target because of {e.__class__.__name__}: {str(e)}") from e
-		return target
 
 	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
@@ -149,7 +137,7 @@ class Presentation():
 			if child.tagName == "meta":
 				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")), multikeys = [ "variables" ])
 			elif child.tagName == "variables":
-				variables = JSONTools.merge_dicts(variables, cls._parse_variables(child, rendering_parameters))
+				variables = VariableSubstitutionContainer.merge_dicts(variables, cls._parse_variables(child, rendering_parameters))
 			elif child.tagName == "slide":
 				if not XMLTools.get_bool_attr(child, "hide"):
 					content.append(RenderSlideDirective(child))
@@ -173,12 +161,15 @@ class Presentation():
 
 		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
 			# Inject metadata as last step
-			variables = JSONTools.merge_dicts(variables, rendering_parameters.injected_metadata)
+			variables = VariableSubstitutionContainer.merge_dicts(variables, rendering_parameters.injected_metadata)
 
 		_log.trace("Presentation variables: %s", str(variables))
 
 		# Then format the metadata strings using the format variables
-		meta = cls._substitute_variables(meta, variables)
+		if meta is not None:
+			environment = VariableSubstitutionContainer.default_environment()
+			environment["v"] = variables
+			meta = VariableSubstitutionContainer(meta, environment = environment, self_varname = "m").evaluate_all()
 		return cls(meta, content, sources, variables)
 
 	def _validate_metadata(self):

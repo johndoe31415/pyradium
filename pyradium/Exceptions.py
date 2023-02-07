@@ -47,6 +47,7 @@ class SVGValidationError(PyRadiumException): pass
 class DuplicateOrderException(PyRadiumException): pass
 class InvalidBooleanValueException(PyRadiumException): pass
 class InvalidFStringExpressionException(PyRadiumException): pass
+class InfiniteRecusionVariableSubstitution(PyRadiumException): pass
 class InvalidValueNodeException(PyRadiumException): pass
 class FailedToLookupFileException(PyRadiumException): pass
 class InvalidTeXException(PyRadiumException): pass

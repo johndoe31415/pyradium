@@ -23,7 +23,7 @@ import os
 import json
 import hashlib
 import subprocess
-from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidFStringExpressionException, InvalidEvalExpressionException
+from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidEvalExpressionException
 
 class XMLTools():
 	@classmethod
@@ -260,39 +260,6 @@ class JSONTools():
 			return { key: cls.round_dict_floats(value, digits = digits) for (key, value) in obj.items() }
 		else:
 			return obj
-
-	@classmethod
-	def merge_dicts(cls, obj1, obj2):
-		assert(isinstance(obj1, dict))
-		assert(isinstance(obj2, dict))
-		result = obj1
-		for (key, value) in obj2.items():
-			if (key in result) and isinstance(result[key], dict) and isinstance(value, dict):
-				result[key] = cls.merge_dicts(result[key], value)
-			else:
-				result[key] = value
-		return result
-
-	@classmethod
-	def format_substitution(cls, fstring: str, sub_environment: dict):
-		if "\"\"\"" in fstring:
-			raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {fstring} may not contain triple quotes")
-		expression = "f\"\"\"" + fstring + "\"\"\""
-		try:
-			return EvalTools.secure_eval(expression, sub_environment)
-		except Exception as e:
-			raise InvalidFStringExpressionException(f"Unable to evaluate as f-string: {expression} -- {type(e).__name__}: {str(e)}") from e
-
-	@classmethod
-	def recursive_format_substitution(cls, value, sub_environment: dict):
-		if isinstance(value, str):
-			return cls.format_substitution(value, sub_environment)
-		elif isinstance(value, list):
-			return [ cls.recursive_format_substitution(item, sub_environment) for item in value ]
-		elif isinstance(value, dict):
-			return { key: cls.recursive_format_substitution(item, sub_environment) for (key, item) in value.items() }
-		else:
-			return value
 
 class ImageTools():
 	@classmethod
