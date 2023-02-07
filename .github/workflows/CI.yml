@@ -30,7 +30,7 @@ jobs:
         run: sudo apt-get update
 
       - name: Install Linux dependencies
-        run: sudo apt-get install texlive texlive-latex-extra ghostscript imagemagick inkscape gnuplot inotify-tools graphviz fontconfig
+        run: sudo apt-get install texlive texlive-latex-extra ghostscript imagemagick inkscape gnuplot inotify-tools graphviz fontconfig qrencode
 
       - name: Run all testcases
         run: python3 -m unittest pyradium.tests
