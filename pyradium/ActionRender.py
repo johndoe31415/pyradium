@@ -30,8 +30,9 @@ from .BaseAction import BaseAction
 from .Presentation import Presentation
 from .RenderingParameters import RenderingParameters
 from .Renderer import Renderer
-from .Exceptions import XMLFileNotFoundException, CallingProcessException, PyRadiumException
+from .Exceptions import XMLFileNotFoundException, CallingProcessException, PyRadiumException, DeploymentException
 from .Enums import PresentationFeature
+from .Deployment import Deployment
 
 _log = logging.getLogger(__spec__.name)
 
@@ -123,6 +124,16 @@ class ActionRender(BaseAction):
 				rendered_presentation = renderer.render(resource_directory = resource_dir, deploy_directory = self._args.outdir)
 				t1 = time.time()
 				_log.info("Successfully rendered presentation into directory \"%s\", took %.1f seconds", self._args.outdir, t1 - t0)
+
+				if self._args.deploy_presentation:
+					if "deployment" not in presentation.variables:
+						raise DeploymentException("Deployment requested, but no deployment configuration available.")
+				deployment = Deployment(deployment_configuration = presentation.variables["deployment"], presentation_directory = self._args.outdir)
+				if len(self._args.deployment_name) == 0:
+					deployment.deploy("default")
+				else:
+					for configuration_name in self._args.deployment_name:
+						deployment.deploy(configuration_name)
 				render_success = True
 			except XMLFileNotFoundException as e:
 				# This can happen when we save an XML file in VIM and inotify

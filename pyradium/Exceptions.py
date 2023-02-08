@@ -31,6 +31,7 @@ class MalformedJSONInputException(PyRadiumException): pass
 class MalformedXMLInputException(PyRadiumException): pass
 class MalformedFormatStringInputException(PyRadiumException): pass
 class MalformedStyleConfigurationException(PyRadiumException): pass
+class DeploymentException(PyRadiumException): pass
 
 class SlideException(PyRadiumException): pass
 class UndefinedContentException(SlideException): pass
