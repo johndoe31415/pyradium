@@ -162,6 +162,7 @@ class Presentation():
 		if (rendering_parameters is not None) and (rendering_parameters.injected_metadata is not None):
 			# Inject metadata as last step
 			variables = VariableSubstitutionContainer.merge_dicts(variables, rendering_parameters.injected_metadata)
+		variables = VariableSubstitutionContainer(variables, environment = VariableSubstitutionContainer.default_environment())
 
 		_log.trace("Presentation variables: %s", str(variables))
 
