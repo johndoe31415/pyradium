@@ -105,13 +105,9 @@ class VariableSubstitutionContainer():
 			return value
 
 		if isinstance(self._content, dict):
-			result = { }
-			for key in self._content:
-				result[key] = _evaluate_if_possible(self[key])
+			result = { key: _evaluate_if_possible(value) for (key, value) in self.items() }
 		elif isinstance(self._content, list):
-			result = [ ]
-			for key in range(len(self._content)):
-				result.append(_evaluate_if_possible(self[key]))
+			result = list(self)
 		else:
 			raise NotImplementedError(type(self._content))
 		return result
@@ -134,6 +130,24 @@ class VariableSubstitutionContainer():
 		else:
 			return element
 
+	def __contains__(self, element):
+		return element in self._content
+
 	def __getitem__(self, key):
 		element = self._content[key]
 		return self._evaluate(key, element)
+
+	def items(self):
+		assert(isinstance(self._content, dict))
+		for key in self._content:
+			yield (key, self[key])
+
+	def __iter__(self):
+		if isinstance(self._content, dict):
+			yield from self._content
+		elif isinstance(self._content, list):
+			result = [ ]
+			for key in range(len(self._content)):
+				yield self[key]
+		else:
+			raise NotImplementedError(type(self._content))
