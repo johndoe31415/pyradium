@@ -128,12 +128,12 @@ class ActionRender(BaseAction):
 				if self._args.deploy_presentation:
 					if "deployment" not in presentation.variables:
 						raise DeploymentException("Deployment requested, but no deployment configuration available.")
-				deployment = Deployment(deployment_configuration = presentation.variables["deployment"], presentation_directory = self._args.outdir)
-				if len(self._args.deployment_name) == 0:
-					deployment.deploy("default")
-				else:
-					for configuration_name in self._args.deployment_name:
-						deployment.deploy(configuration_name)
+					deployment = Deployment(deployment_configuration = presentation.variables["deployment"], presentation_directory = self._args.outdir)
+					if len(self._args.deployment_name) == 0:
+						deployment.deploy("default")
+					else:
+						for configuration_name in self._args.deployment_name:
+							deployment.deploy(configuration_name)
 				render_success = True
 			except XMLFileNotFoundException as e:
 				# This can happen when we save an XML file in VIM and inotify
