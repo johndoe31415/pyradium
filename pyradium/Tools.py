@@ -20,9 +20,11 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import os
+import sys
 import json
 import hashlib
 import tempfile
+import contextlib
 import subprocess
 from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidEvalExpressionException
 
@@ -323,3 +325,12 @@ class FileTools():
 				rndname = f"{dirname}/.{basename}_{os.urandom(8).hex()}"
 			if not os.path.exists(rndname):
 				return rndname
+
+	@classmethod
+	@contextlib.contextmanager
+	def open_write_stdout(cls, filename):
+		if filename == "-":
+			yield sys.stdout
+		else:
+			with open(filename, "w") as f:
+				yield f

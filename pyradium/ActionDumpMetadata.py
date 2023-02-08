@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -25,6 +25,7 @@ import logging
 from .BaseAction import BaseAction
 from .RenderingParameters import RenderingParameters
 from .Presentation import Presentation
+from .Tools import FileTools
 
 _log = logging.getLogger(__spec__.name)
 
@@ -42,7 +43,14 @@ class ActionDumpMetadata(BaseAction):
 				injected_metadata = injected_metadata)
 		presentation = Presentation.load_from_file(self._args.infile, rendering_parameters)
 
-		if self._args.pretty_print:
-			print(json.dumps(presentation.meta, indent = 4, sort_keys = True))
-		else:
-			print(json.dumps(presentation.meta, separators = (",", ":")))
+		dump_data = {
+			"vars": presentation.variables.evaluate_all(),
+			"meta": presentation.meta,
+		}
+
+		with FileTools.open_write_stdout(self._args.outfile) as f:
+			if self._args.pretty_print:
+				json.dump(dump_data, f, indent = 4, sort_keys = True)
+			else:
+				json.dump(dump_data, f, separators = (",", ":"))
+			print(file = f)

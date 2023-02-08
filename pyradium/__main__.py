@@ -139,7 +139,8 @@ def main():
 	def genparser(parser):
 		parser.add_argument("-p", "--pretty-print", action = "store_true", help = "Pretty print the output JSON data.")
 		parser.add_argument("-I", "--include-dir", metavar = "path", action = "append", default = [ ], help = "Specifies an additional include directory in which, for example, images are located which are referenced from the presentation. Can be issued multiple times.")
-		parser.add_argument("-j", "--inject-metadata", metavar = "filename", help = "Gives the option to inject metadata into the presentation. Must point to a JSON filename and will override the respective metadata fields of the presentation. Useful for changing things like the presentation date on the command line.")
+		parser.add_argument("-j", "--inject-metadata", metavar = "filename", help = "Gives the option to inject variables into the presentation variable data. Must point to a JSON filename and will override the respective metadata fields of the presentation. Useful for changing things like the presentation date on the command line.")
+		parser.add_argument("-o", "--outfile", metavar = "filename", default = "-", help = "Write JSON data to this file. May be '-' to write to stdout. Defaults to %(default)s.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")
 	mc.register("dumpmeta", "Dump the metadata dictionary in JSON format", genparser, action = ActionDumpMetadata)
