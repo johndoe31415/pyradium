@@ -107,7 +107,7 @@ class VariableSubstitutionContainer():
 		if isinstance(self._content, dict):
 			result = { key: _evaluate_if_possible(value) for (key, value) in self.items() }
 		elif isinstance(self._content, list):
-			result = list(self)
+			result = [ _evaluate_if_possible(item) for item in self ]
 		else:
 			raise NotImplementedError(type(self._content))
 		return result
