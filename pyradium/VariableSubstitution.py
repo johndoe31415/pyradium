@@ -137,6 +137,11 @@ class VariableSubstitutionContainer():
 		element = self._content[key]
 		return self._evaluate(key, element)
 
+	def get(self, key, default_value = None):
+		if key not in self._content:
+			return default_value
+		return self[key]
+
 	def items(self):
 		assert(isinstance(self._content, dict))
 		for key in self._content:
