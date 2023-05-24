@@ -48,7 +48,20 @@ class Deployment():
 			else:
 				redirect = "/not_available_yet.html"
 			with open(self._presentation_directory + "/.htaccess", "w") as f:
+				if "access_key" in target_config:
+					print(f"# If access key is set in query string, set the access_key cookie", file = f)
+					print(f"RewriteCond %{{QUERY_STRING}} ^{target_config['access_key']}$", file = f)
+					print(f"RewriteRule ^ - [CO=access_key:{target_config['access_key']}:%{{HTTP_HOST}}] [L]", file = f)
+					print(file = f)
+
+				if "access_key" not in target_config:
+					print(f"# If too soon, redirect to 'not available' page", file = f)
+				else:
+					print(f"# If too soon, access_key query string is not set and access_key cookie is not set, redirect to 'not available' page", file = f)
 				print(f"RewriteCond %{{TIME}} <{ts.strftime('%Y%m%d%H%M%S')}", file = f)
+				if "access_key" in target_config:
+					print(f"RewriteCond %{{QUERY_STRING}} !^{target_config['access_key']}$", file = f)
+					print(f"RewriteCond %{{HTTP_COOKIE}} !access_key={target_config['access_key']}", file = f)
 				print(f"RewriteRule ^ {redirect} [R=307]", file = f)
 
 		cmd = [ "rsync", "-a", "--mkpath", "--delete", "--chmod=D755,F644", self._presentation_directory + "/", target_config["remote_target"] ]
