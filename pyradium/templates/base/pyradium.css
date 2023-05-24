@@ -166,3 +166,8 @@ tr.fat-border-bottom th, tr.fat-border-bottom td {
 th.border-right, td.border-right {
 	border-right: 1px solid #ddd;
 }
+
+/* In presentation mode, make links not clickable */
+.fullscreen a {
+	pointer-events: none;
+}
