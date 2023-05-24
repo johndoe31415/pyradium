@@ -124,9 +124,12 @@ class DigitalTimingDiagram():
 		text_width = 50
 		svg_text = self._svg.new_text_span(x - text_width, abs_y_mid - 6, text_width, 30, signal_name.lstrip("!"), group_name = "signal")
 		svg_text.style["text-align"] = "right"
-		if signal_name.startswith("!"):
-			svg_text.style["text-decoration"] = "overline"
 		svg_text.style["font-family"] = "'Latin Modern Roman'"
+		if signal_name.startswith("!"):
+			# text-decoration: overline does not work reliably, emulate
+			svg_text = self._svg.new_text_span(x - text_width, abs_y_mid - 6 - 12, text_width, 30, "_" * (len(signal_name) - 1), group_name = "signal")
+			svg_text.style["text-align"] = "right"
+			svg_text.style["font-family"] = "'Latin Modern Roman'"
 
 		for cur in cmds:
 			if prev is None:
