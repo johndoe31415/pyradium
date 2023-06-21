@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -32,9 +32,8 @@ except ModuleNotFoundError:
 	aiohttp = None
 import asyncio
 from pyradium.Presentation import Presentation
-from pyradium.Tools import XMLTools, FileTools
+from pyradium.Tools import XMLTools, FileTools, ImageTools
 from pyradium.CircuitJS import CircuitJSCircuit
-from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.FileLookup import FileLookup
 from .BaseModifyCommand import BaseModifyCommand
 
@@ -140,9 +139,7 @@ class CircuitJSRenderImages(BaseModifyCommand):
 
 				# Postprocess the SVG file
 				if not self._args.no_svg_postprocessing:
-					cmd = [ "inkscape", "-g", "--verb=FitCanvasToDrawing;FileSave;FileQuit", output_filename_svg ]
-					_log.debug("Fitting SVG to canvas: %s", CmdlineEscape().cmdline(cmd))
-					subprocess.check_call(cmd, stdout = _log.subproc_target, stderr = _log.subproc_target)
+					ImageTools.svg_canvas_size_to_object(output_filename_svg)
 
 				if self._args.capture_circuit or (self._args.write_back != _WriteBack.NoWriteback):
 					# The circuit may have modified after it's settled. Retrieve it if user requests it.
