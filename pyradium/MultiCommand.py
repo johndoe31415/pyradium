@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	MultiCommand - Provide an openssl-style multi-command abstraction
-#	Copyright (C) 2011-2022 Johannes Bauer
+#	Copyright (C) 2011-2023 Johannes Bauer
 #
 #	This file is part of pycommon.
 #
@@ -130,7 +130,7 @@ class MultiCommand():
 		if parseresult.cmd.action is None:
 			raise Exception("Should run command '%s', but no action was registered." % (parseresult.cmd.name))
 		result = parseresult.cmd.action(parseresult.cmd.name, parseresult.args)
-		if self._run_method:
+		if self._run_method and hasattr(result, "run"):
 			result = result.run()
 		return result
 
