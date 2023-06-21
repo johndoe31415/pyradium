@@ -272,7 +272,7 @@ class ImageTools():
 
 	@classmethod
 	def svg_canvas_size_to_object(cls, filename):
-		cmd = [ "inkscape", "-g", "--verb=FitCanvasToDrawing;FileSave;FileQuit", filename ]
+		cmd = [ "inkscape", f"--actions=select-all; fit-canvas-to-selection; export-filename:{filename}; export-do", filename ]
 		subprocess.check_call(cmd)
 
 	@classmethod
