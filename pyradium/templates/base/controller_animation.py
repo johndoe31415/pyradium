@@ -22,7 +22,7 @@
 import logging
 from pyradium.Controller import BaseController
 from pyradium.Exceptions import UsageException, MalformedXMLInputException
-from pyradium.svg import SVGTransformation
+from pysvgedit import SVGDocument, SVGAnimation, SVGAnimationMode
 
 _log = logging.getLogger(__spec__.name)
 
@@ -54,91 +54,39 @@ class AnimationController(BaseController):
 		if not filename.lower().endswith(".svg"):
 			raise UsageException("Any 'animation' type slide requires an SVG input filename, but found: %s" % (filename))
 
+
 		animation_mode = self.slide.get_xml_slide_var("mode")
 		if animation_mode is None:
-			animation_mode = "compose"
-		if animation_mode not in self._VALID_ANIMATION_MODES:
-			raise UsageException("An 'animation' type slide needs to have a mode set to any of %s, but found: %s" % (", ".join(self._VALID_ANIMATION_MODES), animation_mode))
-		frame_range = _parse_frame_range(self.slide.get_xml_slide_var("range"))
+			animation_mode = SVGAnimationMode.Compose
+		else:
+			try:
+				animation_mode = SVGAnimationMode(animation_mode)
+			except ValueError as e:
+				raise UsageException("An 'animation' type slide needs to have a mode set to any of %s, but found: %s" % (", ".join(mode.value for mode in SVGAnimationMode), animation_mode)) from e
 
+
+		frame_range = _parse_frame_range(self.slide.get_xml_slide_var("range"))
 		full_filename = self.rendered_presentation.renderer.lookup_include(filename)
 
-		# Determine the number of layers the we should consider first
-		svg = SVGTransformation(full_filename)
-		if animation_mode == "compose":
-			considered_layers = list(svg.visible_layer_ids)
-		elif animation_mode in [ "replace", "compose-all" ]:
-			considered_layers = list(svg.layer_ids)
-		else:
-			raise NotImplementedError(animation_mode)
-
-		if len(considered_layers) == 0:
-			_log.warning("SVG animation from %s has no layers to be considered.", filename)
-			return
-
-		# Then look at all these layers and determine their special handling
-		layer_tags = { }
-		for layer_id in considered_layers:
-			layer = svg.get_layer(layer_id)
-			label = layer.label
-			if ":" in label:
-				(tags, _) = label.split(":", maxsplit = 1)
-				layer_tags[layer_id] = set(tags.split(","))
-
-		# Find out which layers are protected
-		protected_layer_ids = set()
-		for (layer_id, tags) in layer_tags.items():
-			if "protect" in tags:
-				protected_layer_ids.add(layer_id)
-
-		svg_transforms = [ ]
-
-		# Store commands to hide all layers first
-		for layer_id in considered_layers:
-			svg_transforms.append({
-				"cmd":			"hide_layer",
-				"layer_id":		layer_id,
-			})
-
-		# Then show them one-by-one and render each
-		additional_slide_var_list = [ ]
-		previous_layer_id = None
+		svg_doc = SVGDocument.readfile(full_filename)
+		svg_animation = SVGAnimation(svg_doc, animation_mode = animation_mode)
 		renderer = self.rendered_presentation.renderer.get_custom_renderer("img")
-		for layer_id in considered_layers:
-			tags = layer_tags.get(layer_id, set())
-			if "reset" in tags:
-				# Hide all below layers but those which are protected
-				for below_layer_id in considered_layers:
-					if below_layer_id == layer_id:
-						break
-					elif below_layer_id not in protected_layer_ids:
-						svg_transforms.append({
-							"cmd":			"hide_layer",
-							"layer_id":		below_layer_id,
-						})
 
-			svg_transforms.append({
-				"cmd":			"show_layer",
-				"layer_id":		layer_id,
+		# TODO: we're including all files in the presentation even if we only
+		# need the last because we're collapsing the presentation
+		additional_slide_var_list = [ ]
+		for svg_frame in svg_animation:
+			rendered_image = renderer.render({
+				"filetype":			"svg",
+				"value":			svg_frame.asbytes(),
+				"max_dimension":	self.rendered_presentation.renderer.rendering_params.image_max_dimension
 			})
-			if (animation_mode == "replace") and (previous_layer_id is not None):
-				svg_transforms.append({
-					"cmd":			"hide_layer",
-					"layer_id":		previous_layer_id,
-				})
-			if not "nostop" in tags:
-				# Actually emit this image
-				rendered_image = renderer.render({
-					"src":				full_filename,
-					"max_dimension":	self.rendered_presentation.renderer.rendering_params.image_max_dimension,
-					"svg_transform":	svg_transforms,
-				})
-				local_filename = "imgs/anim/%s.%s" % (rendered_image.keyhash, rendered_image.data["extension"])
-				self.rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
-				additional_slide_var_list.append({
-					"image": local_filename,
-				})
-			previous_layer_id = layer_id
+			local_filename = f"imgs/anim/{rendered_image.keyhash}.{rendered_image.data['extension']}"
+			self.rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
+			additional_slide_var_list.append({
+				"image": local_filename,
+			})
+
 
 		if frame_range is not None:
 			filtered_slide_var_list = [ ]

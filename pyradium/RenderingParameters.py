@@ -21,7 +21,7 @@
 
 import dataclasses
 import os
-from pyradium.svg import SVGValidator, SVGValidatorErrorClass
+from pysvgedit import SVGValidator, SVGValidatorErrorClass
 from .FileLookup import FileLookup
 
 @dataclasses.dataclass()

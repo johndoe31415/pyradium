@@ -21,6 +21,7 @@ setuptools.setup(
 		"pygments",
 		"requests",
 		"lzstr>=0.0.3",
+		"pysvgedit>=0.0.3",
 	],
 	entry_points = {
 		"console_scripts": [

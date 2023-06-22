@@ -19,15 +19,14 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-import io
 import logging
 import tempfile
 import mimetypes
 import subprocess
+from pysvgedit import SVGDocument, FormatTextTransformation
 from pyradium.CmdlineEscape import CmdlineEscape
 from pyradium.Tools import ImageTools, HashTools
 from pyradium.Exceptions import UsageException, ImageRenderingException
-from pyradium.svg import SVGTransformation
 from .BaseRenderer import BaseRenderer
 
 _log = logging.getLogger(__spec__.name)
@@ -59,24 +58,22 @@ class ImageRenderer(BaseRenderer):
 			img_data = output_file.read()
 		return (extension, img_data)
 
+	def _dict_to_svg_transform(self, svg_doc, transform_dict):
+		if transform_dict["cmd"] == "format_text":
+			return FormatTextTransformation(svg_doc, template_vars = transform_dict["variables"])
+		else:
+			raise NotImplementedError(transform_dict["cmd"])
+
 	def _render_svg(self, content, max_dimension, svg_transform = None):
 		if svg_transform is None:
 			return self._render_raw_svg(content, max_dimension)
 		else:
-			# Transform SVG before rendering it
-			with tempfile.NamedTemporaryFile(prefix = "pyradium_svg_", suffix = ".svg", mode = "wb") as svg_file:
-				# First write the unmodified file to the tempfile
-				svg_file.write(content)
-				svg_file.flush()
-
-				# Then perform the transformation and write it back
-				transformed_svg = io.StringIO()
-				svg = SVGTransformation(svg_file.name)
-				svg.apply_all(svg_transform)
-				svg.write(transformed_svg)
-
-				transformed_content = transformed_svg.getvalue().encode("utf-8")
-				return self._render_raw_svg(transformed_content, max_dimension)
+			svg_doc = SVGDocument.frombytes(content)
+			for transform_dict in svg_transform:
+				transform = self._dict_to_svg_transform(svg_doc, transform_dict)
+				transform.apply()
+			transformed_content = svg_doc.asbytes()
+			return self._render_raw_svg(transformed_content, max_dimension)
 
 	def _render_raster_bitmap(self, content, mimetype, max_dimension):
 		# Resize using ImageMagick
@@ -107,6 +104,9 @@ class ImageRenderer(BaseRenderer):
 		}
 
 	def _determine_mimetype(self, property_dict):
+		if ("filetype" not in property_dict) and ("src" not in property_dict):
+			raise ImageRenderingException("Unable to determine MIME type with image property dictionary without either 'filetype' or 'src' key set.")
+
 		if "filetype" in property_dict:
 			filename = f"x.{property_dict['filetype']}"
 			return mimetypes.guess_type(filename)[0]

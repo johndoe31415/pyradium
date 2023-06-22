@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -22,6 +22,7 @@
 import os
 import logging
 from pyradium.DigitalTimingDiagram import DigitalTimingDiagram
+from pyradium.Tools import ImageTools
 from .BaseStandaloneCommand import BaseStandaloneCommand
 
 _log = logging.getLogger(__spec__.name)
@@ -53,4 +54,5 @@ class DigitalTimingDiagramRenderer(BaseStandaloneCommand):
 		dtd = DigitalTimingDiagram(xdiv = self._args.xdiv_size, height = self._args.height, clock_ticks = not self._args.no_clock_ticks, low_high_lines = self._args.low_high_lines)
 		dtd.parse_and_write(dtd_text)
 		dtd.svg.writefile(self._args.outfile_svg)
+		ImageTools.svg_canvas_size_to_object(self._args.outfile_svg)
 		return 0

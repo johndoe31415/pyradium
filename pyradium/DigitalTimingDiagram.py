@@ -20,9 +20,10 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import enum
+import functools
 import collections
 import dataclasses
-from pyradium.svg import SVGWriter
+from pysvgedit import SVGDocument, SVGGroup, SVGPath, SVGText, Vector2D
 
 class DigitalTimingType(enum.Enum):
 	Low = "0"
@@ -90,14 +91,14 @@ class DigitalTimingDiagram():
 		self._render_clock_ticks = clock_ticks
 		self._low_high_lines = low_high_lines
 		self._risefall = height / 8
-		self._svg = SVGWriter()
+		self._svg = SVGDocument.new()
 		self._path = None
 		self._plot_count = 0
 		self._clock_ticks = 0
 		if self._low_high_lines:
-			self._svg.group("low_high_horizontal")
+			self._layer("low_high_horizontal")
 		if self._render_clock_ticks:
-			self._svg.group("clock_ticks")
+			self._layer("clock_ticks")
 		self._markers = [ ]
 
 	@property
@@ -108,40 +109,46 @@ class DigitalTimingDiagram():
 	def base_height(self):
 		return ((self._height + self._vertical_distance) * self._plot_count) - self._vertical_distance
 
+	@functools.cache
+	def _layer(self, layer_label):
+		layer = self._svg.add(SVGGroup.new(is_layer = True))
+		layer.label = layer_label
+		return layer
+
 	def _transition_middle(self, y, transition_scale = 1):
 		transition_width = transition_scale * self._risefall * (abs(y) / self._height)
 		lead = (self._xdiv - transition_width) / 2
-		self._path.horiz_rel(lead)
-		self._path.line_rel(transition_width, y)
-		self._path.horiz_rel(lead)
+		self._path.horizontal(lead, relative = True)
+		self._path.lineto(Vector2D(transition_width, y), relative = True)
+		self._path.horizontal(lead, relative = True)
 
 	def _render_signal_sequence(self, signal_name, x, y, cmds):
 		prev = None
 		self._plot_count += 1
 		abs_y_mid = y + (self._height / 2)
-		self._path = self._svg.new_path(x, abs_y_mid, group_name = "signal")
+		self._path = self._layer("signal").add(SVGPath.new(Vector2D(x, abs_y_mid)))
 
 		text_width = 50
-		svg_text = self._svg.new_text_span(x - text_width, abs_y_mid - 6, text_width, 30, signal_name.lstrip("!"), group_name = "signal")
+		svg_text = self._layer("signal").add(SVGText.new(pos = Vector2D(x - text_width, abs_y_mid - 6), rect_extents = Vector2D(text_width, 30), text = signal_name.lstrip("!")))
 		svg_text.style["text-align"] = "right"
 		svg_text.style["font-family"] = "'Latin Modern Roman'"
 		if signal_name.startswith("!"):
 			# text-decoration: overline does not work reliably, emulate
-			svg_text = self._svg.new_text_span(x - text_width, abs_y_mid - 6 - 12, text_width, 30, "_" * (len(signal_name) - 1), group_name = "signal")
-			svg_text.style["text-align"] = "right"
-			svg_text.style["font-family"] = "'Latin Modern Roman'"
+			path = self._layer("signal").add(SVGPath.new(pos = Vector2D(x, abs_y_mid - 5.5)))
+			path.horizontal(-9 * len(signal_name.lstrip("!")), relative = True)
+			path.style["stroke-width"] = 0.75
 
 		for cur in cmds:
 			if prev is None:
 				prev = cur
 				if prev.cmdtype in [ DigitalTimingType.Low, DigitalTimingType.LowHigh, DigitalTimingType.LowHighTransition ]:
-					self._path.move_rel(0, self._height / 2)
+					self._path.moveto(Vector2D(0, self._height / 2), relative = True)
 				elif prev.cmdtype in [ DigitalTimingType.High ]:
-					self._path.move_rel(0, -self._height / 2)
+					self._path.moveto(Vector2D(0, -self._height / 2), relative = True)
 
 			match (prev.cmdtype, cur.cmdtype):
 				case (DigitalTimingType.Low, DigitalTimingType.Low) | (DigitalTimingType.High, DigitalTimingType.High) | (DigitalTimingType.HighZ, DigitalTimingType.HighZ):
-					self._path.horiz_rel(self._xdiv)
+					self._path.horizontal(self._xdiv, relative = True)
 
 				case (DigitalTimingType.Low, DigitalTimingType.High):
 					self._transition_middle(-self._height)
@@ -158,15 +165,15 @@ class DigitalTimingDiagram():
 				case (DigitalTimingType.LowHigh, DigitalTimingType.LowHigh) | (DigitalTimingType.LowHighTransition, DigitalTimingType.LowHigh):
 					with self._path.returnto():
 						# High to high
-						self._path.move_rel(0, -self._height)
-						self._path.horiz_rel(self._xdiv)
+						self._path.moveto(Vector2D(0, -self._height), relative = True)
+						self._path.horizontal(self._xdiv, relative = True)
 					# Low to low
-					self._path.horiz_rel(self._xdiv)
+					self._path.horizontal(self._xdiv, relative = True)
 
 				case (DigitalTimingType.High, DigitalTimingType.LowHigh):
 					with self._path.returnto():
 						# High to high
-						self._path.horiz_rel(self._xdiv)
+						self._path.horizontal(self._xdiv, relative = True)
 					# High to low
 					self._transition_middle(self._height)
 
@@ -175,24 +182,23 @@ class DigitalTimingDiagram():
 						# Low to high
 						self._transition_middle(-self._height)
 					# Low to low
-					self._path.horiz_rel(self._xdiv)
-
+					self._path.horizontal(self._xdiv, relative = True)
 
 				case (DigitalTimingType.LowHigh, DigitalTimingType.High):
 					with self._path.returnto():
 						# High to high
-						self._path.move_rel(0, -self._height)
-						self._path.horiz_rel(self._xdiv)
+						self._path.moveto(Vector2D(0, -self._height), relative = True)
+						self._path.horizontal(self._xdiv, relative = True)
 					# Low to low
 					self._transition_middle(-self._height)
 
 				case (DigitalTimingType.LowHigh, DigitalTimingType.Low):
 					with self._path.returnto():
 						# High to low
-						self._path.move_rel(0, -self._height)
+						self._path.moveto(Vector2D(0, -self._height), relative = True)
 						self._transition_middle(self._height)
 					# Low to low
-					self._path.horiz_rel(self._xdiv)
+					self._path.horizontal(self._xdiv, relative = True)
 
 				case (DigitalTimingType.HighZ, DigitalTimingType.LowHigh):
 					with self._path.returnto():
@@ -206,17 +212,17 @@ class DigitalTimingDiagram():
 						# Low to HighZ
 						self._transition_middle(-self._height / 2)
 					# High to HighZ
-					self._path.move_rel(0, -self._height)
+					self._path.moveto(Vector2D(0, -self._height), relative = True)
 					self._transition_middle(self._height / 2)
 
 				case (DigitalTimingType.LowHigh, DigitalTimingType.LowHighTransition) | (DigitalTimingType.LowHighTransition, DigitalTimingType.LowHighTransition):
 					with self._path.returnto():
 						self._transition_middle(-self._height, transition_scale = 2)
-					self._path.move_rel(0, -self._height)
+					self._path.moveto(Vector2D(0, -self._height), relative = True)
 					self._transition_middle(self._height, transition_scale = 2)
 
 				case (_, DigitalTimingType.Empty):
-					self._path.move_to(self._path.pos.x, abs_y_mid)
+					self._path.moveto(Vector2D(self._path.pos.x + self._xdiv, abs_y_mid))
 					prev = None
 					continue
 
@@ -235,15 +241,15 @@ class DigitalTimingDiagram():
 			have_label = (marker.label is not None) and (marker.label != "")
 			marker_length = self.base_height if (not have_label) else (self.base_height + self._marker_extend)
 
-			path = self._svg.new_path(marker.x, 0, group_name = "marker")
-			path.vert_rel(marker_length)
+			path = self._layer("marker").add(SVGPath.new(Vector2D(marker.x, 0)))
+			path.vertical(marker_length, relative = True)
 			path.style["stroke-width"] = 0.5
 
 			if have_label:
 				text_width = 100
 				text_height = 50
 
-				svg_text = self._svg.new_text_span(marker.x - (text_width / 2), marker_length, text_width, text_height, marker.label, group_name = "marker")
+				svg_text = self._layer("marker").add(SVGText.new(pos = Vector2D(marker.x - (text_width / 2), marker_length), rect_extents = Vector2D(text_width, text_height), text = marker.label))
 				svg_text.style["text-align"] = "center"
 
 	def _do_render_clock_ticks(self):
@@ -252,8 +258,8 @@ class DigitalTimingDiagram():
 
 		for tick in range(self._clock_ticks):
 			x = (tick * self._xdiv) + self._xdiv / 2
-			path = self._svg.new_path(x, 0, group_name = "clock_ticks")
-			path.vert_rel(self.base_height)
+			path = self._layer("clock_ticks").add(SVGPath.new(Vector2D(x, 0)))
+			path.vertical(self.base_height, relative = True)
 			path.style["stroke-width"] = 0.25
 			path.style["stroke"] = "#95a5a6"
 			path.style["stroke-miterlimit"] = 4
@@ -266,8 +272,8 @@ class DigitalTimingDiagram():
 			y_high = (self._height + self._vertical_distance) * plot
 			y_low = y_high + self._height
 			for y in [ y_low, y_high ]:
-				path = self._svg.new_path(0, y, group_name = "low_high_horizontal")
-				path.horiz_rel(x_width)
+				path = self._layer("low_high_horizontal").add(SVGPath.new(Vector2D(0, y)))
+				path.horizontal(x_width, relative = True)
 
 				path.style["stroke-width"] = 0.5
 				path.style["stroke"] = "#95a5a6"

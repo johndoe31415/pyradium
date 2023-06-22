@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from pysvgedit import SVGDocument
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
 from pyradium.Exceptions import InvalidTransformationException, MalformedXMLInputException
@@ -73,7 +74,8 @@ class ImgHook(BaseHook):
 			filename = rendered_presentation.renderer.lookup_include(node.getAttribute("src"))
 			properties["src"] = filename
 			if filename.lower().endswith(".svg"):
-				rendered_presentation.renderer.rendering_params.svg_validator.validate(filename)
+				doc = SVGDocument.read(filename)
+				rendered_presentation.renderer.rendering_params.svg_validator.validate(doc)
 		else:
 			# Literal specification as value
 			properties["value"] = node.getAttribute("value").encode("utf-8")

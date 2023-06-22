@@ -19,9 +19,9 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+from pysvgedit import SVGStyle
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.svg import SVGStyle
 
 @XMLHookRegistry.register_hook
 class TexHook(BaseHook):
@@ -64,7 +64,7 @@ class TexHook(BaseHook):
 			indent = float(node.getAttribute("indent"))
 			indent_px = round(indent * 50)
 			img_style["margin-left"] = f"{indent_px}px"
-		img_style.sync_to_node()
+		img_style.sync_node_style()
 
 		if not wrap_in_div:
 			replacement_node = img_node
