@@ -81,7 +81,7 @@ _KNOWN_TEMPLATES = {
 	""",
 
 	"textblock_term": """
-		<s:term prompt="^(\$|#) "><![CDATA[
+		<s:term prompt="^(\\$|#) "><![CDATA[
 		]]></s:term>
 	""",
 
