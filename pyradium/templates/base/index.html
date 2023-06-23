@@ -6,7 +6,7 @@
 		<meta name="author" content="${presentation.meta.get("author")}" />
 		%endif
 		<meta name="generator" content="https://github.com/johndoe31415/pyradium v${pyradium_version}" />
-		<title>${presentation.meta.get("title", "Untitled Presentation")}</title>
+		<title>${presentation.meta.get("title", "Untitled presentation")}</title>
 		%for css_filename in rendered_presentation.css:
 		<link rel="stylesheet" href="${preuri}${css_filename}" />
 		%endfor
@@ -34,8 +34,9 @@
 			<button id="btn_goto_slide" class="control">Goto</button>
 			%if rendered_presentation.has_feature("timer"):
 			<button id="btn_timer" class="control">Timer</button>
+			<button id="btn_pause" class="control">Pause</button>
 			%endif
-			<button id="btn_present" class="control">Start Presentation</button>
+			<button id="btn_present" class="control">Start presentation</button>
 		</div>
 %endif
 
@@ -59,6 +60,29 @@
 				document.querySelector("#info_git_revision").innerText = globalThis.pyradium.presentation.info.source_versions[0].filename + " / git " + globalThis.pyradium.presentation.info.source_versions[0].version.git;
 			</script>
 %endif
+%if rendered_presentation.has_feature("pause"):
+			<div class="modal type-info fixed" id="pyradium_pause_popup">
+				<div class="content">
+					<span class="close">×</span>
+					<div class="msg">
+						<div class="pause_duration">
+							Pause for <span id="pause_duration"></span> minutes until <span id="pause_until"></span>.
+						</div>
+						<div class="pause_remaining">
+							Remaining: <span id="pause_remaining"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<script type="module">
+				import {ModalWindow} from "${preuri_ds}template/base/pyradium_modal.js";
+				const modal_div = document.querySelector("#pyradium_pause_popup");
+				modal_div.pyradium_modal = new ModalWindow(modal_div, {
+					close_on_popup_click:	false,
+				});
+			</script>
+%endif
 
 		%for slide in rendered_presentation.rendered_slides:
 		${slide | n}
@@ -75,14 +99,21 @@
 				"slideno_text":		document.querySelector("#current_slideno"),
 				"full_screen_div":	document.querySelector("#full_screen_div"),
 				"info_modal":		document.querySelector("#pyradium_info_popup"),
+				"pause_modal":		document.querySelector("#pyradium_pause_popup"),
 			};
-			const presentation = new Presentation(ui_elements, globalThis.pyradium.presentation.interactive);
+			const parameters = {
+				"preuri":			"${preuri}",
+			};
+			const presentation = new Presentation(ui_elements, parameters, globalThis.pyradium.presentation.interactive);
 			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
 			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start_presentation());
 			document.addEventListener("wheel", (event) => presentation.event_wheel(event));
 			document.addEventListener("fullscreenchange", (event) => presentation.event_fullscreen(event));
 			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
 			document.addEventListener("keydown", (event) => presentation.event_keydown(event));
+			%if rendered_presentation.has_feature("pause"):
+			document.querySelector("#btn_pause").addEventListener("click", (event) => presentation.pause());
+			%endif
 			%if rendered_presentation.has_feature("timer"):
 			document.querySelector("#btn_timer").addEventListener("click", (event) => window.open("${preuri}template/base/timer.html#" + presentation.session_id));
 			%endif

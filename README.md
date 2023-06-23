@@ -81,6 +81,7 @@ There are three external components that pyradium uses:
     It is licensed under the OFL.
   * The font Latin Modern Mono is included, from [GUST](http://www.gust.org.pl/projects/e-foundry/latin-modern).
     It is licensed under the GUST font license.
+  * The pause end ringtone is taken from Jason Steele's [FilmCow Royalty Free Sound Effects Library](https://filmcow.itch.io/filmcow-sfx).
 
 All third party licenses can be found in the [licenses/ subdirectory](https://github.com/johndoe31415/pyradium/tree/master/licenses)
 subdirectory. Additionally, detailed attribution information is also provided

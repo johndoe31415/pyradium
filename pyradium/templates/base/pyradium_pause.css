@@ -1,0 +1,26 @@
+div.pause_duration {
+	font-size: 400%;
+	text-align: center;
+}
+
+div.pause_remaining {
+	margin-top: 20px;
+	font-size: 400%;
+	text-align: center;
+}
+
+span#pause_remaining {
+	font-weight: bold;
+}
+
+span#pause_remaining.plenty {
+	color: #000;
+}
+
+span#pause_remaining.little {
+	color: #e67e22;
+}
+
+span#pause_remaining.none {
+	color: #c0392b;
+}

@@ -31,9 +31,21 @@ export class ModalWindow {
 		} else {
 			this._modal_div.querySelector("span.close").addEventListener("click", (event) => this.close());
 		}
+		this._close_callback = null;
+	}
+
+	set on_close(callback) {
+		this._close_callback = callback;
+	}
+
+	get active() {
+		return this._modal_div.classList.contains("active");
 	}
 
 	close() {
+		if (this._close_callback) {
+			this._close_callback(this);
+		}
 		this._modal_div.classList.remove("active");
 	}
 

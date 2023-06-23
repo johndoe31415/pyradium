@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -27,3 +27,4 @@ class PresentationFeature(enum.Enum):
 	Info = "info"
 	Pygments = "pygments"
 	Acronyms = "acronyms"
+	Pause = "pause"

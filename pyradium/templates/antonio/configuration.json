@@ -147,6 +147,14 @@
 					"base/pyradium_timer.css"
 				]
 			},
+			"pause": {
+				"static": [
+					"base/presentation_pause_end.mp3"
+				],
+				"css": [
+					"base/pyradium_pause.css"
+				]
+			},
 			"pygments": {
 				"css": [
 					"base/pygments.css"

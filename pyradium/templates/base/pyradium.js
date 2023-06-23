@@ -21,6 +21,8 @@
 	*	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
+import {TimeTools} from "./pyradium_tools.js";
+
 const CursorStyle = {
 	CURSOR_OFF: 0,
 	CURSOR_DEFAULT: 1,
@@ -29,8 +31,9 @@ const CursorStyle = {
 }
 
 export class Presentation {
-	constructor(ui_elements, presentation_meta) {
+	constructor(ui_elements, parameters, presentation_meta) {
 		this._ui_elements = ui_elements;
+		this._parameters = parameters;
 		this._presentation_meta = presentation_meta;
 		this._cursor_style = CursorStyle.CURSOR_OFF;
 		this._enumerate_slides();
@@ -343,5 +346,62 @@ export class Presentation {
 		} else {
 			this.stop();
 		}
+	}
+
+	_pause_tick(parameters) {
+		const now_secs = new Date().getTime() / 1000;
+		const expiry_secs = parameters.pause_start_secs + parameters.pause_duration_secs;
+		const remaining_secs = expiry_secs - now_secs;
+		parameters.pause_remaining_span.innerText = TimeTools.format_ms(remaining_secs);
+
+		parameters.pause_remaining_span.classList.remove("plenty");
+		parameters.pause_remaining_span.classList.remove("little");
+		parameters.pause_remaining_span.classList.remove("none");
+		if (remaining_secs >= 3 * 60) {
+			parameters.pause_remaining_span.classList.add("plenty");
+		} else if (remaining_secs >= 0) {
+			parameters.pause_remaining_span.classList.add("little");
+		} else {
+			parameters.pause_remaining_span.classList.add("none");
+		}
+
+		if ((!parameters.expired) && (remaining_secs < 0)) {
+			/* Expired now! */
+			parameters.expired = true;
+			new Audio(this._parameters.preuri + "template/base/presentation_pause_end.mp3").play();
+		}
+	}
+
+	pause() {
+		const modal_div = this._ui_elements.pause_modal;
+		if (modal_div.active) {
+			return;
+		}
+
+		const pause_duration_mins = window.prompt("Pause duration (minutes): ", "15");
+		if (pause_duration_mins <= 0) {
+			return;
+		}
+
+		let pause_parameters = {
+			"pause_duration_secs":		pause_duration_mins * 60,
+			"pause_start_secs":			new Date().getTime() / 1000,
+			"pause_remaining_span":		modal_div.querySelector("#pause_remaining"),
+			"expired":					false,
+		}
+
+		const modal = modal_div.pyradium_modal;
+		modal_div.querySelector("#pause_duration").innerText = pause_duration_mins;
+
+		const pause_until = new Date((pause_parameters.pause_start_secs + pause_parameters.pause_duration_secs) * 1000);
+		modal_div.querySelector("#pause_until").innerText = TimeTools.format_datetime(pause_until).hms
+
+		this._pause_tick(pause_parameters);
+		const interval_id = setInterval(() => this._pause_tick(pause_parameters), 1000);
+
+		modal.on_close = () => {
+			clearInterval(interval_id);
+		};
+		modal.show();
 	}
 }

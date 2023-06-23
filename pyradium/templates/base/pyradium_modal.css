@@ -9,6 +9,11 @@ div.modal {
 	background: rgba(0, 0, 0, 0.45);
 }
 
+div.modal.fixed {
+	top: 0;
+	position: fixed;
+}
+
 div.modal.active {
 	display: flex;
 }

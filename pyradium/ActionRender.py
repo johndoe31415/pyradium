@@ -37,7 +37,7 @@ from .Deployment import Deployment
 _log = logging.getLogger(__spec__.name)
 
 class ActionRender(BaseAction):
-	_DEFAULT_PRESENTATION_FEATURES = set([ PresentationFeature.Interactive, PresentationFeature.Timer ])
+	_DEFAULT_PRESENTATION_FEATURES = set([ PresentationFeature.Interactive, PresentationFeature.Timer, PresentationFeature.Pause ])
 
 	def _wait_for_change(self, renderer):
 		cmd = [ "inotifywait" ]
