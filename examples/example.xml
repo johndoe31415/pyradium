@@ -175,6 +175,26 @@
 	</slide>
 
 	<slide>
+		<s:var name="heading" value="Long code in scrollbox"/>
+		<s:code lang="python3" height="500px"><![CDATA[
+			if foo == "bar":
+				print("foo was 'bar' 1")
+				print("foo was 'bar' 2")
+				print("foo was 'bar' 3")
+				print("foo was 'bar' 4")
+				print("foo was 'bar' 5")
+				return getattr(self, "bar")
+			else:
+				print("foo was not 'bar' 1")
+				print("foo was not 'bar' 2")
+				print("foo was not 'bar' 3")
+				print("foo was not 'bar' 4")
+				print("foo was not 'bar' 5")
+				return lambda x: tuple(x, "foo", 123)
+		]]></s:code>
+	</slide>
+
+	<slide>
 		<s:var name="heading" value="Some C Code"/>
 		<s:code lang="c"><![CDATA[
 			int main(int argc, char **argv) {
