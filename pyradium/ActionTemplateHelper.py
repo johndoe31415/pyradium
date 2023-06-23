@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -81,7 +81,7 @@ _KNOWN_TEMPLATES = {
 	""",
 
 	"textblock_term": """
-		<s:term prompt="$ "><![CDATA[
+		<s:term prompt="^(\$|#) "><![CDATA[
 		]]></s:term>
 	""",
 
