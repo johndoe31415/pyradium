@@ -191,7 +191,7 @@
 
 	<slide>
 		<s:var name="heading" value="Some Terminal"/>
-		<s:term prompt="$ "><![CDATA[
+		<s:term prompt="^(\$|#) " height="500px"><![CDATA[
 			$ ls /
 			bin
 			sbin
@@ -201,6 +201,10 @@
 				| uniq \
 				| wc -l
 			3332
+			$ echo $UID
+			1000
+			# echo $UID
+			0
 		]]></s:term>
 	</slide>
 

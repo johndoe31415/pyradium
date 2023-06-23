@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,6 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import re
 from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
 
 @XMLHookRegistry.register_hook
@@ -30,16 +31,28 @@ class TerminalHook(InnerTextHook):
 		replacement_node = node.ownerDocument.createElement("pre")
 		replacement_node.setAttribute("class", "terminal")
 		if node.hasAttribute("prompt"):
+			# Compile prompt as a regex and split up the source into lines
 			prompt = node.getAttribute("prompt")
+			regex = re.compile(prompt)
 			lines = text.splitlines(keepends = True)
+
 			while len(lines) > 0:
 				line = lines.pop(0)
-				if not line.startswith(prompt):
+				rematch = regex.match(line)
+				if rematch is None:
+					# No prompt found, just add the line as regular text
 					replacement_node.appendChild(node.ownerDocument.createTextNode(line))
 					continue
-				command = line[len(prompt) : ]
-				replacement_node.appendChild(node.ownerDocument.createTextNode(prompt))
-				while line.strip().endswith("\\"):
+
+				# Prompt found, extract the text
+				command = line[rematch.span()[1] : ]
+
+				# Create a text node that contains the prompt characters itself
+				replacement_node.appendChild(node.ownerDocument.createTextNode(line[ : rematch.span()[1]]))
+
+				# Append all lines of the command until we're finished (there
+				# are no more continuations)
+				while command.rstrip().endswith("\\") and (len(lines) > 0):
 					line = lines.pop(0)
 					command += line
 
@@ -48,10 +61,11 @@ class TerminalHook(InnerTextHook):
 				# will contain it too
 				has_trailing_nl = command.endswith("\n")
 				command = command.rstrip("\n")
-				command_node = node.ownerDocument.createElement("span")
+
+				# Now create the command node and append it
+				command_node = replacement_node.appendChild(node.ownerDocument.createElement("span"))
 				command_node.setAttribute("class", "command")
 				command_node.appendChild(node.ownerDocument.createTextNode(command))
-				replacement_node.appendChild(command_node)
 
 				if has_trailing_nl:
 					# In this case we need to insert the newline back into the
