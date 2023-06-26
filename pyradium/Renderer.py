@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2022 Johannes Bauer
+#	Copyright (C) 2021-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #

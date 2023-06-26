@@ -26,8 +26,9 @@ import {TimeTools} from "./pyradium_tools.js";
 const CursorStyle = {
 	CURSOR_OFF: 0,
 	CURSOR_DEFAULT: 1,
-	CURSOR_HIGHLIGHT: 2,
-	INVALID: 3,
+	CURSOR_CIRCLE: 2,
+	CURSOR_ARROW: 3,
+	INVALID: 4,
 }
 
 export class Presentation {
@@ -35,7 +36,12 @@ export class Presentation {
 		this._ui_elements = ui_elements;
 		this._parameters = parameters;
 		this._presentation_meta = presentation_meta;
-		this._cursor_style = CursorStyle.CURSOR_OFF;
+		this._cursor = {
+			style:		CursorStyle.CURSOR_OFF,
+			size:		0,
+			last_uri:	null,
+			last_svg:	null,
+		};
 		this._enumerate_slides();
 		this._internal_slide_index = 0;
 		this._resize_obs = new ResizeObserver((event) => this.event_resize(event));
@@ -126,8 +132,40 @@ export class Presentation {
 		this._ui_elements.full_screen_div.style.display = "none";
 	}
 
+	_set_scaled_cursor(svg_data) {
+		const scale_factor = Math.pow(1.1, this._cursor.size);
+
+		const doc = new DOMParser().parseFromString(svg_data, "application/xml");
+		const svg = doc.getElementById("scale_svg");
+		svg.setAttribute("width", svg.getAttribute("width") * scale_factor);
+		svg.setAttribute("height", svg.getAttribute("height") * scale_factor);
+
+		const layer = doc.getElementById("scale_layer");
+		layer.setAttribute("transform", "scale(" + scale_factor + "), " + layer.getAttribute("transform"));
+
+		const cursor_svg = new XMLSerializer().serializeToString(doc);
+		console.log(cursor_svg);
+		this._ui_elements.full_screen_div.style.cursor = "url(\"data:image/svg+xml," + encodeURIComponent(cursor_svg) + "\") 0 0, auto";
+	}
+
+	_load_cursor_svg(uri) {
+		if (this._cursor.last_uri != uri) {
+			fetch(uri).then((response) => {
+				if (response.ok) {
+					return response.text();
+				}
+			}).then((svg_data) => {
+				this._cursor.last_uri = uri;
+				this._cursor.last_svg = svg_data;
+				this._set_scaled_cursor(svg_data);
+			});
+		} else {
+			this._set_scaled_cursor(this._cursor.last_svg);
+		}
+	}
+
 	_set_cursor_style() {
-		switch (this._cursor_style) {
+		switch (this._cursor.style) {
 			case CursorStyle.CURSOR_OFF:
 				this._ui_elements.full_screen_div.style.cursor = "none";
 				break;
@@ -136,8 +174,12 @@ export class Presentation {
 				this._ui_elements.full_screen_div.style.cursor = "inherit";
 				break;
 
-			case CursorStyle.CURSOR_HIGHLIGHT:
-				this._ui_elements.full_screen_div.style.cursor = "url('template/base/cursor.svg'), auto";
+			case CursorStyle.CURSOR_CIRCLE:
+				this._load_cursor_svg(this._parameters.preuri + "template/base/cursor_circle.svg");
+				break;
+
+			case CursorStyle.CURSOR_ARROW:
+				this._load_cursor_svg(this._parameters.preuri + "template/base/cursor_arrow.svg");
 				break;
 		}
 	}
@@ -157,7 +199,7 @@ export class Presentation {
 			 * timer. */
 			this._tx_start_presentation();
 		}
-		this._cursor_style = 0;
+		this._cursor.style = 0;
 		this._prepare_full_screen_div();
 		this._ui_elements.full_screen_div.requestFullscreen();
 	}
@@ -197,7 +239,13 @@ export class Presentation {
 			this.start_presentation();
 		} else if (event.key == "c") {
 			this._log("Keypress: 'c' -> toggle cursor");
-			this.toggle_cursor();
+			this.cursor_cycle_type();
+		} else if (event.key == "+") {
+			this._log("Keypress: '+' -> increase cursor size");
+			this.cursor_size_change(1);
+		} else if (event.key == "-") {
+			this._log("Keypress: '-' -> decrease cursor size");
+			this.cursor_size_change(-1);
 		} else if ((event.key == "X") && (event.ctrlKey) && (event.shiftKey)) {
 			this._debugging = true;
 			this._log("Debugging mode enabled.");
@@ -287,10 +335,20 @@ export class Presentation {
 		}
 	}
 
-	toggle_cursor() {
-		this._cursor_style += 1;
-		if (this._cursor_style == CursorStyle.INVALID) {
-			this._cursor_style = 0;
+	cursor_cycle_type() {
+		this._cursor.style += 1;
+		if (this._cursor.style == CursorStyle.INVALID) {
+			this._cursor.style = 0;
+		}
+		this._set_cursor_style();
+	}
+
+	cursor_size_change(size_increment) {
+		this._cursor.size += size_increment;
+		if (this._cursor.size < -5) {
+			this._cursor.size = -5;
+		} else if (this._cursor.size > 9) {
+			this._cursor.size = 9;
 		}
 		this._set_cursor_style();
 	}
