@@ -132,7 +132,7 @@ export class Presentation {
 		this._ui_elements.full_screen_div.style.display = "none";
 	}
 
-	_set_scaled_cursor(svg_data) {
+	_set_scaled_cursor(svg_data, offsetx, offsety) {
 		const scale_factor = Math.pow(1.1, this._cursor.size);
 
 		const doc = new DOMParser().parseFromString(svg_data, "application/xml");
@@ -143,12 +143,13 @@ export class Presentation {
 		const layer = doc.getElementById("scale_layer");
 		layer.setAttribute("transform", "scale(" + scale_factor + "), " + layer.getAttribute("transform"));
 
+		const scaled_offsetx = (scale_factor * offsetx) | 0;
+		const scaled_offsety = (scale_factor * offsety) | 0;
 		const cursor_svg = new XMLSerializer().serializeToString(doc);
-		console.log(cursor_svg);
-		this._ui_elements.full_screen_div.style.cursor = "url(\"data:image/svg+xml," + encodeURIComponent(cursor_svg) + "\") 0 0, auto";
+		this._ui_elements.full_screen_div.style.cursor = "url(\"data:image/svg+xml," + encodeURIComponent(cursor_svg) + "\") " + scaled_offsetx + " " + scaled_offsety + ", auto";
 	}
 
-	_load_cursor_svg(uri) {
+	_load_cursor_svg(uri, offsetx, offsety) {
 		if (this._cursor.last_uri != uri) {
 			fetch(uri).then((response) => {
 				if (response.ok) {
@@ -157,10 +158,10 @@ export class Presentation {
 			}).then((svg_data) => {
 				this._cursor.last_uri = uri;
 				this._cursor.last_svg = svg_data;
-				this._set_scaled_cursor(svg_data);
+				this._set_scaled_cursor(svg_data, offsetx, offsety);
 			});
 		} else {
-			this._set_scaled_cursor(this._cursor.last_svg);
+			this._set_scaled_cursor(this._cursor.last_svg, offsetx, offsety);
 		}
 	}
 
@@ -175,11 +176,11 @@ export class Presentation {
 				break;
 
 			case CursorStyle.CURSOR_CIRCLE:
-				this._load_cursor_svg(this._parameters.preuri + "template/base/cursor_circle.svg");
+				this._load_cursor_svg(this._parameters.preuri + "template/base/cursor_circle.svg", 25, 25);
 				break;
 
 			case CursorStyle.CURSOR_ARROW:
-				this._load_cursor_svg(this._parameters.preuri + "template/base/cursor_arrow.svg");
+				this._load_cursor_svg(this._parameters.preuri + "template/base/cursor_arrow.svg", 0, 0);
 				break;
 		}
 	}
@@ -344,12 +345,16 @@ export class Presentation {
 	}
 
 	cursor_size_change(size_increment) {
+		const min_cursor_size = -5;
+		const max_cursor_size = 9;
+
 		this._cursor.size += size_increment;
-		if (this._cursor.size < -5) {
-			this._cursor.size = -5;
-		} else if (this._cursor.size > 9) {
-			this._cursor.size = 9;
+		if (this._cursor.size < min_cursor_size) {
+			this._cursor.size = min_cursor_size;
+		} else if (this._cursor.size > max_cursor_size) {
+			this._cursor.size = max_cursor_size;
 		}
+		this._log("Cursor size now", this._cursor.size);
 		this._set_cursor_style();
 	}
 

@@ -2,7 +2,6 @@
 <svg
    width="50"
    height="50"
-   viewBox="0 0 13.229167 13.229167"
    version="1.1"
    id="scale_svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
@@ -23,9 +22,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="11.364216"
-     inkscape:cy="-3.1567267"
+     inkscape:zoom="11.2"
+     inkscape:cx="39.732143"
+     inkscape:cy="17.8125"
      inkscape:document-units="mm"
      inkscape:current-layer="scale_layer"
      inkscape:document-rotation="0"
@@ -35,9 +34,9 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="3840"
-     inkscape:window-height="2075"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-height="2123"
+     inkscape:window-x="3840"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:showpageshadow="2"
      inkscape:pagecheckerboard="0"
@@ -59,10 +58,10 @@
      id="scale_layer"
      transform="translate(-18.010663,-49.928237)">
     <circle
-       style="opacity:0.75;fill:#c0392b;stroke:#f39c12;stroke-width:0.863562;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none"
+       style="opacity:0.75;fill:#c0392b;stroke:#f39c12;stroke-width:3.26386;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none"
        id="path833"
-       cx="24.625246"
-       cy="56.54282"
-       r="6.1828022" />
+       cx="43.010662"
+       cy="74.928238"
+       r="23.368073" />
   </g>
 </svg>

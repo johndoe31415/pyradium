@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="49.999992"
-   height="50.000019"
-   viewBox="0 0 13.229165 13.229172"
+   width="50"
+   height="50"
    version="1.1"
    id="scale_svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
@@ -23,9 +22,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6"
-     inkscape:cx="67.321429"
-     inkscape:cy="48.125"
+     inkscape:zoom="11.2"
+     inkscape:cx="39.732143"
+     inkscape:cy="20.133929"
      inkscape:document-units="mm"
      inkscape:current-layer="scale_layer"
      inkscape:document-rotation="0"
@@ -35,9 +34,9 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="3840"
-     inkscape:window-height="2075"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-height="2123"
+     inkscape:window-x="3840"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:showpageshadow="2"
      inkscape:pagecheckerboard="0"
@@ -60,8 +59,8 @@
      transform="translate(-33.78551,-45.694702)">
     <path
        id="path352-3"
-       style="opacity:0.75;fill:#c0392b;stroke:#f39c12;stroke-width:0.25118px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 43.265324,58.746263 36.596083,52.07702 33.9111,54.762005 v -8.941713 h 8.941706 l -2.684982,2.684986 6.66924,6.669244 z"
+       style="opacity:0.75;fill:#c0392b;stroke:#f39c12;stroke-width:0.949342px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 69.614733,95.023443 44.408149,69.816852 34.260181,79.964828 V 46.169373 h 33.795428 l -10.147964,10.14798 25.206579,25.206594 z"
        sodipodi:nodetypes="cccccccc" />
   </g>
 </svg>
