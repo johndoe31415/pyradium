@@ -15,6 +15,14 @@
 			14:30
 		</agenda>
 		<filename-key>4864c5ba-8450-4819-9fb5-2d255aea3016</filename-key>
+		<timer-presets>
+			<preset name="Group 1 Part 1" time="14:30-0:15/2" subset="1/2" />
+			<preset name="Group 1 Part 2" time="14:30" subset="2/2" />
+			<preset name="Group 2 Part 1" time="16:30-0:30/3" subset="1/3" />
+			<preset name="Group 2 Part 2" time="16:30-0:15/2" subset="2/3" />
+			<preset name="Group 2 Part 3" time="16:30" subset="3/3" />
+			<preset name="Group 3" time="{v['group3_endtime']}" subset="1/1" />
+		</timer-presets>
 	</meta>
 
 	<variables>
@@ -22,7 +30,8 @@
 		<variable src="my_vars2.json" />
 		<variable>
 		{
-			"week":	3
+			"week":				3,
+			"group3_endtime":	"17:30"
 		}
 		</variable>
 	</variables>
