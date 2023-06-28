@@ -23,8 +23,9 @@
 
 const TimestampMode = {
 	ABSOLUTE: 0,
-	RELATIVE_NOW: 1,
-	RELATIVE_PRESENTATION_LENGTH: 2,
+	ABSOLUTE_DIVIDED: 1,
+	RELATIVE_NOW: 2,
+	RELATIVE_PRESENTATION_LENGTH: 3,
 };
 
 class Timestamp {
@@ -37,6 +38,11 @@ class Timestamp {
 	compute(presentation_duration_seconds) {
 		if (this._ts_type == TimestampMode.ABSOLUTE) {
 			return this._ts_value;
+		} else if (this._ts_type == TimestampMode.ABSOLUTE_DIVIDED) {
+			const now = new Date();
+			const duration = this._ts_value.timestamp.getTime() - now.getTime();
+			const divided_duration = duration / this._ts_value.divisor;
+			return new Date(now.getTime() + divided_duration);
 		} else if (this._ts_type == TimestampMode.RELATIVE_NOW) {
 			const now = new Date();
 			return new Date(now.getTime() + (this._ts_value * 1000));
@@ -70,7 +76,7 @@ export class TimeTools {
 		/* Absolute timestamp given day, hour, minute */
 		{
 			const now = new Date();
-			const match = timestamp_str.match(/^\s*((?<timestamp_day>\d{1,2})-)?\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*$/);
+			const match = timestamp_str.match(/^\s*((?<timestamp_day>\d{1,2})-)?\s*(?<timestamp_hour>\d{1,2}):(?<timestamp_minute>\d{2})\s*(-\s*((?<subtract_hour>\d{1,2}):)?(?<subtract_minute>\d{1,3}))?\s*(\/(?<divisor>\d{1,3}))?\s*$/);
 			if (match) {
 				const timestamp_hour = match.groups.timestamp_hour | 0;
 				const timestamp_minute = match.groups.timestamp_minute | 0;
@@ -85,12 +91,33 @@ export class TimeTools {
 					return null;
 				}
 
+				/* If a day is actually given, this could be within the next
+				 * month. Choose the relative closer one (e.g., when we hold a
+				 * presentation on May 31st and specify as 'day' '1', we mean
+				 * 1st of June, not 1st of May) */
 				const option1 = new Date(now.getFullYear(), now.getMonth(), timestamp_day, timestamp_hour, timestamp_minute, 0);
 				const option2 = new Date(now.getFullYear(), now.getMonth() + 1, timestamp_day, timestamp_hour, timestamp_minute, 0);
 				const diff1 = Math.abs(option1.getTime() - now.getTime());
 				const diff2 = Math.abs(option2.getTime() - now.getTime());
-				const timestamp = (diff1 < diff2) ? option1 : option2;
-				return new Timestamp(TimestampMode.ABSOLUTE, timestamp);
+				const timestamp_raw = (diff1 < diff2) ? option1 : option2;
+
+				let timestamp = timestamp_raw;
+				if (match.groups.subtract_minute) {
+					const subtract_minutes = ((match.groups.subtract_hour | 0) * 60) + (match.groups.subtract_minute | 0);
+					timestamp = new Date(timestamp_raw.getTime() - (subtract_minutes * 60 * 1000));
+				}
+
+				if (!match.groups.divisor) {
+					/* "hh:mm" or "hh:mm-mm" or "hh:mm-hh:mm" are all absolute measures */
+					return new Timestamp(TimestampMode.ABSOLUTE, timestamp);
+				} else {
+					/* "hh:mm / divisor" is a relative measure */
+					const divisor = match.groups.divisor | 0;
+					return new Timestamp(TimestampMode.ABSOLUTE_DIVIDED, {
+						"timestamp": 	timestamp,
+						"divisor":		divisor,
+					});
+				}
 			}
 		}
 
