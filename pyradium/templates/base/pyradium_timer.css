@@ -94,3 +94,8 @@ div.main_indicator.beyond_last_slide_in_subset {
 img.media {
 	width: 48px;
 }
+
+div.timermenu input.parse-error {
+	border: 1px solid #c0392b;
+	box-shadow: 0 0 7px #c0392b;
+}

@@ -23,11 +23,6 @@ div.menu .control {
 	margin-right: 15px;
 }
 
-div.menu input.parse-error {
-	border: 1px solid #c0392b;
-	box-shadow: 0 0 7px #c0392b;
-}
-
 /* Do not draw border around menu controls when they're selected */
 div.menu .control:focus {
 	outline: none;
