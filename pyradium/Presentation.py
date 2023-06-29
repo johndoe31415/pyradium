@@ -184,7 +184,6 @@ class Presentation():
 	def _validate_metadata(self):
 		if self._meta is None:
 			return
-		print(self._meta)
 		if "agenda" in self._meta:
 			self._meta["agenda"] = Agenda.parse(text = self._meta["agenda"])
 
