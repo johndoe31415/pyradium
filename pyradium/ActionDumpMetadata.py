@@ -25,7 +25,7 @@ import logging
 from .BaseAction import BaseAction
 from .RenderingParameters import RenderingParameters
 from .Presentation import Presentation
-from .Tools import FileTools
+from .Tools import FileTools, JSONTools
 
 _log = logging.getLogger(__spec__.name)
 
@@ -49,8 +49,4 @@ class ActionDumpMetadata(BaseAction):
 		}
 
 		with FileTools.open_write_stdout(self._args.outfile) as f:
-			if self._args.pretty_print:
-				json.dump(dump_data, f, indent = 4, sort_keys = True)
-			else:
-				json.dump(dump_data, f, separators = (",", ":"))
-			print(file = f)
+			JSONTools.dump(dump_data, f, pretty_print = self._args.pretty_print)

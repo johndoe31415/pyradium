@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -239,3 +239,6 @@ class Agenda():
 			unresolved_items.append(unresolved_item)
 		(agenda_items, markers) = cls._resolve(unresolved_items, granularity_minutes = granularity_minutes)
 		return cls(agenda_items = agenda_items, markers = markers, name = name)
+
+	def to_json(self):
+		return [ agenda_item._asdict() for agenda_item in self._agenda_items ]

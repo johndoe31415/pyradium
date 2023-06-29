@@ -264,6 +264,22 @@ class JSONTools():
 		else:
 			return obj
 
+	@classmethod
+	def _serialize_default(cls, obj):
+		if hasattr(obj, "to_json"):
+			return obj.to_json()
+		else:
+			raise NotImplementedError(f"Cannot serialize JSON from type {obj.__class__.__name__} (implement a 'to_json' method if you want this to be serializable)")
+
+	@classmethod
+	def dump(cls, obj, f, pretty_print = False):
+		if pretty_print:
+			json.dump(obj, f, indent = "\t", sort_keys = True, default = cls._serialize_default)
+			print(file = f)
+		else:
+			json.dump(obj, f, separators = (",", ":"), default = cls._serialize_default)
+
+
 class ImageTools():
 	@classmethod
 	def get_image_info(cls, filename):
