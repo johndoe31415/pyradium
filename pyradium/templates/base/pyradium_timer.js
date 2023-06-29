@@ -372,8 +372,11 @@ export class PresentationTimer {
 		const current_slide_ratio = this._slide_subset_selector.get_ratio_of(this._current_slide);
 		const current_slide_nominal_duration_secs = current_slide_ratio / this._active_timer.subset_ratio * this._active_timer.presentation_duration_secs;
 		const current_slide_dynamic_duration_secs = current_slide_ratio / this._dynamic_timer.subset_ratio * this._dynamic_timer.presentation_duration_secs;
-		this._ui_elements.slide_time_display.innerHTML = "nominal " + TimeTools.format_hms(current_slide_nominal_duration_secs) + "<br />dynamic " + TimeTools.format_hms(current_slide_dynamic_duration_secs);
 
+		this._ui_elements.slide_time_display.innerHTML = "nominal " + TimeTools.format_hms(current_slide_nominal_duration_secs);
+		if (!isNaN(current_slide_dynamic_duration_secs)) {
+			this._ui_elements.slide_time_display.innerHTML += "<br />dynamic " + TimeTools.format_hms(current_slide_dynamic_duration_secs);
+		}
 		const cumulative_current_slide_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._current_slide);
 
 		const nominal_subset_begin_ratio = this._slide_subset_selector.get_cumulative_ratio_before(this._active_timer.slide_subset.begin_slide);
@@ -386,7 +389,9 @@ export class PresentationTimer {
 
 		const nominal_delta_time_secs = ideal_nominal_elapsed_time_secs - nominal_elapsed_time_secs + current_slide_nominal_duration_secs;
 		const dynamic_delta_time_secs = ideal_dynamic_elapsed_time_secs - dynamic_elapsed_time_secs + current_slide_dynamic_duration_secs;
-		if (this._current_slide <= this._dynamic_timer.slide_subset.end_slide) {
+
+
+		if ((!isNaN(dynamic_delta_time_secs)) && (this._current_slide <= this._dynamic_timer.slide_subset.end_slide)) {
 			this._ui_elements.dynamic_delta_time_display.innerText = TimeTools.format_hms(dynamic_delta_time_secs);
 		} else {
 			/* Dynamic timings do not make sense when exceeding the subset, so default to the nominal timing then */
