@@ -282,15 +282,24 @@ export class PresentationTimer {
 
 		if (this._presentation_end_time != null) {
 			const end_ts = this._presentation_end_time.compute(this._nominal_presentation_duration_secs);
-			const hh_mm_str = end_ts.getHours() + ":" + end_ts.getMinutes().toString().padStart(2, "0");
 			const now = new Date();
-			this._presentation_duration_secs = (end_ts.getTime() - now.getTime()) / 1000;
-			this._ui_elements.presentation_end_time_display.innerText = hh_mm_str;
-			this._ui_elements.presentation_duration_display.innerText = TimeTools.format_hm(this._presentation_duration_secs);
+			const presentation_duration_secs = (end_ts.getTime() - now.getTime()) / 1000
+			if (presentation_duration_secs > 0) {
+				const hh_mm_str = end_ts.getHours() + ":" + end_ts.getMinutes().toString().padStart(2, "0");
+				this._ui_elements.presentation_end_time_display.innerText = hh_mm_str;
+				this._ui_elements.presentation_duration_display.innerText = TimeTools.format_hm(presentation_duration_secs);
+				this._presentation_duration_secs = presentation_duration_secs;
+			} else {
+				this._presentation_duration_secs = null;
+				this._ui_elements.presentation_end_time.classList.add("parse-error");
+			}
 		} else {
+			this._presentation_duration_secs = null;
+		}
+
+		if (this._presentation_duration_secs == null) {
 			this._ui_elements.presentation_end_time_display.innerText = "-";
 			this._ui_elements.presentation_duration_display.innerText = "-";
-			this._presentation_duration_secs = null;
 		}
 
 		let nominal_subset_duration_secs = this._compute_nominal_subset_duration_secs();
@@ -305,7 +314,7 @@ export class PresentationTimer {
 			this._ui_elements.average_slide_duration_display.innerText = "-";
 		}
 
-		if ((this._presentation_end_time != null) && (this._slide_subset != null)) {
+		if ((this._presentation_end_time != null) && (this._slide_subset != null) && (this._presentation_duration_secs != null)) {
 			const pace_percent = nominal_subset_duration_secs / this._presentation_duration_secs * 100;
 			this._ui_elements.presentation_pace_display.innerText = pace_percent.toFixed(0) + "%";
 		} else {
