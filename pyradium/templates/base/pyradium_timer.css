@@ -16,6 +16,7 @@ div.main_indicator {
 	font-size: 5em;
 	text-align: center;
 	border-radius: 10px;
+	border: 15px solid white;
 }
 
 div.main_indicator div.sub_indicator {
@@ -80,6 +81,14 @@ div.main_indicator.slightly_behind {
 div.main_indicator.largely_behind {
 	background: #cc3300;
 	color: white;
+}
+
+div.main_indicator.last_slide_in_subset {
+	border: 15px solid #e67e22;
+}
+
+div.main_indicator.beyond_last_slide_in_subset {
+	border: 15px solid #c0392b;
 }
 
 img.media {

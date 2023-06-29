@@ -426,6 +426,11 @@ export class PresentationTimer {
 		} else {
 			this._ui_elements.main_indicator.classList.add("largely_ahead");
 		}
+		if (this._current_slide == this._dynamic_timer.slide_subset.end_slide) {
+			this._ui_elements.main_indicator.classList.add("last_slide_in_subset");
+		} else if (this._current_slide > this._dynamic_timer.slide_subset.end_slide) {
+			this._ui_elements.main_indicator.classList.add("beyond_last_slide_in_subset");
+		}
 	}
 
 	_timer_preset_changed() {
