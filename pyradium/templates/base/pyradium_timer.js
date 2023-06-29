@@ -1,6 +1,6 @@
 /*
 	*	pyradium - HTML presentation/slide show generator
-	*	Copyright (C) 2015-2021 Johannes Bauer
+	*	Copyright (C) 2015-2023 Johannes Bauer
 	*
 	*	This file is part of pyradium.
 	*
@@ -539,6 +539,9 @@ export class PresentationTimer {
 	}
 
 	_recompute_dynamic_timer() {
+		if (this._active_timer == null) {
+			return;
+		}
 		this._dynamic_timer = this._create_timer_object(true);
 	}
 
