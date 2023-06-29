@@ -197,7 +197,7 @@ class XMLTools():
 		return False
 
 	@classmethod
-	def xml_to_dict(cls, node, multikeys = None):
+	def xml_to_dict(cls, node, multikeys = None, handlers = None):
 		if node is None:
 			return None
 		if cls.has_sub_elements(node):
@@ -205,7 +205,10 @@ class XMLTools():
 			for child in node.childNodes:
 				if child.nodeType == node.ELEMENT_NODE:
 					key = child.tagName
-					value = cls.xml_to_dict(child)
+					if (handlers is not None) and (key in handlers):
+						value = handlers[key](child)
+					else:
+						value = cls.xml_to_dict(child, multikeys = multikeys, handlers = handlers)
 					if (multikeys is None) or (key not in multikeys):
 						result[key] = value
 					else:

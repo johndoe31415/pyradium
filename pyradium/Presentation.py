@@ -124,6 +124,12 @@ class Presentation():
 		return variables
 
 	@classmethod
+	def _xml_to_dict_timer_preset(cls, node):
+		if not node.hasAttribute("name"):
+			raise MalformedXMLInputException("'timer-preset' node in the metadata of the presentation requires a 'name' attribute.")
+		return { key: node.getAttribute(key) for key in [ "name", "time", "subset" ] }
+
+	@classmethod
 	def load_from_file(cls, filename, rendering_parameters = None):
 		(dom, presentation) = cls.parse_xml(filename)
 		meta = None
@@ -135,7 +141,9 @@ class Presentation():
 				continue
 
 			if child.tagName == "meta":
-				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")), multikeys = [ "variables" ])
+				meta = XMLTools.xml_to_dict(XMLTools.child_tagname(dom, ("presentation", "meta")), multikeys = [ "variables", "timer-preset" ], handlers = {
+					"timer-preset":		cls._xml_to_dict_timer_preset,
+				})
 			elif child.tagName == "variables":
 				variables = VariableSubstitutionContainer.merge_dicts(variables, cls._parse_variables(child, rendering_parameters))
 			elif child.tagName == "slide":
@@ -176,6 +184,7 @@ class Presentation():
 	def _validate_metadata(self):
 		if self._meta is None:
 			return
+		print(self._meta)
 		if "agenda" in self._meta:
 			self._meta["agenda"] = Agenda.parse(text = self._meta["agenda"])
 
