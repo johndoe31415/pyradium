@@ -237,6 +237,9 @@ export class PresentationTimer {
 		this._ui_elements.slide_subset.value = "all";
 		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._ui_update_everything());
 		this._ui_elements.slide_subset.addEventListener("input", (event) => this._ui_update_everything());
+		this._ui_elements.presentation_end_time.addEventListener("input", (event) => this._timer_preset_custom());
+		this._ui_elements.slide_subset.addEventListener("input", (event) => this._timer_preset_custom());
+		this._ui_elements.timer_preset.addEventListener("input", (event) => this._timer_preset_changed());
 		this._ui_elements.btn_arm_timer.addEventListener("click", (event) => this.arm_timer());
 		this._ui_elements.btn_start_timer.addEventListener("click", (event) => this.start_timer());
 		this._ui_elements.main_indicator.addEventListener("click", (event) => this.stop_timer());
@@ -420,6 +423,20 @@ export class PresentationTimer {
 		}
 	}
 
+	_timer_preset_changed() {
+		const index = this._ui_elements.timer_preset.value | 0;
+		if (index >= 0) {
+			const preset = this._meta.timer_preset[index];
+			this._ui_elements.presentation_end_time.value = preset.time;
+			this._ui_elements.slide_subset.value = preset.subset;
+			this._ui_update_everything();
+		}
+	}
+
+	_timer_preset_custom() {
+		this._ui_elements.timer_preset.value = -1;
+	}
+
 	_ui_update_everything() {
 		this._ui_update_input_fields();
 		this._ui_update_buttons();
@@ -458,6 +475,14 @@ export class PresentationTimer {
 		if (this._meta.presentation_time != null) {
 			this._ui_elements.presentation_end_time.value = "+" + this._meta.presentation_time;
 			this._nominal_presentation_duration_secs = TimeTools.parse_hh_mm(this._meta.presentation_time) * 60;
+		}
+
+		if (this._meta.timer_preset != null) {
+			for (const [ i, preset ] of this._meta.timer_preset.entries()) {
+				const option = this._ui_elements.timer_preset.appendChild(this._ui_elements.timer_preset.ownerDocument.createElement("option"));
+				option.setAttribute("value", i);
+				option.innerText = preset.name;
+			}
 		}
 		this._slide_subset_selector = new SlideSubsetSelector(this._meta.slide_ratios);
 		this._ui_update_everything();

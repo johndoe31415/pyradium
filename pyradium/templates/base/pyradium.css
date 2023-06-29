@@ -74,7 +74,8 @@ input {
 	width: 40%;
 }
 
-input, textarea {
+input, textarea, select {
+	background: white;
 	border-radius: 5px;
 	border: 1px solid #aaa;
 	padding: 10px;
