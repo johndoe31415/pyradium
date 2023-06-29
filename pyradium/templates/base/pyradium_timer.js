@@ -49,8 +49,9 @@ class SlideSubset {
 }
 
 class SlideSubsetSelector {
-	constructor(slide_ratios) {
+	constructor(slide_ratios, markers) {
 		this._slide_ratios = slide_ratios;
+		this._markers = markers;
 		this._cumulative_ratios = [ ];
 
 		let cumulative_ratio = 0;
@@ -111,32 +112,41 @@ class SlideSubsetSelector {
 		 *     any value of 'begin' or 'end' can be a percent value by using a '%' suffix
 		 */
 		{
-			const match = selector.match(/^\s*(?<count>#\s*)?((?<lhs>(?<lhs_num>\d+)(?<lhs_percent>\s*%)?))?\s*-\s*((?<rhs>(?<rhs_num>\d+)(?<rhs_percent>\s*%)?))?\s*$/);
+			const match = selector.match(/^\s*(?<count>#\s*)?((?<lhs>(?<lhs_num>\d+)(?<lhs_percent>\s*%)?|@(?<lhs_name>[_a-zA-Z0-9]+)))?\s*-\s*((?<rhs>(?<rhs_num>\d+)(?<rhs_percent>\s*%)?|@(?<rhs_name>[_a-zA-Z0-9]+)))?\s*$/);
 			if (match) {
 				const count_based = (match.groups.count != null);
 				let begin_slide = 1;
 				if (match.groups.lhs != null) {
-					const lhs_percent = (match.groups.lhs_percent != null);
-					const lhs_value = match.groups.lhs_num | 0;
+					if (match.groups.lhs_num) {
+						const lhs_percent = (match.groups.lhs_percent != null);
+						const lhs_value = match.groups.lhs_num | 0;
 
-					if (!lhs_percent) {
-						/* Plain value like '5', always count-based */
-						begin_slide = lhs_value;
-					} else {
-						if (count_based) {
-							/* Percent value like '33%', count-based */
-							begin_slide = Math.round(lhs_value / 100 * (this.slide_count - 1)) + 1;
+						if (!lhs_percent) {
+							/* Plain value like '5', always count-based */
+							begin_slide = lhs_value;
 						} else {
-							/* Percent value like '33%', time-based */
-							begin_slide = this._find_slide_ratio(lhs_value / 100);
+							if (count_based) {
+								/* Percent value like '33%', count-based */
+								begin_slide = Math.round(lhs_value / 100 * (this.slide_count - 1)) + 1;
+							} else {
+								/* Percent value like '33%', time-based */
+								begin_slide = this._find_slide_ratio(lhs_value / 100);
+							}
+							if (begin_slide > 1) {
+								/* We want to start offset one, so that for 100 slides,
+								 * 0% - 50%   =>   1 - 50
+								 * 50% - 100% =>   51 - 100
+								 */
+								begin_slide += 1;
+							}
 						}
-						if (begin_slide > 1) {
-							/* We want to start offset one, so that for 100 slides,
-							 * 0% - 50%   =>   1 - 50
-							 * 50% - 100% =>   51 - 100
-							 */
-							begin_slide += 1;
+					} else {
+						/* lhs by name */
+						const lhs_name = match.groups.lhs_name;
+						if (!(lhs_name in this._markers)) {
+							return null;
 						}
+						begin_slide = this._markers[lhs_name] + 1;
 					}
 				}
 				begin_slide = MathTools.clamp(begin_slide, 1, this.slide_count);
@@ -144,21 +154,30 @@ class SlideSubsetSelector {
 
 				let end_slide = this.slide_count;
 				if (match.groups.rhs != null) {
-					const rhs_percent = (match.groups.rhs_percent != null);
-					const rhs_value = match.groups.rhs_num | 0;
+					if (match.groups.rhs_num) {
+						const rhs_percent = (match.groups.rhs_percent != null);
+						const rhs_value = match.groups.rhs_num | 0;
 
-					if (!rhs_percent) {
-						/* Plain value like '15', always count-based */
-						end_slide = match.groups.rhs_num | 0;
-					} else {
-
-						if (count_based) {
-							/* Percent value like '66%', count-based */
-							end_slide = Math.round(rhs_value / 100 * (this.slide_count - 1)) + 1;
+						if (!rhs_percent) {
+							/* Plain value like '15', always count-based */
+							end_slide = match.groups.rhs_num | 0;
 						} else {
-							/* Percent value like '66%', time-based */
-							end_slide = this._find_slide_ratio(rhs_value / 100, begin_slide);
+
+							if (count_based) {
+								/* Percent value like '66%', count-based */
+								end_slide = Math.round(rhs_value / 100 * (this.slide_count - 1)) + 1;
+							} else {
+								/* Percent value like '66%', time-based */
+								end_slide = this._find_slide_ratio(rhs_value / 100, begin_slide);
+							}
 						}
+					} else {
+						/* rhs by name */
+						const rhs_name = match.groups.rhs_name;
+						if (!(rhs_name in this._markers)) {
+							return null;
+						}
+						end_slide = this._markers[rhs_name];
 					}
 				}
 				end_slide = MathTools.clamp(end_slide, 1, this.slide_count);
@@ -203,8 +222,6 @@ class SlideSubsetSelector {
 				}
 			}
 		}
-
-
 		return null;
 	}
 }
@@ -255,7 +272,7 @@ export class PresentationTimer {
 		}
 
 		if (this._slide_subset_selector != null) {
-			this._slide_subset = this._slide_subset_selector.parse(this._ui_elements.slide_subset.value, (this._meta == null) ? null : this._meta.slide_count);
+			this._slide_subset = this._slide_subset_selector.parse(this._ui_elements.slide_subset.value);
 			if (this._slide_subset == null) {
 				this._ui_elements.slide_subset.classList.add("parse-error");
 			} else {
@@ -494,7 +511,7 @@ export class PresentationTimer {
 				option.innerText = preset.name;
 			}
 		}
-		this._slide_subset_selector = new SlideSubsetSelector(this._meta.slide_ratios);
+		this._slide_subset_selector = new SlideSubsetSelector(this._meta.slide_ratios, this._meta.markers);
 		this._ui_update_everything();
 	}
 

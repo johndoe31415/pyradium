@@ -21,6 +21,8 @@
 		<timer-preset name="Group 2 Part 2" time="16:30-0:15/2" subset="2/3" />
 		<timer-preset name="Group 2 Part 3" time="16:30" subset="3/3" />
 		<timer-preset name="Group 3" time="{v['group3_endtime']}" subset="1/1" />
+		<timer-preset name="Marker before" time="100%" subset="1 - @before_intro" />
+		<timer-preset name="Marker after" time="100%" subset="@before_intro -" />
 	</meta>
 
 	<variables>
@@ -67,6 +69,8 @@
 			<li>This should show <i>only</i> show <s:enq>Moo</s:enq> below.</li>
 		</ul>
 	</slide>
+
+	<marker name="before_intro" />
 
 	<section>Introduction</section>
 	<subsection>Nomenclature</subsection>

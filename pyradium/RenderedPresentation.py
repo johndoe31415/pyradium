@@ -42,6 +42,7 @@ class RenderedPresentation():
 		self._total_slide_count = 0
 		self._uid = 0
 		self._features = set()
+		self._markers = { }
 
 		time_range = self._renderer.presentation.meta.get("presentation-time")
 		if time_range is None:
@@ -132,6 +133,10 @@ class RenderedPresentation():
 			feature = PresentationFeature(feature)
 		return feature in self.features
 
+	@property
+	def markers(self):
+		return self._markers
+
 	def append_slide(self, rendered_slide):
 		self._rendered_slides.append(rendered_slide)
 
@@ -186,6 +191,7 @@ class RenderedPresentation():
 			"slide_ratios":			self.schedule.slide_ratio_list,
 			"presentation_time":	self.renderer.presentation.meta.get("presentation-time"),
 			"timer_preset":			self.renderer.presentation.meta.get("timer-preset"),
+			"markers":				self.markers,
 		}
 
 	@property

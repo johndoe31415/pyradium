@@ -31,6 +31,7 @@ from .TOC import TOCElement, TOCDirective
 from .Slide import RenderSlideDirective
 from .VariableSubstitution import VariableSubstitutionContainer
 from .Acronyms import AcronymDirective
+from .Markers import MarkerDirective
 from .Exceptions import XMLFileNotFoundException, MalformedXMLInputException, JSONFileNotFoundException, MalformedJSONInputException
 
 _log = logging.getLogger(__spec__.name)
@@ -149,6 +150,8 @@ class Presentation():
 			elif child.tagName == "slide":
 				if not XMLTools.get_bool_attr(child, "hide"):
 					content.append(RenderSlideDirective(child))
+			elif child.tagName == "marker":
+				content.append(MarkerDirective(child.getAttribute("name")))
 			elif child.tagName == "include":
 				src = child.getAttribute("src")
 				if rendering_parameters is not None:
