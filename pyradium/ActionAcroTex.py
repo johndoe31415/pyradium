@@ -43,3 +43,4 @@ class ActionAcroTex(BaseAction):
 				else:
 					print(f"\\acro{{{acronym_id}}}[{acronym}]{{{acrodata['text']}}}", file = f)
 			print("\\end{acronym}", file = f)
+		return 0
