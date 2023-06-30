@@ -19,17 +19,27 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import os
+import sys
 from .Acrofile import Acrofile
 from .BaseAction import BaseAction
+from .Tools import FileTools
 
 class ActionAcroTex(BaseAction):
 	def run(self):
+		if (not self._args.force) and (self._args.tex_outfile != "-") and os.path.exists(self._args.tex_outfile):
+			print(f"Refusing to overwrite: {self._args.tex_outfile}", file = sys.stderr)
+			return 1
+
 		acrofile = Acrofile.load_from_file(self._args.acrofile)
-		print("\\begin{acronym}")
-		for (acronym_id, acrodata) in sorted(acrofile):
-			acronym = acrodata.get("acronym", acronym_id)
-			if acronym_id == acronym:
-				print(f"\\acro{{{acronym_id}}}{{{acrodata['text']}}}")
-			else:
-				print(f"\\acro{{{acronym_id}}}[{acronym}]{{{acrodata['text']}}}")
-		print("\\end{acronym}")
+		with FileTools.open_write_stdout(self._args.tex_outfile) as f:
+			print("\\begin{acronym}", file = f)
+			if self._args.itemsep is not None:
+				print(f"\\itemsep={{{self._args.itemsep}}}", file = f)
+			for (acronym_id, acrodata) in sorted(acrofile):
+				acronym = acrodata.get("acronym", acronym_id)
+				if acronym_id == acronym:
+					print(f"\\acro{{{acronym_id}}}{{{acrodata['text']}}}", file = f)
+				else:
+					print(f"\\acro{{{acronym_id}}}[{acronym}]{{{acrodata['text']}}}", file = f)
+			print("\\end{acronym}", file = f)

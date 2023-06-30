@@ -122,8 +122,11 @@ def main():
 	mc.register("acrosort", "Sort an acryonym database", genparser, action = ActionAcroSort, aliases = [ "asort" ])
 
 	def genparser(parser):
+		parser.add_argument("-i", "--itemsep", metavar = "distance", help = "Include an \\itemsep command inside the acronym directory.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
+		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files if they already exist.")
 		parser.add_argument("acrofile", help = "Acronym database JSON file.")
+		parser.add_argument("tex_outfile", nargs = "?", default = "-", help = "TeX output file to generate. If omitted, defaults to stdout.")
 	mc.register("acrotex", "Convert an acronym database to LaTeX format", genparser, action = ActionAcroTex)
 
 	def genparser(parser):
@@ -154,7 +157,7 @@ def main():
 		parser.add_argument("-m", "--mode", choices = [ "print", "vim", "evim", "fulljson" ], default = gc.get("spellcheck", "mode") or "print", help = "Mode in which spellchecking is performed. Can be one of %(choices)s, defaults to %(default)s.")
 		parser.add_argument("-o", "--outfile", metavar = "filename", help = "Write output to this file. By default, outputs to stdout.")
 		parser.add_argument("--vim", action = "store_true", help = "Run vim to actually spellcheck the file in question.")
-		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files in destination directory if they already exist.")
+		parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite files if they already exist.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
 		parser.add_argument("infile", help = "Input XML file of the presentation.")
 	mc.register("spellcheck", "Spellcheck an XML presentation file", genparser, action = ActionSpellcheck)
