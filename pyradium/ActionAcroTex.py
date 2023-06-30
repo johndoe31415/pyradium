@@ -35,7 +35,7 @@ class ActionAcroTex(BaseAction):
 		with FileTools.open_write_stdout(self._args.tex_outfile) as f:
 			print("\\begin{acronym}", file = f)
 			if self._args.itemsep is not None:
-				print(f"\\itemsep={{{self._args.itemsep}}}", file = f)
+				print(f"\\itemsep={self._args.itemsep}", file = f)
 			for (acronym_id, acrodata) in sorted(acrofile):
 				acronym = acrodata.get("acronym", acronym_id)
 				if acronym_id == acronym:
