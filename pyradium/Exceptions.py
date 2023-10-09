@@ -29,6 +29,7 @@ class XMLFileNotFoundException(PyRadiumException): pass
 class JSONFileNotFoundException(PyRadiumException): pass
 class MalformedJSONInputException(PyRadiumException): pass
 class MalformedXMLInputException(PyRadiumException): pass
+class MalformedImageException(PyRadiumException): pass
 class MalformedFormatStringInputException(PyRadiumException): pass
 class MalformedStyleConfigurationException(PyRadiumException): pass
 class DeploymentException(PyRadiumException): pass

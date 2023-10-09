@@ -20,9 +20,10 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pysvgedit import SVGDocument
+from pysvgedit.Exceptions import SVGValidationException
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
 from pyradium.Tools import XMLTools
-from pyradium.Exceptions import InvalidTransformationException, MalformedXMLInputException
+from pyradium.Exceptions import InvalidTransformationException, MalformedXMLInputException, MalformedImageException
 
 @XMLHookRegistry.register_hook
 class ImgHook(BaseHook):
@@ -75,7 +76,10 @@ class ImgHook(BaseHook):
 			properties["src"] = filename
 			if filename.lower().endswith(".svg"):
 				doc = SVGDocument.read(filename)
-				rendered_presentation.renderer.rendering_params.svg_validator.validate(doc)
+				try:
+					rendered_presentation.renderer.rendering_params.svg_validator.validate(doc)
+				except SVGValidationException as e:
+					raise MalformedImageException(f"SVG image {filename} did not pass SVG validation: {str(e)}") from e
 		else:
 			# Literal specification as value
 			properties["value"] = node.getAttribute("value").encode("utf-8")
