@@ -1,3 +1,8 @@
+:root {
+	--flatui-red: #c0392b;
+	--flatui-green: #27ae60;
+}
+
 a {
 	color: #2185c5;
 
@@ -217,6 +222,11 @@ ol {
 	margin-left: 15px;
 }
 
+ul.posneg {
+	text-indent: -56px;
+	margin-left: 38px;
+}
+
 ul > li {
 	list-style: none;
 }
@@ -233,6 +243,26 @@ ul > li > ul > li:before {
 ul.bare > li {
 	background-image: none;
 	padding-left: 0px;
+}
+
+ul.posneg > li.pos:before {
+	content: "＋";
+	color: var(--flatui-green);
+	margin-right: 8px;
+}
+
+ul.posneg > li.pos {
+	color: var(--flatui-green);
+}
+
+ul.posneg > li.neg:before {
+	content: "－";
+	color: var(--flatui-red);
+	margin-right: 8px;
+}
+
+ul.posneg > li.neg {
+	color: var(--flatui-red);
 }
 
 div.final_flex {
