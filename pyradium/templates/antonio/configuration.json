@@ -153,6 +153,7 @@
 					"base/presentation_pause_end.mp3"
 				],
 				"css": [
+					"base/pyradium_modal.css",
 					"base/pyradium_pause.css"
 				]
 			},
