@@ -77,7 +77,7 @@ class XMLHookRegistry():
 				new_text = cls._replace_text(text)
 				if text != new_text:
 					node.replaceWholeText(new_text)
-		XMLTools.walk(root_node, callback)
+		XMLTools.walk(root_node, callback, cancel_descent_predicate=lambda node: node.nodeName == "s:verb")
 
 class BaseHook():
 	_TAG_NAME = None
