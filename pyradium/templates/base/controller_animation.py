@@ -45,8 +45,6 @@ def _parse_frame_range(frame_range_str):
 	return frames
 
 class AnimationController(BaseController):
-	_VALID_ANIMATION_MODES = [ "compose", "compose-all", "replace" ]
-
 	def render(self):
 		filename = self.slide.get_xml_slide_var("filename")
 		if filename is None:
