@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 from pyradium.Exceptions import NoSuchVariableException, CodeExecutionFailedException
 
@@ -48,4 +48,4 @@ class VariableSubstitutionHook(BaseHook):
 
 		value = str(value)
 		replacement_node = node.ownerDocument.createTextNode(value)
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node)

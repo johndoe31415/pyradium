@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import re
-from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry, ReplacementFragment
 
 @XMLHookRegistry.register_hook
 class TerminalHook(InnerTextHook):
@@ -76,4 +76,4 @@ class TerminalHook(InnerTextHook):
 
 		if node.hasAttribute("height"):
 			replacement_node.setAttribute("style", "height: %s" % (node.getAttribute("height")))
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node, continue_descent = False)

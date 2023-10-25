@@ -21,7 +21,7 @@
 
 import shutil
 import xml.dom.minidom
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 from pyradium.CmdlineParser import CmdlineParser
 from pyradium.Exceptions import FailedToLookupFileException, MalformedXMLInputException, SecurityViolationException
@@ -67,4 +67,4 @@ class ExecHook(BaseHook):
 			raise MalformedXMLInputException("Ouptut of script execution (%s) returned invalid XML: %s" % (CmdlineEscape().cmdline(cmd), str(e))) from e
 
 		root = doc.firstChild
-		return list(root.childNodes)
+		return ReplacementFragment(replacement = list(root.childNodes))

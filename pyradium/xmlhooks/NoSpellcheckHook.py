@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 
 @XMLHookRegistry.register_hook
 class NoSpellcheckHook(BaseHook):
@@ -27,4 +27,4 @@ class NoSpellcheckHook(BaseHook):
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		return list(node.childNodes)
+		return ReplacementFragment(replacement = list(node.childNodes))

@@ -21,7 +21,7 @@
 
 from pysvgedit import SVGDocument
 from pysvgedit.Exceptions import SVGValidationException
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 from pyradium.Exceptions import InvalidTransformationException, MalformedXMLInputException, MalformedImageException
 
@@ -118,4 +118,4 @@ class ImgHook(BaseHook):
 			replacement_node = img_node
 
 		rendered_presentation.add_file(local_filename, rendered_image.data["img_data"])
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node, continue_descent = False)

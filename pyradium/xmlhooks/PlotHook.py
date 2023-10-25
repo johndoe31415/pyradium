@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2021-2021 Johannes Bauer
+#	Copyright (C) 2021-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 
 @XMLHookRegistry.register_hook
 class PlotHook(BaseHook):
@@ -45,4 +45,4 @@ class PlotHook(BaseHook):
 		replacement_node.appendChild(img_node)
 
 		rendered_presentation.add_file(local_filename, rendered_plot.data["img_data"])
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node, continue_descent = False)

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
@@ -40,4 +40,4 @@ class DigitalTimingDiagramHook(BaseHook):
 		replacement_node = node.ownerDocument.createElement("s:img")
 		replacement_node.setAttribute("value", result.data["svg"])
 		replacement_node.setAttribute("filetype", "svg")
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node, continue_descent = False)

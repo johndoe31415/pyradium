@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -21,7 +21,7 @@
 
 import xml.dom.minidom
 import pygments
-from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Enums import PresentationFeature
 from pyradium.Exceptions import CodeHighlightingException
 
@@ -42,4 +42,4 @@ class CodeHook(InnerTextHook):
 		if node.hasAttribute("height"):
 			replacement_node.setAttribute("style", "height: %s" % (node.getAttribute("height")))
 		rendered_presentation.add_feature(PresentationFeature.Pygments)
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node, continue_descent = False)

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,12 +19,12 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import InnerTextHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 
 @XMLHookRegistry.register_hook
-class VerbatimHook(InnerTextHook):
+class VerbatimHook(BaseHook):
 	_TAG_NAME = "verb"
 
 	@classmethod
-	def handle_text(cls, text, rendered_presentation, node):
-		return list(node.childNodes)
+	def handle(cls, rendered_presentation, node):
+		return ReplacementFragment(replacement = list(node.childNodes), continue_descent = False)

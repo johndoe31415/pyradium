@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Exceptions import NoAgendaException
 
 @XMLHookRegistry.register_hook
@@ -38,4 +38,4 @@ class AgendaHook(BaseHook):
 			li_node.appendChild(node.ownerDocument.createElement("b")).appendChild(node.ownerDocument.createTextNode(f"{item.start_time} - {item.end_time}"))
 			li_node.appendChild(node.ownerDocument.createTextNode(f": {item.text}"))
 		replacement_node.setAttribute("class", "agenda")
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node)

@@ -29,6 +29,8 @@ import subprocess
 from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidEvalExpressionException
 
 class XMLTools():
+	class CancelDescentException(Exception): pass
+
 	@classmethod
 	def child_tagname(cls, node, tag_name):
 		if node is None:
@@ -90,10 +92,16 @@ class XMLTools():
 	def walk(cls, node, callback, predicate = None, cancel_descent_predicate = None):
 		if (cancel_descent_predicate is not None) and cancel_descent_predicate(node):
 			return
+		continue_descent = True
 		if (predicate is None) or predicate(node):
-			callback(node)
-		for child in node.childNodes:
-			cls.walk(child, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
+			try:
+				callback(node)
+			except cls.CancelDescentException:
+				continue_descent = False
+
+		if continue_descent:
+			for child in node.childNodes:
+				cls.walk(child, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
 
 	@classmethod
 	def walk_elements(cls, node, callback):

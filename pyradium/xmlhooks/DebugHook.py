@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -31,3 +31,4 @@ class DebugHook(BaseHook):
 	@classmethod
 	def handle(cls, rendered_presentation, node):
 		_log.debug("Debug hook: %s", str(node))
+		return node

@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
@@ -45,4 +45,4 @@ class NthHook(BaseHook):
 			node.ownerDocument.createElement("sup"),
 		]
 		replacement_nodes[1].appendChild(node.ownerDocument.createTextNode(suffix))
-		return replacement_nodes
+		return ReplacementFragment(replacement = replacement_nodes, continue_descent = False)

@@ -20,7 +20,7 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 from pysvgedit import SVGStyle
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
@@ -74,4 +74,4 @@ class TexHook(BaseHook):
 			replacement_node.appendChild(img_node)
 
 		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node)

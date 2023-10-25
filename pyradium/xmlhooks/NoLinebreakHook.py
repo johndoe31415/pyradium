@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
@@ -32,4 +32,4 @@ class NoLinebreakHook(BaseHook):
 			text = inner_node.wholeText.replace(" ", "\u00a0")
 			inner_node.replaceWholeText(text)
 		XMLTools.walk(node, callback, predicate = lambda node: (node.nodeType == node.TEXT_NODE))
-		return list(node.childNodes)
+		return ReplacementFragment(replacement = list(node.childNodes))

@@ -21,7 +21,7 @@
 
 import os
 import hashlib
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Exceptions import MalformedXMLInputException
 
 @XMLHookRegistry.register_hook
@@ -53,4 +53,4 @@ class FileHook(BaseHook):
 			for child in list(node.childNodes):
 				replacement_node.appendChild(child)
 
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node)

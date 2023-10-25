@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2022 Johannes Bauer
+#	Copyright (C) 2015-2023 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 from pyradium.BooleanExpression import BooleanExpressionParser, TexBooleanExpressionPrinter
 
@@ -45,4 +45,4 @@ class BoolHook(BaseHook):
 			if node.hasAttribute(copy_attr):
 				replacement_node.setAttribute(copy_attr, node.getAttribute(copy_attr))
 
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node)

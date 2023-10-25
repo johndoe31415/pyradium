@@ -19,7 +19,7 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
-from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry
+from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 
 @XMLHookRegistry.register_hook
@@ -40,4 +40,4 @@ class QRCodeHook(BaseHook):
 		replacement_node = node.ownerDocument.createElement("s:img")
 		replacement_node.setAttribute("value", qrcode_svg.data["svg"].decode())
 		replacement_node.setAttribute("filetype", "svg")
-		return replacement_node
+		return ReplacementFragment(replacement = replacement_node)
