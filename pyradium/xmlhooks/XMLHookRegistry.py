@@ -80,6 +80,8 @@ class XMLHookRegistry():
 				if text != new_text:
 					#print(f"Text replace {id(node):x}: {text} -> {new_text}")
 					node.data = new_text
+			elif node.nodeType == node.COMMENT_NODE:
+				XMLTools.remove_node(node)
 		XMLTools.walk(root_node, callback)
 
 
