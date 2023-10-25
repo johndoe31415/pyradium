@@ -44,7 +44,7 @@ class XMLHookTests(unittest.TestCase):
 		XMLHookRegistry.mangle(rendered_presentation = None, root_node = node)
 		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">- -- ---</slide>")
 
-	def test_text_replace_not_in_verb(self):
+	def test_text_replace_not_in_enq_verb(self):
 		node = self._parse("<s:enq type=\"bkt\"><s:verb>- -- ---</s:verb></s:enq>")
 		XMLHookRegistry.mangle(rendered_presentation = None, root_node = node)
 		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">[- -- ---]</slide>")
