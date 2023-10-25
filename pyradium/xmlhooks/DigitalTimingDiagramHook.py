@@ -28,9 +28,6 @@ class DigitalTimingDiagramHook(BaseHook):
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-#		if not node.hasAttribute("cmd"):
-#			raise MalformedXMLInputException("An s:exec node must have a 'cmd' attribute.")
-
 		properties = {
 			"data":	XMLTools.inner_text(node),
 		}
