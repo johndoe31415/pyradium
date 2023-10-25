@@ -49,15 +49,11 @@ class XMLHookRegistry():
 	@classmethod
 	def mangle(cls, rendered_presentation, root_node):
 		def callback(node):
-			print("CALLBACK", hex(id(node)), node)
 			if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName.startswith("s:")):
 				hook_name = node.nodeName[2:]
 				if hook_name in cls._HOOKS:
 					hook_class = cls._HOOKS[hook_name]
 					replace_by = hook_class.handle(rendered_presentation, node)
-
-					print(hook_name, replace_by)
-
 					if replace_by is None:
 						# Delete node entirely
 						XMLTools.remove_node(node)
@@ -82,11 +78,9 @@ class XMLHookRegistry():
 				text = node.data
 				new_text = cls._replace_text(text)
 				if text != new_text:
-					print(f"Text replace {id(node):x}: {text} -> {new_text}")
+					#print(f"Text replace {id(node):x}: {text} -> {new_text}")
 					node.data = new_text
-					print(dir(node))
 		XMLTools.walk(root_node, callback)
-		print("="*120)
 
 
 @dataclasses.dataclass

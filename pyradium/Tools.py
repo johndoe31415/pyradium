@@ -89,7 +89,7 @@ class XMLTools():
 			return (None, node.tagName)
 
 	@classmethod
-	def _walk(cls, node, callback, predicate = None, cancel_descent_predicate = None):
+	def walk(cls, node, callback, predicate = None, cancel_descent_predicate = None):
 		if (cancel_descent_predicate is not None) and cancel_descent_predicate(node):
 			return
 		continue_descent = True
@@ -97,18 +97,14 @@ class XMLTools():
 			try:
 				callback(node)
 			except cls.CancelDescentException:
-				print("ABORTING DESCENT", node)
 				continue_descent = False
 
 		if continue_descent:
-			print("DESCENDING", node.childNodes)
+			# We *must* make a copy of childNodes here so that we are
+			# guaranteed to not iterate over wrong elements if the callback
+			# chooses to modify the DOM
 			for child in list(node.childNodes):
-				cls._walk(child, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
-
-	@classmethod
-	def walk(cls, node, callback, predicate = None, cancel_descent_predicate = None):
-		print("INIT WALK", node)
-		cls._walk(node, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
+				cls.walk(child, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
 
 	@classmethod
 	def walk_elements(cls, node, callback):
