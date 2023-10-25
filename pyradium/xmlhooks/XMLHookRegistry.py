@@ -30,7 +30,6 @@ _log = logging.getLogger(__spec__.name)
 class XMLHookRegistry():
 	_HOOKS = { }
 	_SPECIAL = set([ "var", "pause", "content", "param", "format" ])
-#	_BREAK_DESCENT_ON = set([ "s:verb", "s:term", "s:code" ])
 
 	@classmethod
 	def register_hook(cls, hook_class):
@@ -53,36 +52,44 @@ class XMLHookRegistry():
 			print("CALLBACK", node)
 			if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName.startswith("s:")):
 				hook_name = node.nodeName[2:]
-				if hook_name not in cls._SPECIAL:
-					if hook_name in cls._HOOKS:
-						hook_class = cls._HOOKS[hook_name]
-						replace_by = hook_class.handle(rendered_presentation, node)
-						if replace_by is None:
-							# Delete node entirely
-							XMLTools.remove_node(node)
-						elif replace_by is node:
-							# Returned node is identity, keep node as-is
-							pass
-						else:
-							print(f"Replacement after {hook_name}: {replace_by}")
-							# We expect to get a ReplacementFragment here
-							XMLTools.replace_node(node, replace_by.replacement)
+				if hook_name in cls._HOOKS:
+					hook_class = cls._HOOKS[hook_name]
+					replace_by = hook_class.handle(rendered_presentation, node)
 
-							# Since we've replaced nodes, we now need to re-trigger the descent on those
-							if replace_by.continue_descent:
-								for new_child in replace_by.replacement_items:
-									XMLTools.walk(new_child, callback)
-							else:
-								raise XMLTools.CancelDescentException()
+					print(hook_name, replace_by)
+
+					if replace_by is None:
+						# Delete node entirely
+						XMLTools.remove_node(node)
+					elif replace_by is node:
+						# Returned node is identity, keep node as-is
+						pass
 					else:
-						_log.warning("Unknown hook '%s' used in source document.", hook_name)
+						print(f"Replacement after {hook_name}: {replace_by} {', '.join(f'{id(x):x}' for x in replace_by.replacement_items)}")
+						# We expect to get a ReplacementFragment here
+						XMLTools.replace_node(node, replace_by.replacement)
+
+						# Since we've replaced nodes, we now need to re-trigger the descent on those
+						if replace_by.continue_descent:
+							for new_child in replace_by.replacement_items:
+								print("RENEW", new_child)
+								XMLTools.walk(new_child, callback)
+						raise XMLTools.CancelDescentException()
+				elif hook_name in cls._SPECIAL:
+					# Just skip it silently
+					pass
+				else:
+					_log.warning("Unknown hook '%s' used in source document.", hook_name)
 			elif node.nodeType == node.TEXT_NODE:
 				text = node.wholeText
 				new_text = cls._replace_text(text)
+#				if text.startswith("The word"):
+#					fdsjio
 				if text != new_text:
-					print(f"Text replace: {text} -> {new_text}")
+					print(f"Text replace {id(node):x}: {text} -> {new_text}")
 					node.replaceWholeText(new_text)
 		XMLTools.walk(root_node, callback)
+		print("="*120)
 
 
 @dataclasses.dataclass

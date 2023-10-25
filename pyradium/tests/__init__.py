@@ -25,3 +25,4 @@ from .AgendaTests import AgendaTests
 from .BooleanExpressionTests import BooleanExpressionTests
 from .RendererTests import RendererTests
 from .VariableSubstitutionTests import VariableSubstitutionTests
+from .XMLHookTests import XMLHookTests
