@@ -30,9 +30,9 @@ class XMLHookTests(unittest.TestCase):
 		return slide
 
 	def test_simple_enq(self):
-		node = self._parse("<s:enq>foo</s:enq>")
+		node = self._parse("<s:enq type=\"bkt\">foo</s:enq>")
 		XMLHookRegistry.mangle(rendered_presentation = None, root_node = node)
-		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">“foo”</slide>")
+		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">[foo]</slide>")
 
 	def test_text_replace(self):
 		node = self._parse("- -- ---")
@@ -45,6 +45,11 @@ class XMLHookTests(unittest.TestCase):
 		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">- -- ---</slide>")
 
 	def test_text_replace_not_in_verb(self):
-		node = self._parse("<s:enq><s:verb>- -- ---</s:verb></s:enq>")
+		node = self._parse("<s:enq type=\"bkt\"><s:verb>- -- ---</s:verb></s:enq>")
 		XMLHookRegistry.mangle(rendered_presentation = None, root_node = node)
-		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">“- -- ---“</slide>")
+		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">[- -- ---]</slide>")
+
+	def test_comment_replace(self):
+		node = self._parse("foo <!-- comment -->bar")
+		XMLHookRegistry.mangle(rendered_presentation = None, root_node = node)
+		self.assertEqual(node.toxml(), "<slide xmlns:s=\"https://github.com/johndoe31415/pyradium\">foo bar</slide>")

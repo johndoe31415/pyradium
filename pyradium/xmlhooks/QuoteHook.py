@@ -31,6 +31,7 @@ class QuoteHook(BaseHook):
 			"fr":	"«»",
 			"de":	"„“",
 			"sgl":	"‘’",
+			"bkt": "[]",
 		}.get(node.getAttribute("type"), "“”")
 		replacement_nodes = [ node.ownerDocument.createTextNode(style[0]) ] + node.childNodes + [ node.ownerDocument.createTextNode(style[1]) ]
 		return ReplacementFragment(replacement = replacement_nodes)

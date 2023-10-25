@@ -101,7 +101,8 @@ class XMLTools():
 				continue_descent = False
 
 		if continue_descent:
-			for child in node.childNodes:
+			print("DESCENDING", node.childNodes)
+			for child in list(node.childNodes):
 				cls._walk(child, callback, predicate = predicate, cancel_descent_predicate = cancel_descent_predicate)
 
 	@classmethod
