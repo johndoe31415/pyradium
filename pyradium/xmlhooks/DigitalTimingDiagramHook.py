@@ -40,4 +40,4 @@ class DigitalTimingDiagramHook(BaseHook):
 		replacement_node = node.ownerDocument.createElement("s:img")
 		replacement_node.setAttribute("value", result.data["svg"])
 		replacement_node.setAttribute("filetype", "svg")
-		return ReplacementFragment(replacement = replacement_node, continue_descent = False)
+		return ReplacementFragment(replacement = replacement_node)
