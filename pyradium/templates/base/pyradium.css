@@ -5,9 +5,12 @@ body {
 div.size_container {
 	width: ${renderer.rendering_params.geometry_x}px;
 	height: ${renderer.rendering_params.geometry_y}px;
-	border: 1px solid #aaa;
 	margin-bottom: 10px;
 	overflow: hidden;
+}
+
+div.size_container:not(.fullscreen){
+	border: 1px solid #aaa;
 }
 
 a.slideanchor {
