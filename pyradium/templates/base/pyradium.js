@@ -266,11 +266,11 @@ export class Presentation {
 		if (!this._should_capture_event(event)) {
 			return;
 		}
-		if (event.key == "PageDown" || event.key == "ArrowRight") {
+		if ((event.key == "PageDown") || (event.key == "ArrowDown") || (event.key == "ArrowRight")) {
 			this._log("Keydown: 'PageDown' -> next slide");
 			this.goto_next_slide();
 			event.preventDefault();
-		} else if (event.key == "PageUp" || event.key == "ArrowLeft") {
+		} else if ((event.key == "PageUp") || (event.key == "ArrowUp") || (event.key == "ArrowLeft")) {
 			this._log("Keydown: 'PageUp' -> previous slide");
 			this.goto_prev_slide();
 			event.preventDefault();
