@@ -61,26 +61,26 @@
 			</script>
 %endif
 %if rendered_presentation.has_feature("pause"):
-			<div class="modal type-info fixed" id="pyradium_pause_popup">
-				<div class="content">
-					<span class="close">×</span>
-					<div class="msg">
-						<div class="pause_duration">
-							Pause for <span id="pause_duration"></span> minutes until <span id="pause_until"></span>.
-						</div>
-						<div class="pause_remaining">
-							Remaining: <span id="pause_remaining"></span>
-						</div>
+			<dialog id="pyradium_pause_popup">
+				<div class="header">
+					<span class="placeholder"></span>
+					<span class="icon">☕</span>
+					<button autofocus class="close">×</button>
+				</div>
+
+				<div class="body">
+					<div class="pause_duration">
+						Pause for <span id="pause_duration"></span> minutes until <span id="pause_until"></span>.
+					</div>
+					<div class="pause_remaining">
+						Remaining: <span id="pause_remaining"></span>
 					</div>
 				</div>
-			</div>
+			</dialog>
 
 			<script type="module">
-				import {ModalWindow} from "${preuri_ds}template/base/pyradium_modal.js";
-				const modal_div = document.querySelector("#pyradium_pause_popup");
-				modal_div.pyradium_modal = new ModalWindow(modal_div, {
-					close_on_popup_click:	false,
-				});
+				const modal = document.querySelector("#pyradium_pause_popup");
+				modal.querySelector(".close").addEventListener("click", () => modal.close());
 			</script>
 %endif
 

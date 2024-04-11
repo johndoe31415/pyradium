@@ -436,8 +436,9 @@ export class Presentation {
 	}
 
 	pause() {
-		const modal_div = this._ui_elements.pause_modal;
-		if (modal_div.active) {
+		/** @type {HTMLDialogElement} */
+		const modal = this._ui_elements.pause_modal;
+		if (modal.open) {
 			return;
 		}
 
@@ -449,22 +450,19 @@ export class Presentation {
 		let pause_parameters = {
 			"pause_duration_secs":		pause_duration_mins * 60,
 			"pause_start_secs":			new Date().getTime() / 1000,
-			"pause_remaining_span":		modal_div.querySelector("#pause_remaining"),
+			"pause_remaining_span":		modal.querySelector("#pause_remaining"),
 			"expired":					false,
 		}
 
-		const modal = modal_div.pyradium_modal;
-		modal_div.querySelector("#pause_duration").innerText = pause_duration_mins;
+		modal.querySelector("#pause_duration").innerText = pause_duration_mins;
 
 		const pause_until = new Date((pause_parameters.pause_start_secs + pause_parameters.pause_duration_secs) * 1000);
-		modal_div.querySelector("#pause_until").innerText = TimeTools.format_datetime(pause_until).hms
+		modal.querySelector("#pause_until").innerText = TimeTools.format_datetime(pause_until).hms
 
 		this._pause_tick(pause_parameters);
 		const interval_id = setInterval(() => this._pause_tick(pause_parameters), 1000);
 
-		modal.on_close = () => {
-			clearInterval(interval_id);
-		};
-		modal.show();
+		modal.addEventListener("close", () => clearInterval(interval_id));
+		modal.showModal();
 	}
 }

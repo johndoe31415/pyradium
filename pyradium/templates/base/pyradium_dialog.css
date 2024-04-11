@@ -1,0 +1,46 @@
+dialog {
+	border: none;
+	border-radius: 7px;
+	padding: 20px;
+	border: 7px solid #aaa;
+}
+
+::backdrop {
+	background: rgba(0, 0, 0, 0.45);
+}
+
+dialog .header {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	flex-flow: row nowrap;
+}
+
+dialog .close {
+	font-size: 32px;
+	padding: 0;
+	margin: 0;
+	border: none;
+	background-color: inherit;
+	font-weight: bold;
+	width: 48px;
+	height: 48px;
+	opacity: 0.5;
+}
+
+dialog .close:hover {
+	opacity: 1;
+}
+
+dialog .placeholder {
+	width: 48px;
+}
+
+dialog .icon {
+	font-size: 192px;
+	padding: 15px;
+}
+
+dialog .body {
+	padding: 45px;
+}
