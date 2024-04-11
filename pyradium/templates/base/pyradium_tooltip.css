@@ -1,6 +1,6 @@
 
 .tooltip {
-    position: relative;
+	position: relative;
 	background-image: linear-gradient(to right, #97abbc 50%, transparent 50%);
 	background-position: 0 1.04em;
 	background-repeat: repeat-x;
@@ -14,25 +14,25 @@ a.tooltip {
 .tooltip .text {
 	text-indent: 0px;
 	text-align: center;
-    min-width: 300px;
-    top: -15px;
-    left: 50%;
-    transform: translate(-50%, -100%);
-    padding: 10px;
-    color: #222222;
+	min-width: 300px;
+	top: -15px;
+	left: 50%;
+	transform: translate(-50%, -100%);
+	padding: 10px;
+	color: #222222;
 	background-color: #fce5cd;
 	font-size: 20pt;
-    border-radius: 8px;
-    position: absolute;
-    box-sizing: border-box;
-    border: 1px solid #97abbc;
+	border-radius: 8px;
+	position: absolute;
+	box-sizing: border-box;
+	border: 1px solid #97abbc;
 	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
 	display: none;
 	user-select: none;
 }
 
 .tooltip:hover .text {
-    display: block;
+	display: block;
 }
 
 /* In presentation mode, we don't want the underlines */
