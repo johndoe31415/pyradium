@@ -212,8 +212,9 @@ export class Presentation {
 	_update(scroll_to_slide) {
 		if (scroll_to_slide) {
 			this.current_slide.scrollIntoView();
-			if (this.current_slide.getBoundingClientRect().top < 1)
+			if (this.current_slide.getBoundingClientRect().top < 1) {
 				window.scrollBy(0, -100);
+			}
 		}
 		const slide_no = this.current_slide.getAttribute("slide_no") | 0;
 		const sub_slide_index = this.current_slide.getAttribute("sub_slide_index") | 0;
