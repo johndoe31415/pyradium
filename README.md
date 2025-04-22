@@ -45,12 +45,6 @@ continuous building, pyradium relies on the inotifytools:
 If you want to use spellchecking of your presentations, you need to install
 [LanguageTool](https://languagetool.org/download/) as well.
 
-## History
-pyradium has been previously known as pybeamer (in reference to LaTeX-beamer),
-but has been renamed because a different project under that name exists on
-PyPi. It started out as pybeamer in 2015 as a pet project of mine that I've
-never published, but it has since been completely rewritten.
-
 ## Example
 You can view an example of a presentation [here](https://johndoe31415.github.io/pyradium-docs/).
 The source for that presentation can be found [here](https://github.com/johndoe31415/pyradium/tree/master/examples).
@@ -64,12 +58,17 @@ HTML.
 
 ## Display
 You can view the presentation in a browser. Hitting "g" lets you goto a
-specific slide while pressing "f" starts the full-screen view. Note that the
-full-screen view uses [the CSS "zoom" property](https://caniuse.com/?search=zoom)
-which is supported by pretty much every browser except for Firefox. On Firefox,
-you can still full-screen a presentation but have to zoom manually in. There exists
-a more than a decade old Firefox [issue for this](https://bugzilla.mozilla.org/show_bug.cgi?id=390936)
-but it appears that this is deliberately not implemented.
+specific slide while pressing "f" starts the full-screen view.
+
+## Browser
+pyradium presentations work in Chromium and (presumably) Chrome. Firefox is not
+supported. While they did implement support for the critical CSS "zoom"
+property [after only 17 years](https://bugzilla.mozilla.org/show_bug.cgi?id=390936),
+their implementation differs from that of Chromium so substantially
+([Bug details](https://github.com/johndoe31415/pyradium/issues/66)) that it
+does not justify me spending time on fixing this issue. Feel free to spend your
+own time on fixing it and send a PR if you disagree with me and value Firefox
+support.
 
 ## Third-Party Components
 There are three external components that pyradium uses:
