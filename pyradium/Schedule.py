@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2021 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -184,6 +184,8 @@ class PresentationSchedule():
 						slide_time_secs = time_spec.duration_secs
 					elif time_spec.spec_type == TimeSpecificationType.Relative:
 						slide_time_secs = time_spec.relvalue / rel_sum_pts * active_rel_time_secs
+					else:
+						raise NotImplementedError(f"Unexpected time specification: {time_spec.spec_type}")
 				else:
 					slide_time_secs = 1 / rel_sum_pts * active_rel_time_secs
 

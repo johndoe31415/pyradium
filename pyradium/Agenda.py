@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2023 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -234,6 +234,8 @@ class Agenda():
 				last_item = unresolved_items[-1]
 				last_item.markers.append(rematch["marker"])
 				continue
+			else:
+				raise IllegalAgendaSyntaxException("Regular expression matched, but none of the implemented tokens was caught in the if-cascade. Implementation error.")
 
 			unresolved_item = _UnresolvedAgendaItem(spec_type = timespec[0], value = timespec[1], text = rematch["text"], markers = [ ])
 			unresolved_items.append(unresolved_item)
