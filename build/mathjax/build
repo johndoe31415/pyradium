@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+docker build -t pyradium-mathjax .
+CID=$(docker create pyradium-mathjax)
+docker cp ${CID}:/mathjax/output - | tar xv
+docker rm "${CID}"

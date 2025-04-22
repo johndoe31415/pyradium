@@ -71,7 +71,7 @@ own time on fixing it and send a PR if you disagree with me and value Firefox
 support.
 
 ## Third-Party Components
-There are three external components that pyradium uses:
+There are several external components that pyradium uses:
 
   * The default template "Antonio" is adapted from
     [Jimena Catalina at SlideCarnival](https://www.slidescarnival.com/antonio-free-presentation-template/84).
@@ -81,6 +81,7 @@ There are three external components that pyradium uses:
   * The font Latin Modern Mono is included, from [GUST](http://www.gust.org.pl/projects/e-foundry/latin-modern).
     It is licensed under the GUST font license.
   * The pause end ringtone is taken from Jason Steele's [FilmCow Royalty Free Sound Effects Library](https://filmcow.itch.io/filmcow-sfx).
+  * [MathJAX](https://www.mathjax.org/) is licensed under the [Apache License Version 2.0, January 2004](https://github.com/mathjax/MathJax/blob/master/LICENSE)
 
 All third party licenses can be found in the [licenses/ subdirectory](https://github.com/johndoe31415/pyradium/tree/master/licenses)
 subdirectory. Additionally, detailed attribution information is also provided
