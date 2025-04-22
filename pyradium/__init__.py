@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2023 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -21,4 +21,4 @@
 
 import pyradium.Logging
 
-VERSION = "0.0.17rc0"
+VERSION = "0.0.17"
