@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2023 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -69,7 +69,7 @@ class Deployment():
 		try:
 			subprocess.check_call(cmd)
 		except subprocess.CalledProcessError as e:
-			raise DeploymentException("Deployment {configuration_name} failed to successfully execute rsync: {CmdlineEscape().cmdline(cmd)}") from e
+			raise DeploymentException(f"Deployment {configuration_name} failed to successfully execute rsync: {CmdlineEscape().cmdline(cmd)}") from e
 		_log.info("Successully deployed deployment configuration \"%s\".", configuration_name)
 
 	def deploy_all(self):
