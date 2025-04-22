@@ -17,7 +17,7 @@
 
 	a {
 		color: inherit;
-		background-image: none;
+		background-image: linear-gradient(#aaa, #aaa);
 	}
 
 	.tooltip {
