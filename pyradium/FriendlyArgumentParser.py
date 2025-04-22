@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	FriendlyArgumentParser - Argument parser with default help pages
-#	Copyright (C) 2011-2022 Johannes Bauer
+#	Copyright (C) 2011-2024 Johannes Bauer
 #
 #	This file is part of pycommon.
 #
@@ -48,8 +48,6 @@ class FriendlyArgumentParser(argparse.ArgumentParser):
 def baseint(value, default_base = 10):
 	if value.lower().startswith("0x"):
 		return int(value, 16)
-	elif value.lower().startswith("0b"):
-		return int(value, 2)
 	elif value.lower().startswith("0o"):
 		return int(value, 8)
 	elif value.lower().startswith("0b"):
@@ -75,7 +73,7 @@ def baseint_unit(value, default_base = 10):
 
 if __name__ == "__main__":
 	parser = FriendlyArgumentParser(description = "Simple example application.")
-	parser.add_argument("-d", "--dbfile", metavar = "filename", type = str, default = "mydb.sqlite", help = "Specifies database file to use. Defaults to %(default)s.")
+	parser.add_argument("-d", "--dbfile", metavar = "filename", default = "mydb.sqlite", help = "Specifies database file to use. Defaults to %(default)s.")
 	parser.add_argument("-f", "--force", action = "store_true", help = "Do not ask for confirmation")
 	parser.add_argument("-x", metavar = "hexint", type = baseint, default = "0x100", help = "Defaults to %(default)s.")
 	parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increases verbosity. Can be specified multiple times to increase.")
