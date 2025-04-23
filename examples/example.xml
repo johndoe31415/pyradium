@@ -172,6 +172,20 @@
 		<s:tex>\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
 	</slide>
 
+	<slide>
+		<s:var name="heading" value="Indented formula"/>
+		<s:tex long="1" indent="0">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
+		<s:tex long="1" indent="1">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
+		<s:tex long="1" indent="2">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
+	</slide>
+
+	<slide>
+		<s:var name="heading" value="Sized formula"/>
+		<s:tex long="1" scale="0.75">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
+		<s:tex long="1">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
+		<s:tex long="1" scale="1.25">\sum_{i = 0}^{10} \frac{i^2}{\pi}</s:tex>
+	</slide>
+
 	<subsection>Code Highlighting</subsection>
 	<slide>
 		<s:var name="heading" value="Some Python Code"/>

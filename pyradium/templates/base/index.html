@@ -17,14 +17,45 @@
 					inlineMath: [ [ "Q4mta4Ck5NLH", "Zf1qH71g5gJY" ] ],
 					displayMath: [ [ "QBEntEozXWio", "kIt7msRdzcHK" ] ],
 					processEscapes: false,
-				}
+				},
+				svg: {
+					displayAlign: "left",
+				},
+				options: {
+					enableMenu: false,
+					ignoreHtmlClass: "mathjax-disable",
+					processHtmlClass: "mathjax-enable",
+					enableEnrichment: false,
+					enableExplorer: false,
+					a11y: {
+						speech: false,
+						braille: false,
+						subtitles: false,
+						viewBraille: false,
+					},
+					menuOptions: {
+						settings: {
+							assistiveMml: false,
+							collapsible: false,
+							explorer: false,
+						},
+					},
+				},
+				startup: {
+					ready() {
+						/* Remove CSS margin around long formulae */
+						const styles = MathJax._.output.svg.Wrappers.math.SVGmath.styles;
+						styles['mjx-container[jax="SVG"][justify="left"]'].margin = "0";
+						MathJax.startup.defaultReady();
+					},
+				},
 			};
 		</script>
 		<script src="${preuri}template/mathjax/mathjax.js" async></script>
 %endif
 	</head>
 
-	<body>
+	<body class="mathjax-disable">
 		<script type="module">
 			globalThis.pyradium = {
 				"format":		1,

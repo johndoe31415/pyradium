@@ -19,10 +19,25 @@
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
+import dataclasses
 from pysvgedit import SVGStyle
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
 from pyradium.Enums import PresentationFeature
+
+@dataclasses.dataclass
+class TexFormula():
+	formula: str
+	long: bool
+	scale: float | None = None
+	indent: float | None = None
+
+	@property
+	def to_dict(self):
+		return {
+			"formula": self.formula,
+			"long": self.long,
+		}
 
 @XMLHookRegistry.register_hook
 class TexHook(BaseHook):
@@ -30,66 +45,72 @@ class TexHook(BaseHook):
 
 	@classmethod
 	def handle(cls, rendered_presentation, node):
-		properties = {
+		formula = {
 			"formula":	XMLTools.inner_text(node),
 			"long":		XMLTools.get_bool_attr(node, "long"),
 		}
 		if node.hasAttribute("scale"):
-			user_scale = float(node.getAttribute("scale"))
-		else:
-			user_scale = 1
+			formula["scale"] = float(node.getAttribute("scale"))
+		if node.hasAttribute("indent"):
+			formula["indent"] = float(node.getAttribute("indent"))
+		formula = TexFormula(**formula)
 
-		if PresentationFeature.MathJax in rendered_presentation.renderer.rendering_params.presentation_features:
-			return cls._handle_vector_formula(rendered_presentation, node, properties, user_scale)
+		render_as_vector = PresentationFeature.MathJax in rendered_presentation.renderer.rendering_params.presentation_features
+		if render_as_vector:
+			inner_node = cls._handle_vector_formula(formula, node)
 		else:
-			return cls._handle_rasterized_formula(rendered_presentation, node, properties, user_scale)
+			inner_node = cls._handle_rasterized_formula(formula, node, rendered_presentation)
 
-	@classmethod
-	def _handle_vector_formula(cls, rendered_presentation, node, properties: dict, user_scale: float):
-		(begin, end) = {
-			True:		("QBEntEozXWio", "kIt7msRdzcHK"),
-			False:		("Q4mta4Ck5NLH", "Zf1qH71g5gJY"),
-		}[properties["long"]]
-		replacement_node = node.ownerDocument.createTextNode(begin + properties["formula"] + end)
+		# If we need indentation or are a long formula, wrap in a div
+		if formula.long or (formula.indent is not None):
+			replacement_node = node.ownerDocument.createElement("div")
+			if formula.long:
+				replacement_node.setAttribute("class", "texformula")
+			if formula.indent is not None:
+				indent_px = round(formula.indent * 50)
+				replacement_node.setAttribute("style", f"margin-left: {indent_px}px")
+			replacement_node.appendChild(inner_node)
+		else:
+			replacement_node = inner_node
 		return ReplacementFragment(replacement = replacement_node)
 
 	@classmethod
-	def _handle_rasterized_formula(cls, rendered_presentation, node, properties: dict, user_scale: float):
+	def _handle_vector_formula(cls, formula, node):
+		(begin, end) = {
+			True:		("QBEntEozXWio", "kIt7msRdzcHK"),
+			False:		("Q4mta4Ck5NLH", "Zf1qH71g5gJY"),
+		}[formula.long]
+		text_node = node.ownerDocument.createTextNode(begin + formula.formula + end)
+
+		span = node.ownerDocument.createElement("span")
+		span.appendChild(text_node)
+		span.setAttribute("class", "mathjax-enable")
+
+		if formula.scale is not None:
+			span.setAttribute("style", f"font-size: {formula.scale * 100:.1f}%")
+
+		return span
+
+	@classmethod
+	def _handle_rasterized_formula(cls, formula, node, rendered_presentation):
 		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
-		rendered_formula = tex_renderer.render(properties)
+		rendered_formula = tex_renderer.render(formula.to_dict)
 		local_filename = "imgs/latex/%s.png" % (rendered_formula.keyhash)
 		uri = "%simgs/latex/%s.png" % (rendered_presentation.renderer.rendering_params.resource_uri, rendered_formula.keyhash)
 
-		scale_factor = 0.625 * user_scale
+		scale_factor = 0.625 * (formula.scale or 1)
 		width_px = round(rendered_formula.data["info"]["width"] * scale_factor)
 		baseline_px = round(rendered_formula.data["info"]["baseline"] * scale_factor)
-		#print(properties["formula"], rendered_formula.data["info"], width_px)
-
-		# For now, always wrap in div for long formulae. Could easily add an
-		# option to override this if it's useful.
-		wrap_in_div = properties["long"]
 
 		img_node = node.ownerDocument.createElement("img")
 		img_node.setAttribute("src", uri)
-		img_node.setAttribute("alt", properties["formula"])
+		img_node.setAttribute("alt", formula.formula)
 
 		img_style = SVGStyle.from_node(img_node)
 		img_style["width"] = f"{width_px}px"
 		img_style["margin-top"] = "5px"
-		if not properties["long"]:
+		if not formula.long:
 			img_style["margin-bottom"] = f"{-baseline_px + 1}px"
-		if node.hasAttribute("indent"):
-			indent = float(node.getAttribute("indent"))
-			indent_px = round(indent * 50)
-			img_style["margin-left"] = f"{indent_px}px"
 		img_style.sync_node_style()
-
-		if not wrap_in_div:
-			replacement_node = img_node
-		else:
-			replacement_node = node.ownerDocument.createElement("div")
-			replacement_node.setAttribute("class", "texformula")
-			replacement_node.appendChild(img_node)
-
 		rendered_presentation.add_file(local_filename, rendered_formula.data["png_data"])
-		return ReplacementFragment(replacement = replacement_node)
+		return img_node
