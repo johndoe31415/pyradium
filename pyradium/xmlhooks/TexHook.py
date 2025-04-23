@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2023 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -22,6 +22,7 @@
 from pysvgedit import SVGStyle
 from pyradium.xmlhooks.XMLHookRegistry import BaseHook, XMLHookRegistry, ReplacementFragment
 from pyradium.Tools import XMLTools
+from pyradium.Enums import PresentationFeature
 
 @XMLHookRegistry.register_hook
 class TexHook(BaseHook):
@@ -37,6 +38,23 @@ class TexHook(BaseHook):
 			user_scale = float(node.getAttribute("scale"))
 		else:
 			user_scale = 1
+
+		if PresentationFeature.MathJax in rendered_presentation.renderer.rendering_params.presentation_features:
+			return cls._handle_vector_formula(rendered_presentation, node, properties, user_scale)
+		else:
+			return cls._handle_rasterized_formula(rendered_presentation, node, properties, user_scale)
+
+	@classmethod
+	def _handle_vector_formula(cls, rendered_presentation, node, properties: dict, user_scale: float):
+		(begin, end) = {
+			True:		("QBEntEozXWio", "kIt7msRdzcHK"),
+			False:		("Q4mta4Ck5NLH", "Zf1qH71g5gJY"),
+		}[properties["long"]]
+		replacement_node = node.ownerDocument.createTextNode(begin + properties["formula"] + end)
+		return ReplacementFragment(replacement = replacement_node)
+
+	@classmethod
+	def _handle_rasterized_formula(cls, rendered_presentation, node, properties: dict, user_scale: float):
 		tex_renderer = rendered_presentation.renderer.get_custom_renderer("latex")
 		rendered_formula = tex_renderer.render(properties)
 		local_filename = "imgs/latex/%s.png" % (rendered_formula.keyhash)

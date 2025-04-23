@@ -1,2 +1,2 @@
 #!/bin/bash
-./pyradium.py render -l -f -I examples/sub examples/example.xml -R rendered/foobar:foobar/ rendered -vvv --trustworthy-source --allow-missing-svg-fonts
+./pyradium.py render -l -f -I examples/sub examples/example.xml -R rendered/foobar:foobar/ -e mathjax rendered -vvv --trustworthy-source --allow-missing-svg-fonts

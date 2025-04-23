@@ -32,6 +32,13 @@
 			"uri": "https://github.com/googlefonts/noto-emoji",
 			"license": "Apache license, version 2.0",
 			"license_uri": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+		},
+		{
+			"author": "The MathJax Team",
+			"contribution": "MathJax",
+			"uri": "https://www.mathjax.org",
+			"license": "Apache license, version 2.0",
+			"license_uri": "http://www.apache.org/licenses/LICENSE-2.0.txt"
 		}
 	],
 	"parameters": {
@@ -160,6 +167,11 @@
 			"pygments": {
 				"css": [
 					"base/pygments.css"
+				]
+			},
+			"mathjax": {
+				"static": [
+					"mathjax/mathjax.js"
 				]
 			}
 		}

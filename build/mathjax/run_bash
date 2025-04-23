@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+docker run -it --entrypoint /bin/bash pyradium-mathjax 

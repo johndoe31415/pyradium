@@ -1,6 +1,9 @@
 #!/bin/bash -e
 
 docker build -t pyradium-mathjax .
+rm -fr es5
 CID=$(docker create pyradium-mathjax)
-docker cp ${CID}:/mathjax/output - | tar xv
+docker cp ${CID}:/mathjax/es5 - | tar xv
 docker rm "${CID}"
+
+cp es5/tex-svg-full.js mathjax.js

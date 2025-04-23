@@ -10,6 +10,18 @@
 		%for css_filename in rendered_presentation.css:
 		<link rel="stylesheet" href="${preuri}${css_filename}" />
 		%endfor
+%if rendered_presentation.has_feature("mathjax"):
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [ [ "Q4mta4Ck5NLH", "Zf1qH71g5gJY" ] ],
+					displayMath: [ [ "QBEntEozXWio", "kIt7msRdzcHK" ] ],
+					processEscapes: false,
+				}
+			};
+		</script>
+		<script src="${preuri}template/mathjax/mathjax.js" async></script>
+%endif
 	</head>
 
 	<body>
