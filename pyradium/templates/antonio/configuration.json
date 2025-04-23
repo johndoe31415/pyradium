@@ -59,6 +59,7 @@
 		],
 		"static": [
 			"base/pyradium.js",
+			"base/pyradium_tools.js",
 			"base/cursor_circle.svg",
 			"base/cursor_arrow.svg",
 			"antonio/bar.svg",
@@ -145,7 +146,6 @@
 				"static": [
 					"base/timer.html",
 					"base/pyradium_timer.js",
-					"base/pyradium_tools.js",
 					"base/media_stop.svg",
 					"base/media_pause.svg",
 					"base/media_play.svg",
