@@ -305,7 +305,7 @@ class ImageTools():
 		# accept returncode 0 and 1 and hope that if we can parse valid JSON,
 		# it'll all be good.
 		cmd = [ "convert", filename, "json:-" ]
-		proc = subprocess.run(cmd, capture_output = True)
+		proc = subprocess.run(cmd, capture_output = True, check = False)
 		if proc.returncode not in [ 0, 1 ]:
 			raise FailedToExecuteSubprocessException(f"Process yielded unsuccessful return code {proc.returncode}: {CmdlineEscape().cmdline(cmd)}")
 		image_info = json.loads(proc.stdout)[0]
