@@ -86,8 +86,11 @@ class TexHook(BaseHook):
 		span.appendChild(text_node)
 		span.setAttribute("class", "mathjax-enable")
 
-		if formula.scale is not None:
-			span.setAttribute("style", f"font-size: {formula.scale * 100:.1f}%")
+		scale = 1 if formula.scale is None else formula.scale
+		if formula.long:
+			scale *= 0.85
+		if scale != 1:
+			span.setAttribute("style", f"font-size: {scale * 100:.1f}%")
 
 		return span
 
