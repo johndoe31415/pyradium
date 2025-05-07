@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2023 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -26,7 +26,8 @@ import hashlib
 import tempfile
 import contextlib
 import subprocess
-from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidEvalExpressionException
+from pyradium.CmdlineEscape import CmdlineEscape
+from pyradium.Exceptions import InvalidBooleanValueException, InvalidValueNodeException, InvalidEvalExpressionException, FailedToExecuteSubprocessException
 
 class XMLTools():
 	class CancelDescentException(Exception): pass
@@ -296,17 +297,27 @@ class JSONTools():
 
 class ImageTools():
 	@classmethod
-	def get_image_info(cls, filename):
-		image_info = json.loads(subprocess.check_output([ "convert", filename, "json:-" ]))[0]
+	def get_image_info(cls, filename: str):
+		# For some reason, ImageMagick 6.9.13-12 Q16 x86_64 18420 produces a
+		# warning message for this command ("Warning: Option --export-png= is
+		# deprecated", then "Cannot parse double value “'96'” for
+		# --export-dpi"), then produces a returncode of 1. We therefore simply
+		# accept returncode 0 and 1 and hope that if we can parse valid JSON,
+		# it'll all be good.
+		cmd = [ "convert", filename, "json:-" ]
+		proc = subprocess.run(cmd, capture_output = True)
+		if proc.returncode not in [ 0, 1 ]:
+			raise FailedToExecuteSubprocessException(f"Process yielded unsuccessful return code {proc.returncode}: {CmdlineEscape().cmdline(cmd)}")
+		image_info = json.loads(proc.stdout)[0]
 		return image_info
 
 	@classmethod
-	def svg_canvas_size_to_object(cls, filename):
+	def svg_canvas_size_to_object(cls, filename: str):
 		cmd = [ "inkscape", f"--actions=select-all; fit-canvas-to-selection; export-filename:{filename}; export-do", filename ]
 		subprocess.check_call(cmd)
 
 	@classmethod
-	def svg_data_canvas_size_to_object(cls, svg_data):
+	def svg_data_canvas_size_to_object(cls, svg_data: bytes):
 		with tempfile.NamedTemporaryFile(prefix = "pyradium_svg_", suffix = ".svg") as f:
 			f.write(svg_data)
 			f.flush()
