@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+
+async function get_stdin_json() {
+	const chunks = [];
+	for await (const chunk of process.stdin) {
+		chunks.push(chunk);
+	}
+
+	try {
+		return JSON.parse(Buffer.concat(chunks).toString());
+	} catch (err) {
+		throw new Error("Invalid JSON input given on stdin");
+	}
+}
+
+get_stdin_json().then((json_data) => {
+	const {mathjax} = require("mathjax-full/js/mathjax.js");
+	const {TeX} = require("mathjax-full/js/input/tex.js");
+	const {SVG} = require("mathjax-full/js/output/svg.js");
+	const {liteAdaptor} = require("mathjax-full/js/adaptors/liteAdaptor.js");
+	const {RegisterHTMLHandler} = require("mathjax-full/js/handlers/html.js");
+	const {AssistiveMmlHandler} = require("mathjax-full/js/a11y/assistive-mml.js");
+
+	const {AllPackages} = require("mathjax-full/js/input/tex/AllPackages.js");
+
+	const adaptor = liteAdaptor();
+	const handler = RegisterHTMLHandler(adaptor);
+	const pkgs = AllPackages.sort().join(', ').split(/\s*,\s*/);
+	console.log(pkgs);
+	const tex = new TeX({packages: pkgs });
+	const svg = new SVG({fontCache: "local" });
+
+	function render_formula(formula_data) {
+		const html = mathjax.document("", {InputJax: tex, OutputJax: svg});
+
+		const node = html.convert(formula_data.formula, {
+			display: formula_data.long || false,
+			em: formula_data.em || 16,
+			ex: formula_data.ex || 8,
+			containerWidth: formula_data.container_width || 80 * 16,
+		});
+
+		const rendered_formula = {
+			"html": adaptor.outerHTML(node),
+		};
+		if (formula_data.include_css) {
+			rendered_formula.css = adaptor.textContent(svg.styleSheet(html));
+		}
+		if ("id" in formula_data) {
+			rendered_formula.id = formula_data.id;
+		}
+		return rendered_formula;
+	}
+
+	let response = [ ];
+	for (const input_data of json_data) {
+		response.push(render_formula(input_data));
+	}
+
+	return response;
+});

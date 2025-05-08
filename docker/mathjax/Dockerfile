@@ -21,3 +21,13 @@ RUN git checkout 844ad7513005fa096a07d2468bf59c7f6a6c3a50
 RUN npm install
 RUN npm run --silent compile
 RUN npm run --silent make-components
+RUN npm link
+
+WORKDIR /
+RUN git clone https://github.com/mathjax/MathJax-demos-node.git mathjax-demos
+WORKDIR /mathjax-demos
+RUN npm install
+
+COPY mjrender /mjrender
+WORKDIR /mjrender
+RUN npm install
