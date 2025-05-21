@@ -1,5 +1,5 @@
 #	pyradium - HTML presentation/slide show generator
-#	Copyright (C) 2015-2023 Johannes Bauer
+#	Copyright (C) 2015-2025 Johannes Bauer
 #
 #	This file is part of pyradium.
 #
@@ -92,6 +92,12 @@ class ImageRenderer(BaseRenderer):
 			img_data = output_file.read()
 		return (extension, img_data)
 
+	def _render_copied_bitmap(self, content: bytes, mimetype: str):
+		extension = {
+			"image/gif":	"gif",
+		}[mimetype]
+		return (extension, content)
+
 	def rendering_key(self, property_dict):
 		if "src" in property_dict:
 			# Specification as filename
@@ -127,10 +133,14 @@ class ImageRenderer(BaseRenderer):
 
 		if mimetype == "image/svg+xml":
 			(extension, img_data) = self._render_svg(content, max_dimension, svg_transform = property_dict.get("svg_transform"))
+
 		else:
 			if "svg_transform" in property_dict:
 				raise UsageException(f"SVG transformation requested, but source file does not have SVG mimetype: {mimetype} / {str(property_dict)}")
-			(extension, img_data) = self._render_raster_bitmap(content, mimetype, max_dimension)
+			if mimetype == "image/gif":
+				(extension, img_data) = self._render_copied_bitmap(content, mimetype)
+			else:
+				(extension, img_data) = self._render_raster_bitmap(content, mimetype, max_dimension)
 
 		image = {
 			"extension":	extension,
